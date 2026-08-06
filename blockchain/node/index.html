@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BLOCKCHAIN CLT</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-semibold" href="#"><i class="bi bi-currency-bitcoin me-1"></i>Cryptomonnaie</a>
+    <span id="badgeValid" class="badge bg-light text-dark small d-none d-sm-inline">—</span>
+<div class="ms-auto" id="nav-auth">
+</div>
+  </div>
+</nav>
+
+<div class="container my-4">
+
+  <div id="flash" class="alert alert-info d-none"></div>
+
+  <div class="row g-3">
+    <!-- Colonne gauche -->
+    <div class="col-lg-4">
+      <!-- Compte -->
+      <div class="card p-3">
+        <h5>Compte</h5>
+        <div id="accountBox">
+          <p class="text-muted mb-2">Veuillez vous connecter ou créer un compte via les boutons en haut de page.</p>
+        </div>
+
+        <details class="mt-2">
+          <summary class="text-muted" style="cursor:pointer">Export / Import (sécurisé)</summary>
+          <div class="mt-2">
+            <div class="mb-2">
+              <input id="exportPwd" type="password" class="form-control form-control-sm mb-1" placeholder="Mot de passe export (AES-GCM)">
+              <button id="btnExportDb" class="btn btn-sm btn-outline-success w-100">Exporter la base de données (chiffrée)</button>
+            </div>
+            <div class="mb-2">
+              <input id="importFile" type="file" class="form-control form-control-sm mb-1" accept=".cgdb,.bin,.json">
+              <input id="importPwd" type="password" class="form-control form-control-sm mb-1" placeholder="Mot de passe import">
+              <button id="btnImportDb" class="btn btn-sm btn-outline-secondary w-100">Importer la base de données (chiffrée)</button>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Pairs -->
+      <div class="card p-3 mt-3">
+        <h5>Pairs</h5>
+        <form class="row g-2 mb-2" onsubmit="return false;">
+          <div class="col-8">
+            <input id="peerInput" class="form-control" placeholder="https://exemple.com/crypto">
+          </div>
+          <div class="col-4 d-grid">
+            <button id="btnPeerAdd" class="btn btn-outline-primary">Ajouter</button>
+          </div>
+        </form>
+
+        <ul id="peerListUI" class="list-group small mb-3"></ul>
+
+        <div class="d-grid gap-2">
+          <button id="btnSyncConsensus" class="btn btn-secondary">
+            <i class="bi bi-arrow-repeat"></i> Synchroniser (consensus)
+          </button>
+          <div class="d-flex gap-2">
+            <button id="btnShowApis" class="btn btn-sm btn-outline-secondary flex-fill">API pool</button>
+            <button id="btnShowChain" class="btn btn-sm btn-outline-secondary flex-fill">API chain</button>
+            <button id="btnShowPeers" class="btn btn-sm btn-outline-secondary flex-fill">API peers</button>
+          </div>
+        </div>
+
+        <hr>
+        <h6 class="mb-2">Signalisation (WebRTC)</h6>
+        <div class="d-grid gap-2">
+          <button id="btnRegister" class="btn btn-sm btn-outline-primary">S’enregistrer</button>
+          <button id="btnList" class="btn btn-sm btn-outline-secondary">Pairs (signal)</button>
+          <select id="peerSelect" class="form-select form-select-sm"></select>
+          <button id="btnConnect" class="btn btn-sm btn-success">Connexion P2P</button>
+        </div>
+        <div id="myId" class="mt-2 small text-muted"></div>
+      </div>
+    </div>
+
+    <!-- Colonne droite -->
+    <div class="col-lg-8">
+      <!-- Transactions -->
+      <div class="card p-3">
+        <h5>Transactions</h5>
+        <p class="text-muted small mb-2" id="txHint">Connectez-vous pour créer et signer des transactions.</p>
+
+        <form class="row g-2 mb-3" onsubmit="return false;">
+          <div class="col-md-6"><input id="txTo" class="form-control" placeholder="Adresse destinataire"></div>
+          <div class="col-md-3"><input id="txAmount" type="number" step="0.00000001" min="0" class="form-control" placeholder="Montant"></div>
+          <div class="col-md-3 d-grid"><button id="btnAddTx" class="btn btn-primary">Ajouter</button></div>
+        </form>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <button id="btnMine" class="btn btn-success"><i class="bi bi-hammer"></i> Miner</button>
+          <button id="btnBroadcast" class="btn btn-outline-secondary"><i class="bi bi-wifi"></i> Diffuser</button>
+        </div>
+
+        <hr>
+        <h6 class="mb-2">Transactions en attente</h6>
+        <ul id="poolList" class="list-group small"></ul>
+      </div>
+
+      <!-- Blockchain -->
+      <div class="card p-3 mt-3">
+        <h5>Blockchain (<span id="blockCount">0</span> blocs)</h5>
+        <div id="chainView"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="mt-4 text-center text-muted small">
+    MVP éducatif — JS (sql.js) + WebRTC — Synchronisation serveur PHP — Signatures (simples) — Proof of Work — Consensus
+  </footer>
+</div>
+
+<!-- === Modales === -->
+<!-- Inscription -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+    <div class="modal-header bg-primary text-white">
+      <h5 class="modal-title"><i class="bi bi-person-plus"></i> Créer un compte</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <input id="regUser" class="form-control mb-2" placeholder="Nom d'utilisateur">
+      <input id="regPass" type="password" class="form-control mb-2" placeholder="Mot de passe">
+      <button id="btnRegisterLocal" class="btn btn-outline-primary w-100">Créer</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- Connexion -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+    <div class="modal-header bg-primary text-white">
+      <h5 class="modal-title"><i class="bi bi-box-arrow-in-right"></i> Connexion</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <input id="loginUser" class="form-control mb-2" placeholder="Nom d'utilisateur">
+      <input id="loginPass" type="password" class="form-control mb-2" placeholder="Mot de passe">
+      <button id="btnLoginLocal" class="btn btn-primary w-100">Connexion locale</button>
+    </div>
+  </div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

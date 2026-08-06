@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Markdown</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Favicon (SVG) -->
+  <link rel="icon" href="../../assets/images/grid.svg" type="image/svg+xml">
+  <!-- Fallback multi-navigateurs -->
+  <link rel="icon" href="../../assets/images/grid.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#0b1220">
+  
+	<!-- Bootstrap & Icons -->
+	<link rel="stylesheet" href="../../assets/css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css">
+	<link rel="stylesheet" href="../../assets/css/dist/bootstrap@5.3.8/bootstrap_min.css">
+	<link rel="stylesheet" href="../../assets/css/app.css">
+
+	<script src="../../assets/js/app.js"></script>
+	<script src="../../assets/js/dist/html2pdf@0.10.1/html2pdf-bundle_min.js"></script>
+	<!-- Markdown + code highlight -->
+	<script src="../../assets/js/dist/marked@16.2.1/marked_umd.js"></script>
+	<link id="hljs-theme" rel="stylesheet" href="../../assets/css/dist/highlight@11.11.1/github-dark_min.css">
+	<script src="../../assets/js/dist/highlight@11.11.1/common_min.js"></script>
+	<style>
+	  /* Mode aperçu seul */
+	  body.view-only nav,
+	  body.view-only .pane.left,
+	  body.view-only #divider,
+	  body.view-only .pane.right .toolbar { display: none !important; }
+
+	  body.view-only .split { --left: 0% !important; }
+	  body.view-only .pane.right { width: 100% !important; }
+	  body.view-only #preview { padding: 1rem; max-width: 900px; margin: 0 auto; }
+	  body.view-only { background: #fff; } /* rendu propre quand on partage */
+
+		/* === View-only readability overrides === */
+		body.view-only { background:#fff; }
+
+		/* Preview container */
+		body.view-only #preview{
+		  color:#111 !important;
+		  background:#fff !important;
+		  font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif !important;
+		  max-width:900px; margin:0 auto; padding:1rem;
+		}
+
+		/* Headings / paragraphs */
+		body.view-only #preview h1, 
+		body.view-only #preview h2, 
+		body.view-only #preview h3, 
+		body.view-only #preview h4, 
+		body.view-only #preview h5 { line-height:1.25; margin:1.25rem 0 .75rem; color:#111; }
+		body.view-only #preview p{ margin:.75rem 0; }
+
+		/* Texte normal en mode aperçu seul */
+		body.view-only #preview, 
+		body.view-only #preview p, 
+		body.view-only #preview li, 
+		body.view-only #preview td, 
+		body.view-only #preview th, 
+		body.view-only #preview span, 
+		body.view-only #preview div {
+		  color:#111 !important;
+		}
+
+		/* Links */
+		body.view-only #preview a{ color:#0d6efd; text-decoration:none; }
+		body.view-only #preview a:hover{ text-decoration:underline; }
+
+		/* Code blocks + inline code */
+		body.view-only #preview pre code,
+		body.view-only #preview code,
+		body.view-only #preview .hljs{
+		  background:#f7f7f7 !important;
+		  color:#111 !important;
+		}
+		body.view-only #preview pre code{
+		  display:block; padding:.75rem; border:1px solid #ddd; border-radius:.25rem; overflow:auto;
+		}
+		body.view-only #preview code{ padding:.1rem .25rem; border-radius:.2rem; }
+
+		/* Blockquotes */
+		body.view-only #preview blockquote{
+		  border-left:3px solid #3b82f6; padding-left:.75rem; color:#333; margin:.75rem 0;
+		}
+
+		/* Tables */
+		body.view-only #preview table{ border-collapse:collapse; width:100%; margin:.75rem 0; }
+		body.view-only #preview th, 
+		body.view-only #preview td{
+		  border:1px solid #ccc; padding:.4rem .5rem; text-align:left; vertical-align:top;
+		}
+
+		/* Images */
+		body.view-only #preview img{ max-width:100%; height:auto; }
+
+		@media print {
+		  body, #preview {
+			font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif !important;
+		  }
+		  #preview pre code, #preview code {
+			font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace !important;
+		  }
+		}
+		/* les marqueurs eux-mêmes: **, __, * et _ */
+		.md-puncGras { color: #e7c46a; opacity: .95; }
+		.md-puncItal { color: #fca5a5; opacity: .95; }
+		.md-puncUnder { color: #f9f9f9; opacity: .95; }
+
+		/* Soft wrap dans l'éditeur ET dans le miroir */
+		.editor-wrap .codearea,
+		.editor-wrap #highlighting{
+		  white-space: pre-wrap;      /* conserve les \n + wrap automatique */
+		  overflow-wrap: break-word;  /* casse les mots très longs */
+		  word-break: break-word;
+		}
+
+		.gutter .cont::after{
+		  content:"⋯";         /* les trois points */
+		  opacity:.55;
+		  font-weight:600;
+		}
+
+		.dropdown-item.disabled { opacity:.5; pointer-events:none; }
+
+		/* Mode noir et blanc forcé pour l'export PDF */
+		#pdf-export-root, 
+		#pdf-export-root * {
+		  background: #fff !important;
+		  color: #000 !important;
+		  border-color: #000 !important;
+		}
+		#pdf-export-root pre,
+		#pdf-export-root code {
+		  background: #fff !important;
+		  color: #000 !important;
+		  border: 1px solid #000 !important;
+		}
+		#pdf-export-root blockquote {
+		  border-left: 3px solid #000 !important;
+		  color: #000 !important;
+		}
+		body.view-only .hint {
+		  display: none !important;
+		}
+		#code.dragover {
+		  outline: 2px dashed #808080;
+		  background-color: rgba(65,65,65,0.1);
+		}
+		/* Largeur personnalisée du volet */
+		@media (min-width: 992px) { /* uniquement desktop (lg et +) */
+		  .offcanvas.offcanvas-wide {
+			width: 600px;  /* ajustez la valeur selon vos besoins */
+		  }
+		}
+		.offcanvas-body {
+		  scrollbar-width: none;       /* Firefox */
+		  -ms-overflow-style: none;    /* IE / Edge */
+		}
+		.offcanvas-body::-webkit-scrollbar {
+		  display: none;               /* Chrome, Safari */
+		}
+	</style>
+</head>
+<body data-app="markdown">
+  <!-- Top bar -->
+  <nav class="navbar navbar-dark py-2">
+    <div class="container-fluid">
+      <span class="navbar-brand d-flex align-items-center gap-2">
+        <a href="../../" class="text-decoration-none d-inline-flex align-items-center gap-2">
+          <i class="bi bi-markdown"></i>
+        </a> 
+        <span data-i18n="mdTitle"></span>
+        <span id="dirtyDot" class="ms-2" style="display:none;color:#ff4507;">●</span>
+      </span>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm border-0 btn-outline-info" data-bs-toggle="modal" data-bs-target="#featuresModal">
+          <i class="bi bi-info-circle me-1"></i>
+        </button>
+		<!-- Desktop -->
+		<button class="btn btn-sm btn-outline-none d-none d-lg-inline"
+				type="button"
+				data-bs-toggle="offcanvas"
+				data-bs-target="#sidePanel"
+				aria-controls="sidePanel">
+		  <i class="bi bi-stickies me-1"></i><span data-i18n="help"></span>
+		</button>
+
+		<!-- Mobile -->
+		<button class="btn btn-sm btn-outline-none d-inline d-lg-none"
+				type="button"
+				data-bs-toggle="offcanvas"
+				data-bs-target="#menuMobile"
+				aria-controls="menuMobile">
+		  <i class="bi bi-stickies me-1"></i><span data-i18n="help"></span>
+		</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="workbench container-fluid px-0">
+    <div class="split">
+      <!-- Left: Editor -->
+      <section class="pane left d-flex flex-column">
+        <div class="toolbar">
+          <div class="spacer"></div>
+          <!-- Menu Fichier -->
+          <div class="btn-group">
+            <button class="btn btn-sm btn-outline-success dropdown-toggle d-inline-flex align-items-center gap-2"
+                    type="button" id="dropdownFiles" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-file-earmark"></i><span class="d-none d-sm-inline" data-i18n="menuFile"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownFiles">
+              <li>
+                <a id="openLocal" class="dropdown-item d-flex align-items-center gap-2" href="#">
+                  <i class="bi bi-folder2-open"></i> <span data-i18n="openFile"></span>
+                </a>
+              </li>
+              <li>
+                <a id="saveLocal" class="dropdown-item disabled d-flex align-items-center gap-2" href="#" aria-disabled="true">
+                  <i class="bi bi-save"></i> <span data-i18n="saveFile"></span>
+                </a>
+              </li>
+              <li>
+                <a id="saveAs" class="dropdown-item d-flex align-items-center gap-2" href="#">
+                  <i class="bi bi-save2"></i> <span data-i18n="saveAsFile"></span>
+                </a>
+              </li>
+              <li>
+                <a id="exportHtml" class="dropdown-item d-flex align-items-center gap-2" href="#">
+                  <i class="bi bi-filetype-html"></i> <span data-i18n="exportHtml"></span>
+                </a>
+              </li>
+              <li>
+                <a id="exportPdf" class="dropdown-item d-flex align-items-center gap-2" href="#">
+                  <i class="bi bi-filetype-pdf"></i> <span data-i18n="exportPdf"></span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Menu Partage -->
+          <div class="btn-group">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-share me-sm-1"></i><span class="d-none d-sm-inline" data-i18n="share"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li>
+                <a class="dropdown-item" href="#" id="share-both">
+                  <i class="bi bi-link-45deg me-2"></i><span data-i18n="link"></span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" id="share-preview">
+                  <i class="bi bi-window me-2"></i><span data-i18n="previewTitle"></span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <button id="reset" class="btn btn-sm btn-warning">
+            <i class="bi bi-arrow-counterclockwise me-1"></i><span class="d-none d-sm-inline" data-i18n="reset"></span>
+          </button>
+          <button id="print" class="btn btn-sm btn-outline-light">
+            <i class="bi bi-printer me-1"></i><span class="d-none d-sm-inline" data-i18n="print"></span>
+          </button>
+        </div>
+
+        <div class="editor-wrap">
+          <div id="gutter" class="gutter"><div>1</div></div>
+          <div class="codecell">
+            <pre id="highlighting" aria-hidden="true"></pre>
+            <textarea id="code" class="codearea" spellcheck="false" aria-label="Éditeur Markdown"></textarea>
+            <div id="ac" class="autocomplete hidden" role="listbox" aria-label="Snippets Markdown"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Divider -->
+      <div id="divider" class="divider" title="Redimensionner"></div>
+
+      <!-- Right: Preview -->
+      <section class="pane right d-flex flex-column">
+        <div class="toolbar">
+          <div class="fw-semibold" data-i18n="preview"></div>
+        </div>
+        <div id="preview" class="preview"></div>
+		<div class="hint">
+		  <span id="cursorPos"></span> <span data-i18n="hintMd"></span>
+		</div>
+      </section>
+    </div>
+  </main>
+
+		  <!-- 2) Offcanvas mobile -->
+		  <div class="offcanvas offcanvas-top bg-secondary text-light" tabindex="-1" id="menuMobile">
+			<div class="offcanvas-header">
+			  <h5 class="offcanvas-title">
+				<i class="bi bi-stickies"></i> <span data-i18n="help"></span>
+			  </h5>
+			  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+			</div>
+			<div class="offcanvas-body p-0">
+			  <iframe id="helpFrameMobile" style="width:100%;height:100%;border:0;"></iframe>
+			</div>
+		  </div>
+
+		  <!-- 3) Offcanvas desktop -->
+		  <div class="offcanvas offcanvas-end offcanvas-wide bg-secondary text-light"
+			   tabindex="-1" id="sidePanel"
+			   data-bs-scroll="true"
+			   data-bs-backdrop="false">
+			<div class="offcanvas-header">
+			  <h5 class="offcanvas-title d-flex align-items-center gap-2">
+				<i class="bi bi-stickies"></i> <span data-i18n="help"></span>
+			  </h5>
+			  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+			</div>
+			<div class="offcanvas-body p-0">
+			  <iframe id="helpFrame" style="width:100%;height:100%;border:0;"></iframe>
+			</div>
+		  </div>
+		  
+  <!-- Modal Caractéristiques -->
+  <div class="modal fade" id="featuresModal" tabindex="-1" aria-labelledby="featuresModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title" id="featuresModalLabel"><i class="bi bi-stars me-2"></i>Caractéristiques de l’atelier Markdown</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+			<ul class="mb-3">
+			  <li><strong>Édition et rendu instantané</strong> de documents Markdown.</li>
+			  <li><strong>Coloration syntaxique</strong> :
+				<ul>
+				  <li><span class="tok blue"># Titre</span>, <span class="tok blue">## Sous-titre</span> (titres en évidence)</li>
+				  <li><strong>gras</strong>, <em>italique</em>, <code>code</code> (mises en forme repérées)</li>
+				  <li>Liens <code>[texte](url)</code>, listes, images et citations formatées</li>
+				  <li>Blocs de code avec <span class="tok com">highlight.js</span></li>
+				</ul>
+			  </li>
+			  <li><strong>Snippets avec autocomplétion</strong> : titres, tableaux, citations, blocs de code, etc.</li>
+			  <li><strong>Aperçu en direct</strong> via <code>marked.js</code> + coloration syntaxique (<code>highlight.js</code>).</li>
+			  <li><strong>Sauvegarde locale</strong> : texte, position du curseur et défilement mémorisés.</li>
+			  <li><strong>Export et impression</strong> :
+				<ul>
+				  <li>Téléchargement en <code>.md</code> ou export en <code>.html</code></li>
+				  <li>Impression directe ou export PDF via l’imprimante</li>
+				</ul>
+			  </li>
+			  <li><strong>Nom de fichier auto-généré</strong> : <code>Prénom_Objet-ObjetTPxx_YYYYMMDD.md</code>.</li>
+			  <li><strong>Partage rapide</strong> : génération d’un lien (URL encodée en Base64).</li>
+			  <li><strong>Interface mobile-friendly</strong> avec redimensionnement dynamique et mode plein écran (<kbd>F11</kbd>).</li>
+			</ul>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+	<!-- Logic -->
+	<script src="../../assets/js/markdown.js"></script>
+
+	<!-- Bootstrap JS -->
+	<script src="../../assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
+	<script src="../../assets/js/dico.js"></script>
+	<script src="../../assets/js/theme.js"></script>
+	<script>
+	  Theme.init({ canWrite:false });  // applique + suit, sans changer localStorage
+		(function() {
+		  const leftPane = document.querySelector(".pane.left");
+		  if (!leftPane) return;
+
+		  // largeur minimale avant bascule en mode compact
+		  const MIN_WIDTH = 540;  // Ajustable
+
+		  function updateCompactMode() {
+			const w = leftPane.getBoundingClientRect().width;
+
+			if (w < MIN_WIDTH) {
+			  document.body.classList.add("compact-toolbar");
+			} else {
+			  document.body.classList.remove("compact-toolbar");
+			}
+		  }
+
+(function () {
+      const app = (document.body.dataset.app || document.title || "atelier").toLowerCase();
+
+      function short2(str) {
+        return (str || "").toString().trim().slice(0,2).toLowerCase();
+      }
+
+      function getCurrentLang() {
+        // 1) URL courante ?lang=xx
+        const p = new URLSearchParams(window.location.search);
+        if (p.get("lang")) return short2(p.get("lang"));
+
+        // 2) <html lang="xx"> ou <html data-lang="xx">
+        const html = document.documentElement;
+        if (html.getAttribute("lang")) return short2(html.getAttribute("lang"));
+        if (html.dataset && html.dataset.lang) return short2(html.dataset.lang);
+
+        // 3) localStorage
+        const keys = ["lang","i18n_lang","locale","language"];
+        for (const k of keys) {
+          const v = localStorage.getItem(k);
+          if (v) return short2(v);
+        }
+
+        // 4) navigateur
+        if (navigator.language) return short2(navigator.language);
+
+        // 5) défaut
+        return "fr";
+      }
+
+      function updateHelp() {
+        const lang = getCurrentLang();
+        const url = `../../assets/aide/?atelier=${encodeURIComponent(app)}&lang=${encodeURIComponent(lang)}`;
+
+        // Desktop
+        const frameDesktop = document.getElementById("helpFrame");
+        if (frameDesktop && frameDesktop.src !== url) frameDesktop.src = url;
+
+        // Mobile
+        const frameMobile = document.getElementById("helpFrameMobile");
+        if (frameMobile && frameMobile.src !== url) frameMobile.src = url;
+      }
+
+      // Mise à jour initiale
+      updateHelp();
+
+      // Recalcul quand on ouvre le volet desktop
+      document.getElementById("sidePanel")?.addEventListener("show.bs.offcanvas", updateHelp);
+
+      // Recalcul quand on ouvre le volet mobile
+      document.getElementById("menuMobile")?.addEventListener("show.bs.offcanvas", updateHelp);
+
+      // Recalcul si <html lang=""> change (switch langue)
+      const obs = new MutationObserver(updateHelp);
+      obs.observe(document.documentElement, { attributes: true, attributeFilter: ["lang", "data-lang"] });
+    })();
+    
+		  // Observateur de redimensionnement
+		  const ro = new ResizeObserver(updateCompactMode);
+		  ro.observe(leftPane);
+
+		  // Appel initial
+		  updateCompactMode();
+		})();
+	</script>
+</body>
+</html>

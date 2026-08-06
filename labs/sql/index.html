@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>SQL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Favicon (SVG) -->
+  <link rel="icon" href="../../assets/images/grid.svg" type="image/svg+xml">
+  <!-- Fallback multi-navigateurs -->
+  <link rel="icon" href="../../assets/images/grid.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#0b1220">
+ 
+ 	<script src="../../assets/js/app.js"></script> 
+	<!-- Bootstrap & Icons -->
+	<link rel="stylesheet" href="../../assets/css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css">
+	<link rel="stylesheet" href="../../assets/css/dist/bootstrap@5.3.8/bootstrap_min.css">
+	<link rel="stylesheet" href="../../assets/css/app.css">
+
+	<style>
+		/* par défaut (thème sombre) */
+		.tbl-name { color:#fca5a5; }
+		/* variante claire */
+		html[data-theme="light"] .tbl-name {
+		  color:#d6336c;  /* rose foncé */
+		}
+		/* Rend l'aperçu scrollable mais sans barres */
+		.pane.right .result {
+		  flex: 1;
+		  overflow-y: auto;
+		  scrollbar-width: none;     /* Firefox */
+		}
+		.pane.right .result::-webkit-scrollbar {
+		  display: none;             /* Chrome, Safari */
+		}
+		/* Mode light sans topbar */
+		.no-topbar {
+		  margin-top: 0 !important;
+		}
+		main.workbench.no-topbar {
+		  height: 100vh !important;
+		}
+		/* Largeur personnalisée du volet */
+		@media (min-width: 992px) { /* uniquement desktop (lg et +) */
+		  .offcanvas.offcanvas-wide {
+			width: 600px;  /* ajustez la valeur selon vos besoins */
+		  }
+		}
+		.offcanvas-body {
+		  scrollbar-width: none;       /* Firefox */
+		  -ms-overflow-style: none;    /* IE / Edge */
+		}
+		.offcanvas-body::-webkit-scrollbar {
+		  display: none;               /* Chrome, Safari */
+		}
+	</style>
+</head>
+<body data-app="sql">
+<nav class="navbar navbar-dark py-2">
+  <div class="container-fluid">
+    <span class="navbar-brand d-flex align-items-center gap-2">
+      <a href="../../" class="text-decoration-none d-inline-flex align-items-center gap-2">
+        <i class="bi bi-database"></i>
+      </a> <span data-i18n="sqlTitle"></span>
+    </span>
+    <span id="dbBadge" class="badge badge-db rounded-pill text-bg-info d-none">
+      <i class="bi bi-hdd"></i> <span id="dbName">—</span>
+    </span>
+    <div class="d-flex gap-2">
+      <button class="btn btn-sm border-0 btn-outline-info" data-bs-toggle="modal" data-bs-target="#featuresModal">
+        <i class="bi bi-info-circle me-1"></i>
+      </button>
+		<button class="btn btn-sm btn-outline-none"
+				type="button" data-bs-toggle="offcanvas" data-bs-target="#sidePanel" aria-controls="sidePanel">
+			<i class="bi bi-stickies me-1"></i><span data-i18n="help"></span>
+		</button>
+    </div>
+  </div>
+</nav>
+
+<main class="workbench container-fluid px-0">
+  <div class="split">
+    <!-- Éditeur (gauche) -->
+    <section class="pane left d-flex flex-column">
+      <div class="toolbar">
+        <!-- ========== MENUS REGROUPÉS ========== -->
+        <div class="btn-group me-2">
+			<button class="btn btn-sm btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+			  <i class="bi bi-filetype-sql me-1"></i>
+			  <span class="d-none d-sm-inline">SQL</span>
+			</button>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a id="openSQL" class="dropdown-item" href="#"><i class="bi bi-folder2-open me-2"></i><span data-i18n="openFile"></span></a></li>
+            <li><a id="saveSQL" class="dropdown-item" href="#"><i class="bi bi-save me-2"></i><span data-i18n="saveFile"></span></a></li>
+            <li><a id="downloadSQL" class="dropdown-item" href="#"><i class="bi bi-download me-2"></i><span data-i18n="downloadFile"></span></a></li>
+          </ul>
+        </div>
+        <!-- ===================================== -->
+
+        <div class="spacer"></div>
+        <button id="reset" class="btn btn-sm btn-warning"><i class="bi bi-arrow-counterclockwise me-1"></i><span class="d-none d-sm-inline" data-i18n="reset"></span></button>
+        <button id="run" class="btn btn-sm btn-primary"><i class="bi bi-play-fill me-1"></i><span class="d-none d-sm-inline" data-i18n="run"></span></button>
+      </div>
+
+      <div class="editor-wrap" id="editorWrap">
+        <pre id="gutter" class="gutter" aria-hidden="true"></pre>
+        <div class="codecell">
+          <pre id="highlighting"></pre>
+          <textarea id="code" class="codearea" spellcheck="false" aria-label="Éditeur SQL (déposez un .sql ici)"></textarea>
+          <div id="ac" class="autocomplete hidden" role="listbox" aria-label="Suggestions"></div>
+        </div>
+      </div>
+		<div class="hint">
+		  <span id="cursorPos"></span>
+		</div>
+    </section>
+
+    <!-- Divider -->
+    <div id="divider" class="divider" title="Redimensionner"></div>
+
+    <!-- Résultats (droite) -->
+    <section class="pane right d-flex flex-column">
+      <div class="toolbar">
+        <div class="btn-group me-2">
+          <button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-hdd-stack me-1"></i><span class="d-none d-sm-inline">SQLite</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a id="openDB" class="dropdown-item" href="#"><i class="bi bi-database-fill-gear me-2"></i><span data-i18n="openDb"></span></a></li>
+            <li><a id="importDB" class="dropdown-item" href="#"><i class="bi bi-file-earmark-arrow-up me-2"></i><span data-i18n="importDb"></span></a></li>
+            <li><a id="saveDB" class="dropdown-item" href="#"><i class="bi bi-save me-2"></i><span data-i18n="saveDb"></span></a></li>
+            <li><a id="saveDBAs" class="dropdown-item" href="#"><i class="bi bi-save2 me-2"></i><span data-i18n="saveDbAs"></span></a></li>
+            <li><a id="exportDB" class="dropdown-item" href="#"><i class="bi bi-file-earmark-arrow-down me-2"></i><span data-i18n="exportDb"></span></a></li>
+            <li class="dropdown-divider"></li>
+            <li class="px-3"><span data-i18n="loadLabel"></span></li>
+            <li><a id="seedSchool" class="dropdown-item" href="#"><i class="bi bi-mortarboard me-2"></i><span data-i18n="seedSchool"></span></a></li>
+            <li><a id="loadGlossary" class="dropdown-item" href="#"><i class="bi bi-bookmarks me-2"></i><span data-i18n="loadGlossary"></span></a></li>
+			<li>
+				<a id="loadVisits" class="dropdown-item" href="#">
+				  <i class="bi bi-people me-2"></i>
+				  <span data-i18n="loadVisits"></span>
+				</a>
+			</li>
+          </ul>
+        </div>
+
+
+        <div class="fw-semibold" data-i18n="previewTitle"></div>
+        <div class="spacer"></div>
+        <!-- Schéma / introspection -->
+        <div class="btn-group me-2">
+          <button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-diagram-3 me-1"></i><span data-i18n="schema"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a id="showSchema" class="dropdown-item" href="#"><i class="bi bi-list-columns me-2"></i><span data-i18n="tablesCols"></span></a></li>
+            <li><a id="showFks" class="dropdown-item" href="#"><i class="bi bi-link-45deg me-2"></i><span data-i18n="foreignKeys"></span></a></li>
+            <li><a id="showMeta" class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i><span data-i18n="metadata"></span></a></li>
+            <li><a id="showDiagram" class="dropdown-item" href="#"><i class="bi bi-diagram-2 me-2"></i><span data-i18n="erDiagram"></span></a></li>
+          </ul>
+        </div>
+		<button id="clear" class="btn btn-sm btn-outline-light">
+		  <i class="bi bi-eraser me-1"></i>
+		  <span class="d-none d-sm-inline" data-i18n="clear"></span>
+		</button>
+
+		<button id="btnHelp" class="btn btn-sm btn-outline-light"
+				type="button" data-bs-toggle="offcanvas" data-bs-target="#sidePanel" aria-controls="sidePanel">
+			<i class="bi bi-stickies me-1"></i><span data-i18n="help"></span>
+		</button>
+      </div>
+      <div id="output" class="result"></div>
+		<div class="hint">
+			<span data-i18n="hintSql"></span>
+		</div>
+    </section>
+  </div>
+</main>
+
+	<!-- Offcanvas (volet droit) -->
+	<div class="offcanvas offcanvas-top bg-secondary text-light" tabindex="-1" id="menuMobile">
+	  <div class="offcanvas-header">
+		<h5 class="offcanvas-title"><i class="bi bi-stickies"></i> <span data-i18n="help"></span></h5>
+		<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+	  </div>
+	  <div class="offcanvas-body p-0">
+		<iframe id="helpFrameMobile" style="width:100%;height:100%;border:0;"></iframe>
+	  </div>
+	</div>
+
+	<div class="offcanvas offcanvas-end offcanvas-wide bg-secondary text-light"
+		 tabindex="-1" id="sidePanel"
+		 aria-labelledby="sidePanelLabel"
+		 data-bs-scroll="true"
+		 data-bs-backdrop="false">
+	  <div class="offcanvas-header">
+		<h5 class="offcanvas-title d-flex align-items-center gap-2" id="sidePanelLabel">
+		  <i class="bi bi-stickies"></i> <span data-i18n="help"></span>
+		</h5>
+		<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+	  </div>
+		<div class="offcanvas-body p-0">
+		  <iframe id="helpFrame" style="width:100%;height:100%;border:0;"></iframe>
+		</div>
+	</div>
+
+  <!-- Modal Caractéristiques -->
+  <div class="modal fade" id="featuresModal" tabindex="-1" aria-labelledby="featuresModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title" id="featuresModalLabel"><i class="bi bi-stars me-2"></i>Caractéristiques de l’atelier SQL</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+			<ul class="mb-3">
+			  <li><strong>Édition et exécution directe</strong> de requêtes SQL dans le navigateur (SQLite via WebAssembly).</li>
+			  <li><strong>Coloration syntaxique</strong> :
+				<ul>
+				  <li><span class="tok blue">SELECT</span>, <span class="tok blue">FROM</span>, <span class="tok blue">WHERE</span>, <span class="tok blue">JOIN</span> (mots-clés en évidence)</li>
+				  <li><span class="tbl-name">NomTable</span> (tables en couleur spécifique)</li>
+				  <li><span class="tok str">'Texte'</span>, <span class="tok num">123</span> (chaînes et nombres)</li>
+				  <li><span class="tok com">-- commentaire</span> en gris</li>
+				</ul>
+			  </li>
+			  <li><strong>Chargement et enregistrement</strong> :
+				<ul>
+				  <li>Ouvrir / sauvegarder un fichier <code>.sql</code></li>
+				  <li>Ouvrir / exporter une base <code>.sqlite</code></li>
+				</ul>
+			  </li>
+			  <li><strong>Sauvegarde locale</strong> : code et base de données stockés dans le navigateur.</li>
+			  <li><strong>Affichage des résultats</strong> :
+				<ul>
+				  <li>Résultats des requêtes sous forme de tableau</li>
+				  <li>Exploration des tables, clés étrangères et métadonnées</li>
+				  <li>Diagramme entité-relation généré automatiquement</li>
+				</ul>
+			  </li>
+			  <li><strong>Partage rapide</strong> : génération d’un lien (URL encodée en Base64).</li>
+			  <li><strong>Raccourcis pratiques</strong> :
+				<ul>
+				  <li><kbd>F9</kbd> = exécuter la requête</li>
+				</ul>
+			  </li>
+			</ul>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+	<!-- Logic -->
+	<script src="../../assets/js/sql.js"></script>
+	
+	<!-- sql.js (SQLite en WebAssembly) -->
+	<script src="../../assets/js/dist/sql-js@1.13.0/sql-wasm.js"></script>
+	<!-- Bootstrap JS -->
+	<script src="../../assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
+
+	<script src="../../assets/js/dico.js"></script>
+	<script src="../../assets/js/theme.js"></script>
+	<script>
+		Theme.init({ canWrite:false });  // applique + suit, sans changer localStorage
+
+		document.addEventListener("DOMContentLoaded", () => {
+			const params = new URLSearchParams(window.location.search);
+			if (params.has("light")) {
+				document.body.classList.add("l-mode");
+				// Cache la topbar et le hint
+				document.querySelector("nav.navbar")?.remove();
+				document.querySelector(".hint")?.remove();
+				document.querySelector("main.workbench")?.classList.add("no-topbar");
+
+				// Désactive le bouton "Ouvrir…" uniquement en mode light
+				const openBtn = document.getElementById("openLocal");
+				if (openBtn) {
+					openBtn.classList.add("disabled");
+					openBtn.setAttribute("aria-disabled", "true");
+					openBtn.removeAttribute("href");
+					openBtn.addEventListener("click", e => e.preventDefault());
+				}
+			}
+
+		  // Détection langue depuis <html lang="">
+		  const lang = document.documentElement.lang || "inconnue";
+		  const elLang = document.getElementById("currentLang");
+		  if (elLang) elLang.textContent = lang;
+
+		  // Détection atelier depuis <body data-app="">
+		  const app = document.body.dataset.app || document.title || "atelier";
+		  const elApp = document.getElementById("currentApp");
+		  if (elApp) elApp.textContent = app;
+		});
+
+		(function () {
+		  const $langSpan = document.getElementById("currentLang");
+		  const $appSpan  = document.getElementById("currentApp");
+		  const $frame    = document.getElementById("helpFrame");
+		  const app = (document.body.dataset.app || ($appSpan?.textContent || "atelier")).toLowerCase();
+
+		  function short2(str) {
+			return (str || "").toString().trim().slice(0,2).toLowerCase();
+		  }
+
+		  function getCurrentLang() {
+			// 1) URL courante ?lang=xx
+			const p = new URLSearchParams(window.location.search);
+			if (p.get("lang")) return short2(p.get("lang"));
+
+			// 2) <html lang="xx"> ou <html data-lang="xx">
+			const html = document.documentElement;
+			if (html.hasAttribute("lang") && html.getAttribute("lang")) return short2(html.getAttribute("lang"));
+			if (html.dataset && html.dataset.lang) return short2(html.dataset.lang);
+
+			// 3) localStorage (si présent, mais non requis)
+			const keys = ["lang","i18n_lang","locale","language"];
+			for (const k of keys) {
+			  const v = localStorage.getItem(k);
+			  if (v) return short2(v);
+			}
+
+			// 4) navigateur
+			if (navigator.language) return short2(navigator.language);
+
+			// 5) défaut
+			return "fr";
+		  }
+
+		function updateHelp() {
+		  const lang = getCurrentLang();
+		  if ($langSpan) $langSpan.textContent = lang;
+		  if ($appSpan)  $appSpan.textContent  = app;
+
+		  const url = `../../assets/aide/?atelier=${encodeURIComponent(app)}&lang=${encodeURIComponent(lang)}`;
+
+		  // Desktop
+		  const frameDesktop = document.getElementById("helpFrame");
+		  if (frameDesktop && frameDesktop.src !== url) {
+			frameDesktop.src = url;
+		  }
+
+		  // Mobile
+		  const frameMobile = document.getElementById("helpFrameMobile");
+		  if (frameMobile && frameMobile.src !== url) {
+			frameMobile.src = url;
+		  }
+		}
+
+		// Mise à jour initiale
+		updateHelp();
+
+		// Recalcul quand on ouvre le volet desktop
+		const panelDesktop = document.getElementById("sidePanel");
+		if (panelDesktop) {
+		  panelDesktop.addEventListener("show.bs.offcanvas", updateHelp);
+		}
+
+		// Recalcul quand on ouvre le volet mobile
+		const panelMobile = document.getElementById("menuMobile");
+		if (panelMobile) {
+		  panelMobile.addEventListener("show.bs.offcanvas", updateHelp);
+		}
+
+		// Recalcul si <html lang=""> change (ex: switch langue)
+		const obs = new MutationObserver(updateHelp);
+		obs.observe(document.documentElement, { attributes: true, attributeFilter: ["lang", "data-lang"] });
+		})();
+
+		// Ajout focus auto dans la barre de recherche
+		function focusHelpSearch() {
+		  const frame = document.getElementById("helpFrame");
+		  if (!frame) return;
+
+		  try {
+			// Cas same-origin : accès direct
+			const input = frame.contentDocument?.getElementById("search");
+			if (input) {
+			  input.focus();
+			  return;
+			}
+		  } catch (err) {
+			// Cas cross-origin : on bascule sur postMessage
+			frame.contentWindow?.postMessage({ action: "focusSearch" }, "*");
+		  }
+		}
+
+		// Quand le volet aide s’ouvre
+		document.getElementById("sidePanel")
+		  ?.addEventListener("shown.bs.offcanvas", focusHelpSearch);
+
+		document.getElementById("menuMobile")
+		  ?.addEventListener("shown.bs.offcanvas", focusHelpSearch);
+
+		(function() {
+		  const leftPane = document.querySelector(".pane.left");
+		  if (!leftPane) return;
+
+		  // largeur minimale avant bascule en mode compact
+		  const MIN_WIDTH = 540;  // Ajustable
+
+		  function updateCompactMode() {
+			const w = leftPane.getBoundingClientRect().width;
+
+			if (w < MIN_WIDTH) {
+			  document.body.classList.add("compact-toolbar");
+			} else {
+			  document.body.classList.remove("compact-toolbar");
+			}
+		  }
+
+		  // Observateur de redimensionnement
+		  const ro = new ResizeObserver(updateCompactMode);
+		  ro.observe(leftPane);
+
+		  // Appel initial
+		  updateCompactMode();
+		})();
+	</script>
+</body>
+</html>

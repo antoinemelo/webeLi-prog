@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML / CSS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Favicon (SVG) -->
+  <link rel="icon" href="../../assets/images/grid.svg" type="image/svg+xml">
+  <!-- Fallback multi-navigateurs -->
+  <link rel="icon" href="../../assets/images/grid.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#0b1220">
+
+	<script src="../../assets/js/app.js"></script>
+	<script src="../../assets/js/dist/jszip@3.10.1/jszip_min.js"></script>
+
+	<!-- Bootstrap & Icons -->
+	<link rel="stylesheet" href="../../assets/css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css">
+	<link rel="stylesheet" href="../../assets/css/dist/bootstrap@5.3.8/bootstrap_min.css">
+	<link rel="stylesheet" href="../../assets/css/app.css">
+	<style>
+		#fileTabContentCss,
+		#fileTabContentCss .tab-pane,
+		#fileTabContentCss textarea {
+		  border-radius: 0 !important; /* pas d’arrondi */
+		}
+
+		#fileTabContentCss textarea {
+		  resize: none; /* non redimensionnable */
+		}
+		/* Soft wrap dans l'éditeur ET dans le miroir */
+		.editor-wrap #code,
+		.editor-wrap #highlighting{
+		  white-space: pre-wrap;      /* conserve \n + retour auto */
+		  overflow-wrap: break-word;  /* casse les très longs mots */
+		  word-break: break-word;
+		}
+
+		/* Marqueur des rangées de continuation dans la gouttière */
+		#gutter div.cont::after{ content:"⋯"; opacity:.55; }
+
+		/* Pendant le drag du splitter, on désactive les events de l'iframe */
+		.dragging .preview-wrap iframe{ pointer-events:none; }
+		/* Mode light sans topbar */
+		.no-topbar {
+		  margin-top: 0 !important;
+		}
+		main.workbench.no-topbar {
+		  height: 100vh !important;
+		}
+		/* Cache les textes des boutons quand light=1 */
+		body.l-mode .btn span,
+		body.l-mode .btn .d-sm-inline {
+		  display: none !important;
+		}
+		/* largeur d’une tabulation = 4 espaces dans l’éditeur et son overlay */
+		.codearea,
+		#highlighting { tab-size: 4; -moz-tab-size: 4; }
+		/* Largeur personnalisée du volet */
+		@media (min-width: 992px) { /* uniquement desktop (lg et +) */
+		  .offcanvas.offcanvas-wide {
+			width: 600px;  /* ajustez la valeur selon vos besoins */
+		  }
+		}
+		.offcanvas-body {
+		  scrollbar-width: none;       /* Firefox */
+		  -ms-overflow-style: none;    /* IE / Edge */
+		}
+		.offcanvas-body::-webkit-scrollbar {
+		  display: none;               /* Chrome, Safari */
+		}
+		#code.dragover {
+		  outline: 2px dashed #808080;
+		  background-color: rgba(65,65,65,0.1);
+		}
+	</style>
+</head>
+<body data-app="html">
+  <!-- Top bar -->
+  <nav class="navbar navbar-dark py-2">
+    <div class="container-fluid">
+      <span class="navbar-brand d-flex align-items-center gap-2">
+        <a href="../../" class="text-decoration-none d-inline-flex align-items-center gap-2">
+          <i class="bi bi-code-slash"></i>
+        </a>
+        <span data-i18n="htmlCssTitle"></span>
+        <span id="dirtyDot" class="ms-2" style="display:none;color:#ff4507;">●</span>
+      </span>
+      <span id="fileBadge" class="badge rounded-pill text-bg-info ms-2 d-none">
+        <span id="fileBadgeName">—</span>
+      </span>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm border-0 btn-outline-info" data-bs-toggle="modal" data-bs-target="#featuresModal">
+          <i class="bi bi-info-circle me-1"></i>
+        </button>
+		<button class="btn btn-sm btn-outline-none"
+				type="button" data-bs-toggle="offcanvas" data-bs-target="#sidePanel" aria-controls="sidePanel">
+			<i class="bi bi-stickies me-1"></i><span data-i18n="help"></span>
+		</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="workbench container-fluid px-0">
+    <div class="split">
+      <!-- Left: Editor -->
+      <section class="pane left d-flex flex-column">
+        <div class="toolbar">
+          <div class="spacer"></div>
+          <!-- Menu Fichier -->
+          <div class="btn-group">
+            <button class="btn btn-sm btn-outline-success dropdown-toggle d-inline-flex align-items-center gap-2" 
+                    type="button" id="dropdownFiles" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-file-earmark"></i><span class="d-none d-sm-inline" data-i18n="menuFile"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownFiles">
+              <li>
+                <a id="openLocal" class="dropdown-item d-flex align-items-center gap-2" href="#">
+                  <i class="bi bi-folder2-open"></i> <span data-i18n="openFile"></span>
+                </a>
+              </li>
+              <li>
+                <a id="saveLocal" class="dropdown-item d-flex align-items-center gap-2 disabled" href="#">
+                  <i class="bi bi-save"></i> <span data-i18n="saveFile"></span>
+                </a>
+              </li>
+              <li>
+                <a id="saveAsLocal" class="dropdown-item d-flex align-items-center gap-2" href="#">
+                  <i class="bi bi-save2"></i> <span data-i18n="saveAsFile"></span>
+                </a>
+              </li>
+              <li>
+                <a id="download" class="dropdown-item d-flex align-items-center gap-2" href="#">
+                  <i class="bi bi-download"></i> <span data-i18n="downloadFile"></span>
+                </a>
+              </li>
+            </ul>
+          </div>
+			<button id="lightCopyLink" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-2 d-none">
+			  <i class="bi bi-share"></i>
+			</button>
+          <div id="ShareIframe" class="btn-group">
+            <button id="share"
+                    class="btn btn-sm btn-outline-secondary dropdown-toggle d-inline-flex align-items-center gap-2"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-share me-sm-1"></i>
+              <span class="d-none d-sm-inline" data-i18n="share"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li>
+                <a class="dropdown-item d-flex align-items-center gap-2" href="#" id="copyLink">
+                  <i class="bi bi-link-45deg"></i> <span data-i18n="link"></span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item d-flex align-items-center gap-2" href="#" id="copyIframe">
+                  <i class="bi bi-window-stack"></i> <span data-i18n="iframe"></span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <button id="reset" class="btn btn-sm btn-warning" aria-label="Réinitialiser">
+            <i class="bi bi-arrow-counterclockwise me-sm-1"></i>
+            <span class="d-none d-sm-inline" data-i18n="reset"></span>
+          </button>
+
+          <button id="run" class="btn btn-sm btn-primary" aria-label="Aperçu">
+            <i class="bi bi-play-fill me-sm-1"></i>
+            <span class="d-none d-sm-inline" data-i18n="preview"></span>
+          </button>
+        </div>
+        <div class="editor-wrap">
+          <div id="gutter" class="gutter"><div>1</div></div>
+          <!-- Code cell: overlay + textarea -->
+          <div class="codecell">
+            <pre id="highlighting"></pre>
+            <textarea id="code" class="codearea" spellcheck="false"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- Divider -->
+      <div id="divider" class="divider" title="Redimensionner"></div>
+
+      <!-- Right: Output -->
+      <section class="pane right d-flex flex-column">
+        <div class="toolbar">
+          <div class="fw-semibold" data-i18n="previewTitle"></div>
+          <div class="spacer"></div>
+          <button id="clear" class="btn btn-sm btn-outline-light">
+            <i class="bi bi-eraser me-1"></i><span data-i18n="clear"></span>
+          </button>
+		<button id="btnHelp" class="btn btn-sm btn-outline-light"
+				type="button" data-bs-toggle="offcanvas" data-bs-target="#sidePanel" aria-controls="sidePanel">
+			<i class="bi bi-stickies me-1"></i><span data-i18n="help"></span>
+		</button>
+        </div>
+        <div class="preview-wrap">
+          <!-- Onglets CSS (seulement si <link rel="stylesheet"> détecté) -->
+          <ul class="nav nav-tabs d-none" id="fileTabsCss"></ul>
+          <div class="tab-content flex-grow-1" id="fileTabContentCss"></div>
+          <!-- sandbox vide = pas de JS exécuté -->
+          <iframe id="preview" sandbox="allow-scripts"></iframe>
+        </div>
+		<div class="hint">
+		  <span id="cursorPos"></span> <span data-i18n="hintHtml"></span>
+		</div>
+      </section>
+	</div>
+</main>
+
+	<!-- Offcanvas (volet droit) -->
+	<div class="offcanvas offcanvas-top bg-secondary text-light" tabindex="-1" id="menuMobile">
+	  <div class="offcanvas-header">
+		<h5 class="offcanvas-title"><i class="bi bi-stickies"></i> <span data-i18n="help"></span></h5>
+		<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+	  </div>
+	  <div class="offcanvas-body p-0">
+		<iframe id="helpFrameMobile" style="width:100%;height:100%;border:0;"></iframe>
+	  </div>
+	</div>
+
+	<div class="offcanvas offcanvas-end offcanvas-wide bg-secondary text-light"
+		 tabindex="-1" id="sidePanel"
+		 aria-labelledby="sidePanelLabel"
+		 data-bs-scroll="true"
+		 data-bs-backdrop="false">
+	  <div class="offcanvas-header">
+		<h5 class="offcanvas-title d-flex align-items-center gap-2" id="sidePanelLabel">
+		  <i class="bi bi-stickies"></i> <span data-i18n="help"></span>
+		</h5>
+		<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+	  </div>
+		<div class="offcanvas-body p-0">
+		  <iframe id="helpFrame" style="width:100%;height:100%;border:0;"></iframe>
+		</div>
+	</div>
+
+  <!-- Modal Caractéristiques -->
+  <div class="modal fade" id="featuresModal" tabindex="-1" aria-labelledby="featuresModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title" id="featuresModalLabel"><i class="bi bi-stars me-2"></i>Caractéristiques de l’atelier HTML / CSS</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+			<ul class="mb-3">
+			  <li><strong>Édition et prévisualisation</strong> de pages HTML et CSS directement dans le navigateur</li>
+			  <li><strong>Coloration syntaxique</strong>
+				<ul>
+				  <li><span class="tok tag">&lt;h1&gt;</span>, <span class="tok tag">&lt;p&gt;</span>, <span class="tok tag">&lt;div&gt;</span> (balises HTML, mises en valeur)</li>
+				  <li><span class="tok attr">class</span>, <span class="tok attr">id</span> (attributs colorés)</li>
+				  <li><span class="tok str">"texte"</span>, <span class="tok num">123</span> (chaînes et nombres)</li>
+				  <li><span class="tok com">&lt;!-- commentaires --&gt;</span> et <span class="tok com">/* commentaires CSS */</span> en gris</li>
+				</ul>
+			  </li>
+			  <li><strong>Indentation intelligente</strong>
+				<ul>
+				  <li>Entrée = saut de ligne avec indentation automatique après une balise ou une accolade CSS</li>
+				  <li>Fermeture automatique des balises : <code>&lt;div&gt;</code> → insertion de <code>&lt;/div&gt;</code></li>
+				  <li>Suppression intelligente des paires (balises, guillemets, parenthèses) avec <kbd>Backspace</kbd></li>
+				</ul>
+			  </li>
+			  <li><strong>Gestion des paires</strong> : parenthèses, guillemets et chevrons <code>&lt; &gt;</code> fermés automatiquement</li>
+			  <li><strong>Sauvegarde locale</strong> : code, position du curseur et défilement mémorisés.</li>
+			  <li><strong>Chargement et enregistrement</strong>
+				<ul>
+				  <li>Ouvrir un fichier local (<code>.html</code>, <code>.css</code>)</li>
+				  <li>Enregistrer ou télécharger avec nom auto-généré (<code>Prénom_Thème-ObjetTPxx_YYYYMMDD.html</code>)</li>
+				</ul>
+			  </li>
+				<li><strong>Gestion des fichiers CSS virtuels</strong>
+					<ul>
+						<li>Un <code>&lt;link rel="stylesheet" href="abc.css"&gt;</code> dans le code crée automatiquement un onglet <em>abc.css</em> dans la zone Aperçu</li>
+						<li>Le contenu de cet onglet CSS peut être modifié directement.</li>
+						<li>Lors de l’aperçu, le code CSS est injecté dans la page en lieu et place du fichier externe (virtualisation du fichier)</li>
+					</ul>
+				</li>
+			  <li><strong>Partage rapide</strong> : génération d’un lien (URL encodée en Base64)</li>
+			  <li><strong>Aperçu en direct</strong>
+				<ul>
+				  <li>Rendu de la page dans une iframe sécurisée (sandbox)</li>
+				  <li>Si seul du CSS est saisi, il est automatiquement appliqué à un modèle HTML de test</li>
+				</ul>
+			  </li>
+			  <li><strong>Raccourcis pratiques</strong> : <kbd>F9</kbd> = afficher l’aperçu</li>
+			</ul>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+	<!-- Logic -->
+	<script src="../../assets/js/html.js"></script>
+
+	<!-- Bootstrap JS (modal) -->
+	<script src="../../assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
+	<script src="../../assets/js/dico.js"></script>
+	<script src="../../assets/js/theme.js"></script>
+	<script>
+		Theme.init({ canWrite:false });  // applique + suit, sans changer localStorage
+
+		document.addEventListener("DOMContentLoaded", () => {
+			const params = new URLSearchParams(window.location.search);
+			if (params.has("light")) {
+				document.body.classList.add("l-mode");
+				document.querySelector("nav.navbar")?.remove();
+				document.querySelector(".hint")?.remove();
+				document.querySelector("main.workbench")?.classList.add("no-topbar");
+
+				// Cacher les textes des boutons (comme pour Python)
+				document.querySelectorAll(
+				"#dropdownFiles span, #share span, #reset span, #run span"
+				).forEach(span => span.style.display = "none");
+
+				// Désactiver l’option Ouvrir
+				const openBtn = document.getElementById("openLocal");
+				if (openBtn) {
+					openBtn.classList.add("disabled");
+					openBtn.setAttribute("aria-disabled", "true");
+					openBtn.removeAttribute("href");
+					openBtn.addEventListener("click", e => e.preventDefault());
+				}
+			}
+		});
+
+		document.addEventListener("DOMContentLoaded", () => {
+		  // Détection langue depuis <html lang="">
+		  const lang = document.documentElement.lang || "inconnue";
+		  const elLang = document.getElementById("currentLang");
+		  if (elLang) elLang.textContent = lang;
+
+		  // Détection atelier depuis <body data-app="">
+		  const app = document.body.dataset.app || document.title || "atelier";
+		  const elApp = document.getElementById("currentApp");
+		  if (elApp) elApp.textContent = app;
+		});
+
+		(function () {
+		  const $langSpan = document.getElementById("currentLang");
+		  const $appSpan  = document.getElementById("currentApp");
+		  const $frame    = document.getElementById("helpFrame");
+		  const app = (document.body.dataset.app || ($appSpan?.textContent || "atelier")).toLowerCase();
+
+		  function short2(str) {
+			return (str || "").toString().trim().slice(0,2).toLowerCase();
+		  }
+
+		  function getCurrentLang() {
+			// 1) URL courante ?lang=xx
+			const p = new URLSearchParams(window.location.search);
+			if (p.get("lang")) return short2(p.get("lang"));
+
+			// 2) <html lang="xx"> ou <html data-lang="xx">
+			const html = document.documentElement;
+			if (html.hasAttribute("lang") && html.getAttribute("lang")) return short2(html.getAttribute("lang"));
+			if (html.dataset && html.dataset.lang) return short2(html.dataset.lang);
+
+			// 3) localStorage (si présent, mais non requis)
+			const keys = ["lang","i18n_lang","locale","language"];
+			for (const k of keys) {
+			  const v = localStorage.getItem(k);
+			  if (v) return short2(v);
+			}
+
+			// 4) navigateur
+			if (navigator.language) return short2(navigator.language);
+
+			// 5) défaut
+			return "fr";
+		  }
+
+		function updateHelp() {
+		  const lang = getCurrentLang();
+		  if ($langSpan) $langSpan.textContent = lang;
+		  if ($appSpan)  $appSpan.textContent  = app;
+		  const url = `../../assets/aide/?atelier=${encodeURIComponent(app)}&lang=${encodeURIComponent(lang)}`;
+
+		  // Desktop
+		  const frameDesktop = document.getElementById("helpFrame");
+		  if (frameDesktop && frameDesktop.src !== url) {
+			frameDesktop.src = url;
+		  }
+
+		  // Mobile
+		  const frameMobile = document.getElementById("helpFrameMobile");
+		  if (frameMobile && frameMobile.src !== url) {
+			frameMobile.src = url;
+		  }
+		}
+
+		// Mise à jour initiale
+		updateHelp();
+
+		// Recalcul quand on ouvre le volet desktop
+		const panelDesktop = document.getElementById("sidePanel");
+		if (panelDesktop) {
+		  panelDesktop.addEventListener("show.bs.offcanvas", updateHelp);
+		}
+
+		// Recalcul quand on ouvre le volet mobile
+		const panelMobile = document.getElementById("menuMobile");
+		if (panelMobile) {
+		  panelMobile.addEventListener("show.bs.offcanvas", updateHelp);
+		}
+
+		// Recalcul si <html lang=""> change (ex: switch langue)
+		const obs = new MutationObserver(updateHelp);
+		obs.observe(document.documentElement, { attributes: true, attributeFilter: ["lang", "data-lang"] });
+		})();
+
+		// --- Affichage ligne/colonne dans #cursorPos ---
+		(function() {
+		  const ta = document.getElementById('code');
+		  const posEl = document.getElementById('cursorPos');
+		  if (!ta || !posEl) return;
+
+		  function updateCursorPos() {
+			const pos = ta.selectionStart;
+			const textUptoPos = ta.value.substring(0, pos);
+			const lines = textUptoPos.split("\n");
+			const line = lines.length;                           // ligne courante (1-based)
+			const col = (lines[lines.length - 1] || "").length + 1; // colonne courante (1-based)
+			posEl.textContent = `[${line},${col}]`;
+		  }
+
+		  ta.addEventListener('dragover', e => {
+			e.preventDefault();
+			ta.classList.add('dragover');
+		  });
+
+		  ta.addEventListener('dragleave', () => {
+			ta.classList.remove('dragover');
+		  });
+
+		  ta.addEventListener('drop', e => {
+			e.preventDefault();
+			ta.classList.remove('dragover');
+
+			const file = e.dataTransfer.files[0];
+			if (!file) return;
+
+			const reader = new FileReader();
+			reader.onload = () => {
+			  ta.value = reader.result;
+			  ta.dispatchEvent(new Event('input'));   // met à jour numéro + highlight
+			  if (window.syncHighlight) window.syncHighlight();
+			  try { localStorage.setItem('html_editor_code_v1', ta.value); } catch(_) {}
+
+			  // Met à jour le "dirty state" et le badge
+			  window._htmlDirty?.setJustLoaded();
+			  window.EditorFS?.clear();
+			};
+			reader.readAsText(file);
+		  });
+  
+		  // init + mise à jour
+		  updateCursorPos();
+		  ["click","keyup","input","scroll"].forEach(evt =>
+			ta.addEventListener(evt, updateCursorPos)
+		  );
+		})();
+
+		// Ajout focus auto dans la barre de recherche
+		function focusHelpSearch() {
+		  const frame = document.getElementById("helpFrame");
+		  if (!frame) return;
+
+		  try {
+			// Cas same-origin : accès direct
+			const input = frame.contentDocument?.getElementById("search");
+			if (input) {
+			  input.focus();
+			  return;
+			}
+		  } catch (err) {
+			// Cas cross-origin : on bascule sur postMessage
+			frame.contentWindow?.postMessage({ action: "focusSearch" }, "*");
+		  }
+		}
+
+		// Quand le volet aide s’ouvre
+		document.getElementById("sidePanel")
+		  ?.addEventListener("shown.bs.offcanvas", focusHelpSearch);
+
+		document.getElementById("menuMobile")
+		  ?.addEventListener("shown.bs.offcanvas", focusHelpSearch);
+
+		(function() {
+		  const leftPane = document.querySelector(".pane.left");
+		  if (!leftPane) return;
+
+		  // largeur minimale avant bascule en mode compact
+		  const MIN_WIDTH = 540;  // Ajustable
+
+		  function updateCompactMode() {
+			const w = leftPane.getBoundingClientRect().width;
+
+			if (w < MIN_WIDTH) {
+			  document.body.classList.add("compact-toolbar");
+			} else {
+			  document.body.classList.remove("compact-toolbar");
+			}
+		  }
+
+		  // Observateur de redimensionnement
+		  const ro = new ResizeObserver(updateCompactMode);
+		  ro.observe(leftPane);
+
+		  // Appel initial
+		  updateCompactMode();
+		})();
+	</script>
+</body>
+</html>

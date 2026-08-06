@@ -1,0 +1,7 @@
+Le webmail de Google vient de bénéficier de deux nouvelles fonctionnalités. La première concerne la prise en charge du glisser-déposer de pièces jointes. Avec une fenêtre de son explorateur ouverte (ou depuis le bureau), l'utilisateur peut désormais sélectionner directement les fichiers qu'il souhaite joindre à un message et avec le pointeur de la souris, les glisser dans l'interface de Gmail.
+
+Ce glisser-déposer n'est possible qu'avec les navigateurs Google Chrome et Firefox 3.6. Il tire parti des possibilités de HTML5. Pour les autres navigateurs, il faudra donc attendre la prise en charge de l'API permettant le glisser-déposer en local vers une page Web distante.
+
+La deuxième nouveauté de Gmail concerne une meilleure intégration du service Google Agenda pour la création d'un évènement. Lors de la rédaction d'un message, un lien "Invitation" est disponible. Ce lien permet d'accéder à une fenêtre qui affiche sa disponibilité ainsi que celle des contacts à qui est adressé le message, pour peu que le partage soit autorisé. De quoi programmer un événement à plusieurs en fonction de la disponibilité de chacun. Une fois l'invitation insérée, un résumé de cette dernière apparaît dans le message.
+
+Article parut dans le journal génération net le 16 avril 2010 par Jérôme G. Son titre : Gmail, glisser-déposer et invitation.

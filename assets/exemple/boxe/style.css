@@ -1,0 +1,21 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+}
+
+header {
+    background-color: #F0F0F0;
+}
+
+footer {
+    background-color: #000000;
+    color: white;
+}
+
+.deux-colonnes {
+    display: flex;
+}
+
+.deux-colonnes div {
+    flex: 1; /* Les deux colonnes prennent une largeur égale */
+}

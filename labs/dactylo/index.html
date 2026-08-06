@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Dactylographie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="../../assets/images/grid.svg" type="image/svg+xml">
+  <link rel="icon" href="../../assets/images/grid.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#0b1220">
+
+  <!-- Bootstrap & Icons -->
+  <link rel="stylesheet" href="../../assets/css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css">
+  <link rel="stylesheet" href="../../assets/css/dist/bootstrap@5.3.8/bootstrap_min.css">
+  <link rel="stylesheet" href="../../assets/css/app.css">
+
+  <script src="../../assets/js/app.js"></script>
+
+  <!-- Styles spécifiques dactylo -->
+  <style>
+    body[data-app="typing"] .toolbar {
+      background: var(--surface-1);
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      padding-top: .35rem;
+      padding-bottom: .35rem;
+    }
+
+    body[data-app="typing"] #typingArea {
+      width: 100%;
+      height: 230px;
+      resize: none;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 0.95rem;
+      background: var(--surface-3);
+      color: var(--text-main);
+      border-radius: .4rem;
+      border: 1px solid var(--border);
+    }
+
+    body[data-app="typing"] #exerciseDisplay {
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      background: var(--surface-3);
+      border-radius: .4rem;
+      border: 1px solid var(--border);
+      padding: .75rem;
+      min-height: 230px;
+    }
+
+	.word {
+	  white-space: nowrap;
+	}
+
+    /* Grille d’exercices (nouveau) */
+    .exo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+      padding: 10px 0;
+    }
+
+	#exerciseGrid:empty {
+	  display: none;
+	  height: 0;
+	  margin: 0;
+	  padding: 0;
+	}
+
+	#exerciseDisplay {
+		background-color: transparent !important;
+		user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+		-moz-user-select: none;
+	}
+
+	.exo-card {
+		position: relative;
+		display: flex;
+		justify-content: space-between; /* label gauche / icône droite */
+		align-items: center;
+		background: var(--surface-3);
+		border: 1px solid var(--border);
+		padding: 10px;
+		border-radius: .35rem;
+		cursor: pointer;
+		font-size: 0.88rem;
+		text-align: center;
+		transition: 0.2s;
+	}
+
+	.exo-label {
+		flex-grow: 1;
+		text-align: center;
+	}
+
+	.exo-icon {
+		min-width: 22px;
+		text-align: right;
+		opacity: 0.8;
+	}
+
+    .exo-card:hover {
+      background: var(--surface-4);
+      transform: translateY(-2px);
+    }
+
+	.exo-card.active-exo {
+	  background: var(--surface-4);
+	  border-color: var(--border);
+	  box-shadow: var(--surface-5);
+	}
+
+    /* Spans texte référence */
+    body[data-app="typing"] .char {
+      white-space: normal;
+    }
+    body[data-app="typing"] .current-char { text-decoration: underline; }
+    body[data-app="typing"] .current-word { font-weight: 600; }
+    body[data-app="typing"] .special-char { color: #e67e22; }
+    body[data-app="typing"] .current-char { color: #27ae60; }
+    body[data-app="typing"] .char-error {
+      color: #c0392b;
+      font-weight: 700;
+    }
+
+	/* === CLAVIER VISUEL === */
+	.keyboard {
+	  user-select: none;
+	  max-width: 760px;
+	  background: var(--surface-3);
+	  padding: 10px;
+	  border-radius: .4rem;
+	  border: 1px solid var(--border);
+	}
+
+	.key-row {
+	  display: flex;
+	  margin-bottom: 6px;
+	}
+
+	.key {
+	  background: var(--surface-1);
+	  color: var(--text-main);
+	  border-radius: .35rem;
+	  padding: 8px 6px;
+	  margin: 2px;
+	  text-align: center;
+	  min-width: 34px;
+	  font-size: .85rem;
+	  border: 1px solid var(--border);
+	  transition: 0.12s;
+	}
+
+	.key.wide { min-width: 70px; }
+	.key.space { min-width: 220px; }
+	.key.midwide {
+	  min-width: 90px;
+	}
+	.key.smallwide {
+	  min-width: 42px;
+	}
+
+	/* États actifs */
+	.key.active-correct { background: #27ae60 !important; color: white; }
+	.key.active-special { background: #e67e22 !important; color: white; }
+	.key.active-error   { background: #c0392b !important; color: white; }
+
+	.key.rose { background: var(--key-rose) }
+	.key.bleu { background: var(--key-bleu) }
+
+	.char-line {
+	  display: flex;
+	  flex-wrap: wrap;
+	  gap: 4px;
+	  margin-bottom: 8px;
+	}
+
+	.char-card {
+	  padding: 6px 8px;
+	  min-width: 26px;
+	  text-align: center;
+	  background: var(--surface-1);
+	  border: 1px solid var(--border);
+	  border-radius: .30rem;
+	  font-family: ui-monospace, monospace;
+	}
+	
+	.char-card.space {
+	  opacity: 0.55;
+	}
+
+	.char-card.enter {
+	  font-weight: bold;
+	  background: var(--surface-2);
+	}
+
+	.char-card.current {
+	  background: #27ae60 !important;
+	  color: white !important;
+	}
+
+	.btn-outline-secondary:disabled {
+	  opacity: .5;
+	  pointer-events: none;
+	}
+
+	.line-counter {
+	  font-size: 0.9rem;
+	  opacity: 0.75;
+	}
+
+	.zoom-controls {
+	  display: flex;
+	  align-items: center;
+	  gap: 8px;
+	  background: rgba(255,255,255,0.08);
+	  padding: 6px 10px;
+	  border-radius: 10px;
+	  backdrop-filter: blur(6px);
+	  -webkit-backdrop-filter: blur(6px);
+	  width: fit-content;
+	  margin-left: auto;
+	  margin-bottom: 8px;
+	}
+
+	.zoom-btn {
+	  border: none;
+	  background: var(--surface-2);
+	  color: var(--text-1);
+	  font-size: 16px;
+	  padding: 4px 10px;
+	  border-radius: 8px;
+	  cursor: pointer;
+	  transition: all 0.15s ease;
+	  display: flex;
+	  align-items: center;
+	}
+
+	.zoom-btn:hover {
+	  background: var(--surface-3);
+	  transform: scale(1.1);
+	}
+
+	#zoomLevel {
+	  color: var(--text-2);
+	  font-size: 14px;
+	  min-width: 25px;
+	  text-align: center;
+	}
+
+    @media (max-width: 768px) {
+      body[data-app="typing"] #typingArea { height: 180px; }
+      body[data-app="typing"] #exerciseDisplay { min-height: 180px; }
+    }
+
+	@media (max-width: 1200px) {
+	  .btn .label,
+	  .toolbar .label,
+	  .navbar-brand span,
+	  #currentExerciseName {
+		display: none !important;
+	  }
+	  .btn {
+		padding-left: 0.4rem;
+		padding-right: 0.4rem;
+	  }
+	}
+  </style>
+</head>
+
+<body data-app="typing">
+
+<!-- Top bar -->
+<nav class="navbar navbar-dark py-2">
+  <div class="container-fluid">
+    <span class="navbar-brand d-flex align-items-center gap-2">
+      <a href="../../" class="text-decoration-none d-inline-flex align-items-center gap-2">
+        <i class="bi bi-keyboard"></i>
+      </a>
+      <span>Dactylographie</span>
+      <span id="currentExerciseName" class="ms-3 text-info fw-semibold"></span>
+    </span>
+	<span id="progressFileBadge" class="badge text-bg-info ms-2 d-none">
+	  <span id="progressFileName">—</span>
+	</span>
+    <div class="d-flex gap-2 align-items-center">
+      <button class="btn btn-sm border-0 btn-outline-info" data-bs-toggle="modal" data-bs-target="#featuresModal">
+        <i class="bi bi-info-circle me-1"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main class="workbench container-fluid px-0">
+  <div class="split">
+
+    <!-- LEFT PANEL -->
+    <section class="pane left d-flex flex-column">
+
+      <div class="toolbar d-flex align-items-center gap-3">
+
+        <div class="fw-semibold d-flex align-items-center gap-2">
+			  <div class="zoom-btn">
+				Aa_
+			  </div>
+        </div>
+
+		<div class="btn-group ms-3" role="group">
+		  <input type="checkbox" class="btn-check" id="chkTech" autocomplete="off">
+		  <label class="btn btn-outline-secondary" for="chkTech">
+			<i class="bi bi-wrench-adjustable-circle"></i> <span class="label">Technique</span>
+		  </label>
+
+		  <input type="checkbox" class="btn-check" id="chkSpeed" autocomplete="off">
+		  <label class="btn btn-outline-secondary" for="chkSpeed">
+			<i class="bi bi-speedometer"></i> <span class="label">Vitesse</span>
+		  </label>
+		</div>
+
+        <div class="spacer"></div>
+
+		<div id="fileMenuWrap" class="btn-group ms-3">
+		  <button id="fileMenuBtn" class="btn btn-sm btn-outline-success dropdown-toggle d-inline-flex align-items-center gap-2" 
+				data-bs-toggle="dropdown">
+			<i class="bi bi-file-earmark"></i> <span class="label">Ma progression</span>
+		  </button>
+
+		  <ul class="dropdown-menu dropdown-menu-dark">
+			<li><a class="dropdown-item" href="#" onclick="openProgressFile()">
+			  <i class="bi bi-folder2-open"></i> Ouvrir
+			</a></li>
+
+			<li><a class="dropdown-item" href="#" onclick="saveProgress()">
+			  <i class="bi bi-save"></i> Sauvegarder
+			</a></li>
+
+			<li><a class="dropdown-item" href="#" onclick="saveProgressAs()">
+			  <i class="bi bi-save2"></i> Enregistrer sous...
+			</a></li>
+
+			<li><a class="dropdown-item" href="#" onclick="downloadProgress()">
+			  <i class="bi bi-download"></i> Télécharger
+			</a></li>
+		  </ul>
+		</div>
+
+        <button id="btnStart" class="btn btn-sm btn-primary" disabled>
+          <i class="bi bi-play-fill me-sm-1"></i><span class="label">Démarrer (F9)</span>
+        </button>
+
+        <button id="btnReset" class="btn btn-sm btn-warning">
+          <i class="bi bi-arrow-counterclockwise me-sm-1"></i><span class="label">Réinitialiser (Esc)</span>
+        </button>
+
+      </div>
+
+      <!-- Grille d’exercices -->
+      <div class="px-3">
+        <div id="exerciseGrid" class="exo-grid"></div>
+      </div>
+
+      <!-- CONTENU -->
+      <div id="typingPanel" class="p-3 d-flex flex-column gap-3 flex-grow-1">
+
+		<!-- Input invisible pour les fichiers utilisateur -->
+		<input type="file" id="userFileInput" accept=".txt" style="display:none;">
+
+        <textarea id="typingArea" class="flex-grow-1" disabled></textarea>
+
+        <div class="typing-stats">
+          <span>Erreurs : <strong id="statErrors">0</strong></span>
+          <span>Durée : <strong id="statTime">0 s</strong></span>
+
+          <span id="statCpmWrapper" style="display:none;">
+            Frappe/min : <strong id="statCpm">0</strong>
+          </span>
+
+          <span id="statEpmWrapper" style="display:none;">
+            Erreurs/min : <strong id="statEpm">0</strong>
+          </span>
+        </div>
+
+        <div class="typing-info">
+          <i><b>Note</b> : les fichiers textes téléversés doivent être au format .txt; les erreurs sont comptées à chaque frappe incorrecte.</i>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Divider -->
+    <div id="divider" class="divider" title="Redimensionner"></div>
+
+    <!-- RIGHT PANEL -->
+    <section class="pane right d-flex flex-column">
+
+      <div class="toolbar d-flex align-items-center gap-2">
+        <div class="fw-semibold d-flex align-items-center gap-2">
+          <i class="bi bi-journal-text"></i> Texte de référence
+        </div>
+		<div class="btn-group ms-2" role="group">
+		  <input type="radio" class="btn-check" name="displayMode" id="dispText" checked>
+		  <label class="btn btn-outline-secondary" for="dispText">
+			<i class="bi bi-text-left"></i> <span class="label">Bloc</span>
+		  </label>
+
+		  <input type="radio" class="btn-check" name="displayMode" id="dispCards">
+		  <label class="btn btn-outline-secondary" for="dispCards">
+			<i class="bi bi-chat-square"></i> <span class="label">Cartes</span>
+		  </label>
+		</div>
+
+        <div class="spacer"></div>
+
+		<button id="zoomOut" class="zoom-btn" title="Réduire la taille">
+			<i class="bi bi-dash-lg"></i>
+		</button>
+
+		<span id="zoomLevel">100%</span>
+
+		<button id="zoomIn" class="zoom-btn" title="Augmenter la taille">
+			<i class="bi bi-plus-lg"></i>
+		</button>
+	</div>
+
+      <div class="p-3 flex-grow-1 d-flex flex-column gap-3">
+        <div id="exerciseDisplay"></div>
+		<div id="lineCounter" class="line-counter text-center mt-2" style="display:none;"></div>
+
+		<!-- Clavier visuel QWERTZ CH (affiché uniquement en mode technique) -->
+		<div id="keyboardWrapper" class="mt-3" style="display:none;">
+			<div id="keyboard" class="keyboard"></div>
+			<div class="typing-info"><p><br>&nbsp;&nbsp;&nbsp;&nbsp;<small><i><b>Note clavier</b> : les touches roses sont utilisées avec l'index de la main gauche, les bleues avec l'index de la main droite.</i></small></p></div>
+		</div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- Offcanvas aide -->
+<div class="offcanvas offcanvas-top bg-secondary text-light" tabindex="-1" id="menuMobile">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title"><i class="bi bi-stickies"></i> <span data-i18n="help"></span></h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body p-0">
+    <iframe id="helpFrameMobile" style="width:100%;height:100%;border:0;"></iframe>
+  </div>
+</div>
+
+<div class="offcanvas offcanvas-end offcanvas-wide bg-secondary text-light"
+     tabindex="-1" id="sidePanel"
+     aria-labelledby="sidePanelLabel"
+     data-bs-scroll="true"
+     data-bs-backdrop="false">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title d-flex align-items-center gap-2" id="sidePanelLabel">
+      <i class="bi bi-stickies"></i> <span data-i18n="help"></span>
+    </h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+  </div>
+
+  <div class="offcanvas-body p-0">
+    <iframe id="helpFrame" style="width:100%;height:100%;border:0;"></iframe>
+  </div>
+</div>
+
+<!-- Modal Caractéristiques -->
+<div class="modal fade" id="featuresModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title">
+          <i class="bi bi-stars me-2"></i>Atelier dactylographie
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+		<ul>
+		  <li><b>Deux modes d'entraînement</b>
+			<ul>
+			  <li><b>Technique</b> — apprentissage précis des touches, clavier affiché, validation stricte des frappes</li>
+			  <li><b>Vitesse</b> — toutes les frappes comptent, calcul automatique du rythme (CPM) et des erreurs/minute</li>
+			</ul>
+		  </li>
+
+		  <li><b>Deux modes d’affichage du texte de référence</b>
+			<ul>
+			  <li><b>Bloc</b> — texte continu avec suivi dynamique du caractère et du mot en cours</li>
+			  <li><b>Cartes</b> — texte affiché caractère par caractère, y compris l’indication des retours à la ligne <i class="bi bi-arrow-return-left"></i></li>
+			</ul>
+		  </li>
+
+		  <li><b>Surlignage intelligent</b>
+			<ul>
+			  <li>Le caractère en cours apparaît en vert</li>
+			  <li>Le mot en cours est mis en évidence</li>
+			  <li>Les caractères spéciaux sont affichés en orange</li>
+			  <li>Les erreurs apparaissent en rouge dans le texte de référence</li>
+			</ul>
+		  </li>
+
+		  <li><b>Clavier visuel QWERTZ - Suisse romande</b>
+			<ul>
+			  <li>Affiché automatiquement en mode Technique</li>
+			  <li>La touche à presser est surlignée en temps réel</li>
+			  <li>Gestion complète des accents, majuscules, symboles et touches spéciales</li>
+			</ul>
+		  </li>
+
+		  <li><b>Chargement d’un texte personnalisé</b>
+			<ul>
+			  <li>Import ou glisser-déposer d’un fichier <code>.txt</code></li>
+			  <li>Compatible avec tous les modes d’affichage (bloc ou carte)</li>
+			</ul>
+		  </li>
+
+		  <li><b>Statistiques en direct</b>
+			<ul>
+			  <li>Nombre total d’erreurs</li>
+			  <li>Durée écoulée</li>
+			  <li>Frappe/minute (CPM) en mode Vitesse</li>
+			  <li>Erreurs/minute (EPM) en mode Vitesse</li>
+			</ul>
+		  </li>
+
+		  <li><b>Système complet de sauvegarde</b>
+			<ul>
+			  <li><b>Enregistrer</b> — sauvegarde dans le fichier SQLite ouvert</li>
+			  <li><b>Enregistrer sous…</b> — création d’un nouveau fichier SQLite</li>
+			  <li><b>Télécharger</b> — export direct d’une copie de la base</li>
+			  <li><b>Ouvrir</b> — restauration d’une progression depuis un fichier SQLite</li>
+			  <li>La progression est automatiquement répercutée dans l'application</li>
+			</ul>
+		  </li>
+
+		  <li><b>Persistance automatique</b>
+			<ul>
+			  <li>La session de travail (base SQLite) se recharge automatiquement au démarrage</li>
+			  <li>Les scores restent synchronisés avec le navigateur web</li>
+			</ul>
+		  </li>
+
+		  <li><b>Données privées</b>
+			<ul>
+			  <li>Toutes les données sont stockées localement dans votre navigateur web ou dans vos fichiers</li>
+			  <li>AUCUNE information personnelle n’est transmise en ligne</li>
+			</ul>
+		  </li>
+		</ul>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Fin d'exercice -->
+<div class="modal fade" id="modalBravo" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content" style="background:#27ae60; color:white; text-align:center;">
+      
+      <div class="modal-body d-flex flex-column justify-content-center align-items-center">
+        <h1 class="display-3 fw-bold mb-4" style="color: white;">Bravo !</h1>
+        <p id="modalBravoMessage" class="fs-4 mb-4"></p>
+		<div id="modalBravoStats" class="fs-5 mt-3"></div>
+
+		<button id="btnContinue" class="btn btn-light btn-lg mt-4" data-bs-dismiss="modal">
+		  Continuer
+		</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- JS dactylo -->
+<script src="../../assets/js/dist/sql-js@1.13.0/sql-wasm.js"></script>
+<script src="../../assets/js/dactylo_sync.js" defer></script>
+<script src="../../assets/js/dactylo.js" defer></script>
+
+<script src="../../assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
+<script src="../../assets/js/dico.js"></script>
+<script src="../../assets/js/theme.js"></script>
+
+<script>
+  Theme.init({ canWrite:false });
+</script>
+
+</body>
+</html>

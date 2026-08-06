@@ -1,0 +1,473 @@
+// === Dictionnaire ===
+const translations = {
+	fr: {
+		brandTitle: "INFORMATIC - Programmation",
+		navStats: "Statistiques",
+		navGuide: "Guide utilisateur",
+
+		badgeWeb: "web",
+		badgeDocs: "documents",
+		badgeInterp: "interprétation de commandes",
+		badgeData: "données",
+		openBtn: "Ouvrir",
+
+		closeBtn: "Fermer",
+		alertInfo: "Certaines fonctions d’ouverture et d'enregistrement nécessitent l'utilisation des navigateurs Chrome ou Edge (API File System Access). Dans les autres cas (notamment avec Firefox et Safari), utilisez Télécharger / Exporter.",
+		comingFeaturesTitle: "Fonctions à venir",
+		comingFeaturesText: "fonctions live, exécution / arrêt des boucles infinies, corrections de bugs, témoignages, guide utilisateur multi-langue, lexique (js), mode examens.",
+
+		heroTitle: "Espace d’entraînement à la programmation, en ligne - simple et efficace",
+		heroDesc: "Cinq ateliers complémentaires et intégrés pour apprendre à gérer des bases de données (SQLite) ou apprendre à coder en HTML/CSS, Javascript, Markdown et Python.",
+		newTerm: "Nouvelle version αlpha",
+		alphaTerm: " [αlpha.0.2]",
+		betaTerm: "version βeta.0.5",
+		btnOpenJs: "Atelier Javascript",
+
+		htmlTitle: "Atelier HTML/CSS",
+		htmlDesc: "Éditer/voir vos pages yc. avec des feuiles de style.",
+		htmlFeat1: "Aperçu intégré",
+		htmlFeat2: "Snippets et modèle",
+		htmlFeat3: "Intègre la gestion CSS",
+
+		mdTitle: "Atelier Markdown",
+		mdDesc: "Rédiger en .md, rendu live, export simple en HTML/PDF.",
+		mdFeat1: "Aperçu immédiat",
+		mdFeat2: "Langage d'édition",
+		mdFeat3: "Impression et exportation HTML",
+
+		pyTitle: "Atelier Python",
+		pyDesc: "Exécuter des scripts, I/O basiques et plots. Format .py.",
+		pyFeat1: "Sorties console et graphiques",
+		pyFeat2: "Proposition de mots clés",
+		pyFeat3: "Inclus Turtle",
+
+		sqlTitle: "Lab SQL (SQLite)",
+		sqlDesc: "Éditeur SQL, import/export .sqlite, exécution locale.",
+		sqlFeat1: "Scripts .sql et base de données",
+		sqlFeat2: "Métadonnées et schéma Entités/Relations (Mermaid)",
+
+		aboutTitle: "INFORMATIC - À propos",
+		aboutIntro: "Notre plateforme est gratuite et sans publicité. Si vous souhaitez nous soutenir, vous pouvez effectuer un don ou nous offrir un café - merci ❤️",
+		donate: "Effectuer un don",
+		coffee: "Offrir un café",
+
+		diffTitle: "Ce qui nous différencie",
+		diffDesc: "Créé par une équipe d’enseignants et de développeurs expérimentés, ce service met à disposition des ateliers d’aide à la programmation (HTML/CSS, Javascript, Markdown, Python et SQL), 100% web.",
+
+		compareTitle: "Comparaisons",
+		compareFeat: "Brève étude des fonctionnalités",
+		compareLang: "Comparatif des langages de programmation",
+		compareEdu: "Tableau décisionnel pour un usage pédagogique",
+
+		noteTurtle: "Pour des usages avancés des scripts Turtle, nous recommandons WebTigerPython ou WebEduPy, développés par l'ETHZ.",
+
+		footerText: "Environnement informatique pédagogique",
+		themeLabel: "Affichage",
+		themeLight: "clair",
+		themeDark: "foncé",
+		langMenu: "Langues",
+
+  		casTitle: "Cas pratiques",
+		// --- DACTYLO ---
+		typingTitle: "Dactylographique",
+		typingFeat1: "Exercices techniques et vitesse",
+		typingFeat2: "Analyse des erreurs en temps réel",
+		typingFeat3: "Calcul des frappes & erreurs / minute",
+		typingFeat4: "Pour le français",
+		// --- BLOCKCHAIN ---
+  		blockTitle: "Blockchain & cryptomonnaie",
+		blockFeat1: "Adresse publique / privée",
+		blockFeat2: "Transactions signées",
+		blockFeat3: "Pairs et synchronisation",
+		blockFeat4: "Uniquement en français",
+		// --- MEDICA ---
+		medicaTitle: "Confidentialité et fenêtrage",
+		medicaFeat1: "Cryptage et stockage non-corélé",
+		medicaFeat2: "Fonctionnement inter-domaines",
+		medicaFeat3: "Graph et reporting",
+		medicaFeat4: "medica.li",
+		// --- PARAPENTE ---
+		glideTitle: "Données temporelles",
+		glideFeat1: "Présentation d'informations et ventes de produits",
+		glideFeat2: "Gestion de données et processus",
+		glideFeat3: "Suivi en direct",
+		glideFeat4: "parapente.world",
+		// --- AUTRES ---
+		comptaFeat1: "comptabilité",
+		timeFeat1: "horloge",
+		webFeat1: "sites web (cms)",
+		downloadBtn: "Télécharger",
+
+		htmlCssTitle: "HTML / CSS",
+		fullscreen: "F11",
+		menuFile: "Fichier",
+		openFile: "Ouvrir",
+		saveFile: "Sauvegarder",
+		saveAsFile: "Enregistrer sous...",
+		downloadFile: "Télécharger",
+		share: "Partager",
+		link: "Lien",
+		iframe: "iFrame",
+		reset: "Réinitialiser",
+		preview: "Aperçu [F9]",
+		hintHtml: "= [l,c] | Rappel : première ligne sous forme <!-- Prénom / Thème-ObjetTPxx --> ou <!-- nnn.html -->. Vous pouvez déposer les .html dans l’éditeur.",
+		resize: "Redimensionner",
+		previewTitle: "Aperçu",
+		clear: "Effacer",
+		help: "Lexique",
+
+		jsTitle: "Javascript",
+		hintJs: "= [l,c] | Rappel : mettre la 1e ligne sous forme <!-- Prénom / Thème-ObjetTPxx -->. Vous pouvez déposer les .js dans l’éditeur.",
+		result: "Résultat",
+
+		mdTitle: "Markdown",
+		hintMd: "= [l,c] | Rappel : mettre la 1e ligne sous forme #### Prénom / Thème-ObjetTPxx. Vous pouvez déposer les .md dans l’éditeur.",
+		exportHtml: "Exporter .html",
+		exportPdf: "Exporter .pdf",
+		print: "Imprimer",
+
+		notSupported: "Non supporté dans Safari",
+		run: "Exécuter [F9]",
+		hintPy: "= [l,c] | Rappel : mettre la 1e ligne sous forme # Prénom / Thème-ObjetTPxx. Vous pouvez déposer les .py dans l’éditeur.",
+		pyTitle: "Python",
+
+		openDb: "Ouvrir .sqlite",
+		importDb: "Importer .sqlite",
+		saveDb: "Enregistrer .sqlite",
+		saveDbAs: "Enregistrer sous…",
+		exportDb: "Exporter .sqlite",
+		loadLabel: "Charger...",
+		loadVisits: "Stat. des visites",
+		loadGlossary: "Glossaire",
+		seedSchool: "Base scolaire",
+		hintSql: "Rappel : 1e ligne -- Prénom / Thème-ObjetTPxx pour nommer le fichier .sql. Vous pouvez déposer les .sql dans l’éditeur et .sqlite dans le panneau de droite.",
+		schema: "Schéma",
+		tablesCols: "Tables et colonnes",
+		foreignKeys: "Clés étrangères",
+		metadata: "Métadonnées",
+		erDiagram: "Diagramme ER"
+	},
+
+	de: {
+		brandTitle: "INFORMATIC - Programmierung",
+		navStats: "Statistiken",
+		navGuide: "Benutzerhandbuch",
+
+		badgeWeb: "Web",
+		badgeDocs: "Dokumente",
+		badgeInterp: "Befehlsinterpretation",
+		badgeData: "Daten",
+		openBtn: "Öffnen",
+
+		closeBtn: "Schließen",
+		alertInfo: "Einige Funktionen zum Öffnen und Speichern erfordern die Browser Chrome oder Edge (File System Access API). In anderen Fällen (insbesondere mit Firefox und Safari) verwenden Sie Herunterladen / Exportieren.",
+		comingFeaturesTitle: "Kommende Funktionen",
+		comingFeaturesText: "Live-Funktionen, Start/Stopp von Endlosschleifen, Fehlerbehebungen, Erfahrungsberichte, mehrsprachige Bedienungsanleitung, Lexikon (js), Prüfungsmodus.",
+
+		heroTitle: "Online-Übungsumgebung für Programmierung – einfach und effizient",
+		heroDesc: "Fünf ergänzende Workshops, um den Umgang mit Datenbanken (SQLite) zu erlernen oder das Programmieren in HTML/CSS, Javascript, Markdown und Python.",
+		newTerm: "Neue αlpha Version",
+		alphaTerm: " [αlpha.0.2]",
+		betaTerm: "version βeta.0.5",
+		btnOpenJs: "Javascript Workshop",
+
+		htmlTitle: "HTML/CSS Workshop",
+		htmlDesc: "Seiten mit Bootstrap & Icons bearbeiten/ansehen.",
+		htmlFeat1: "Integrierte Vorschau",
+		htmlFeat2: "Snippets & Vorlage",
+		htmlFeat3: "CSS-Verwaltung integriert",
+
+		mdTitle: "Markdown Workshop",
+		mdDesc: "In .md schreiben, Live-Rendering, einfacher Export.",
+		mdFeat1: "Echtzeit-Vorschau",
+		mdFeat2: "Bearbeitungssprache",
+		mdFeat3: "Drucken und HTML-Export",
+
+		pyTitle: "Python Workshop",
+		pyDesc: "Skripte ausführen, grundlegende Ein-/Ausgaben.",
+		pyFeat1: "Konsolen- & Grafik-Ausgaben",
+		pyFeat2: "Vorschläge für Schlüsselwörter",
+		pyFeat3: "Enthält Turtle",
+
+		sqlTitle: "Lab SQL (SQLite)",
+		sqlDesc: "SQL-Editor, Import/Export .sqlite, lokale Ausführung.",
+		sqlFeat1: "SQL-Skripte und Datenbank",
+		sqlFeat2: "Metadaten und Entitäts- / Beziehungsdiagramm (Mermaid)",
+
+		aboutTitle: "INFORMATIC - Über uns",
+		aboutIntro: "Unsere Plattform ist kostenlos und werbefrei. Wenn Sie uns unterstützen möchten, können Sie eine Spende tätigen oder uns einen Kaffee spendieren – danke ❤️",
+		donate: "Spenden",
+		coffee: "Einen Kaffee spendieren",
+
+		diffTitle: "Was uns unterscheidet",
+		diffDesc: "Dieses Angebot wurde von einem Team erfahrener Lehrkräfte und Entwickler erstellt und bietet 100% webbasierte Workshops zur Programmierunterstützung (HTML/CSS, Javascript, Markdown, Python und SQL).",
+
+		compareTitle: "Vergleiche",
+		compareFeat: "Kurze Funktionsübersicht",
+		compareLang: "Vergleich der Programmiersprachen",
+		compareEdu: "Entscheidungstabelle für den pädagogischen Einsatz",
+
+		noteTurtle: "Für fortgeschrittene Turtle-Skripte empfehlen wir WebTigerPython oder WebEduPy, entwickelt von der ETH Zürich.",
+
+		footerText: "Pädagogische IT-Umgebung",
+		themeLabel: "Anzeige",
+		themeLight: "hell",
+		themeDark: "dunkel",
+		langMenu: "Sprachen",
+
+  		casTitle: "Praxisbeispiele",
+		// --- TIPPEN ---
+		typingTitle: "Tippen",
+		typingFeat1: "Technische Übungen und Geschwindigkeit",
+		typingFeat2: "Echtzeit-Fehleranalyse",
+		typingFeat3: "Berechnung der Anschläge und Fehler pro Minute",
+		typingFeat4: "Nur für Französisch",
+		// --- BLOCKCHAIN ---
+		blockTitle: "Blockchain & Kryptowährung",
+		blockFeat1: "Öffentliche / private Adresse",
+		blockFeat2: "Signierte Transaktionen",
+		blockFeat3: "Peers und Synchronisation",
+		blockFeat4: "Nur auf Französisch",
+		// --- MEDICA ---
+		medicaTitle: "Datenschutz und Fensterverwaltung",
+		medicaFeat1: "Verschlüsselung und nicht korrelierte Speicherung",
+		medicaFeat2: "Funktionsweise über mehrere Domains hinweg",
+		medicaFeat3: "Diagramme und Berichterstattung",
+		medicaFeat4: "medica.li",
+		// --- PARAPENTE ---
+		glideTitle: "Zeitbezogene Daten und Produktverkäufe",
+		glideFeat1: "Darstellung von Informationen",
+		glideFeat2: "Daten- und Prozessverwaltung",
+		glideFeat3: "Live-Tracking",
+		glideFeat4: "parapente.world",
+		// --- AUTRES ---
+		comptaFeat1: "Buchhaltung",
+		timeFeat1: "Uhr / Zeiterfassung",
+		webFeat1: "Webseiten (CMS)",
+		downloadBtn: "Herunterladen",
+
+		htmlCssTitle: "HTML / CSS",
+		fullscreen: "F11",
+		menuFile: "Datei",
+		openFile: "Öffnen",
+		saveFile: "Speichern",
+		saveAsFile: "Speichern unter...",
+		downloadFile: "Herunterladen",
+		share: "Teilen",
+		link: "Link",
+		iframe: "iFrame",
+		reset: "Zurücksetzen",
+		preview: "Vorschau [F9]",
+		hintHtml: "= [z,s] | Erinnerung: Erste Zeile wie <!-- Vorname / Thema–ObjektPAxx --> oder <!-- nnn.html --> einfügen.  Sie können .html in den Editor ziehen.",
+		resize: "Größe ändern",
+		previewTitle: "Vorschau",
+		clear: "Löschen",
+		help: "Lexikon",
+
+		jsTitle: "Javascript",
+		hintJs: "= [z,s] | Hinweis: Setze die erste Zeile in die Form <!-- Vorname / Thema–ObjektPAxx -->. Sie können .js in den Editor ziehen.",
+		result: "Ergebnis",
+
+		mdTitle: "Markdown",
+		hintMd: "= [z,s] | Hinweis: Setze die erste Zeile in die Form <code># Vorname / Thema–ObjektPAxx</code>. Sie können .md in den Editor ziehen.",
+		exportHtml: ".html exportieren",
+		exportPdf: ".pdf exportieren",
+		print: "Drucken",
+
+		notSupported: "In Safari nicht unterstützt",
+		run: "Ausführen [F9]",
+		hintPy: "= [z,s] | Erinnerung: Die erste Zeile in der Form # Vorname / Thema–ObjektPAxx. Sie können .py in den Editor ziehen.",
+		pyTitle: "Python",
+
+		openDb: ".sqlite öffnen",
+		importDb: ".sqlite importieren",
+		saveDb: ".sqlite speichern",
+		saveDbAs: "Speichern unter…",
+		exportDb: ".sqlite exportieren",
+		loadLabel: "Laden...",
+		loadVisits: "Besuchsstatistiken",
+		loadGlossary: "Glossar",
+		seedSchool: "Schuldatenbank",
+		hintSql: "Hinweis: Erste Zeile -- Vorname / Thema–ObjektPAxx, um die .sql-Datei zu benennen. Sie können .sql in den Editor und .sqlite ins rechte Panel ziehen.",
+		schema: "Schema",
+		tablesCols: "Tabellen & Spalten",
+		foreignKeys: "Fremdschlüssel",
+		metadata: "Metadaten",
+		erDiagram: "ER-Diagramm"
+	},
+
+	en: {
+		brandTitle: "INFORMATIC - Programming",
+		navStats: "Statistics",
+		navGuide: "User guide",
+
+		badgeWeb: "web",
+		badgeDocs: "documents",
+		badgeInterp: "command interpretation",
+		badgeData: "data",
+		openBtn: "Open",
+
+		closeBtn: "Close",
+		alertInfo: "Some open and save functions require Chrome or Edge (File System Access API). In other cases (notably Firefox and Safari), use Download / Export.",
+		comingFeaturesTitle: "Upcoming features",
+		comingFeaturesText: "live features, infinite loop execution/stopping, bug fixes, testimonials, multilingual user guide, glossary (js), exam mode.",
+
+		heroTitle: "Online programming training space - simple and effective",
+		heroDesc: "Five complementary and integrated workshops to learn how to manage databases (SQLite) or to code in HTML/CSS, Javascript, Markdown, and Python.",
+		newTerm: "New αlpha version",
+		alphaTerm: " [αlpha.0.2]",
+		betaTerm: "version βeta.0.5",
+		btnOpenJs: "Javascript workshop",
+
+  		casTitle: "Case studies",
+		// --- TYPING ---
+		typingTitle: "Typing",
+		typingFeat1: "Technical exercises and speed",
+		typingFeat2: "Real-time error analysis",
+		typingFeat3: "Calculation of keystrokes & errors per minute",
+		typingFeat4: "For French only",
+		// --- BLOCKCHAIN ---
+		blockTitle: "Blockchain & Cryptocurrency",
+		blockFeat1: "Public / private address",
+		blockFeat2: "Signed transactions",
+		blockFeat3: "Peers and synchronization",
+		blockFeat4: "Only in French",
+		// --- MEDICA ---
+		medicaTitle: "Privacy and Window Management",
+		medicaFeat1: "Encryption and non-correlated storage",
+		medicaFeat2: "Cross-domain operation",
+		medicaFeat3: "Graphs and reporting",
+		medicaFeat4: "medica.li",
+		// --- PARAPENTE ---
+		glideTitle: "Time-based Data",
+		glideFeat1: "Information display and product sales",
+		glideFeat2: "Data and process management",
+		glideFeat3: "Live tracking",
+		glideFeat4: "parapente.world",
+		// --- AUTRES ---
+		comptaFeat1: "Accounting",
+		timeFeat1: "Clock / Time tracking",
+		webFeat1: "Websites (CMS)",
+		downloadBtn: "Download",
+
+		htmlTitle: "HTML/CSS workshop",
+		htmlDesc: "Edit/view your pages with Bootstrap & icons..",
+		htmlFeat1: "Integrated preview",
+		htmlFeat2: "Snippets & template",
+		htmlFeat3: "CSS management included",
+
+		mdTitle: "Markdown workshop",
+		mdDesc: "Write in .md, live rendering, simple export to HTML/PDF.",
+		mdFeat1: "Real-time preview",
+		mdFeat2: "Editing language",
+		mdFeat3: "Print and HTML export",
+
+		pyTitle: "Python workshop",
+		pyDesc: "Run scripts, basic I/O and plots. Format .py.",
+		pyFeat1: "Console & graphics output",
+		pyFeat2: "Keyword suggestions",
+		pyFeat3: "Includes Turtle",
+
+		sqlTitle: "SQL Lab (SQLite)",
+		sqlDesc: "SQL editor, import/export .sqlite, local execution.",
+		sqlFeat1: "SQL scripts and databases",
+		sqlFeat2: "Metadata and E/R schema (Mermaid)",
+
+		aboutTitle: "INFORMATIC - About",
+		aboutIntro: "Our platform is free and ad-free. If you want to support us, you can make a donation or buy us a coffee - thank you ❤️",
+		donate: "Make a donation",
+		coffee: "Buy a coffee",
+
+		diffTitle: "What makes us different",
+		diffDesc: "Created by a team of teachers and developers, this service provides 100% web-based programming workshops (HTML/CSS, Javascript, Markdown, Python and SQL).",
+
+		compareTitle: "Comparisons",
+		compareFeat: "Brief feature study",
+		compareLang: "Programming languages comparison",
+		compareEdu: "Decision table for educational use",
+
+		noteTurtle: "For advanced uses of Turtle scripts, we recommend WebTigerPython or WebEduPy, developed by ETHZ.",
+
+		footerText: "Educational computer environment",
+		themeLabel: "Display",
+		themeLight: "light",
+		themeDark: "dark",
+		langMenu: "Languages",
+
+		htmlCssTitle: "HTML / CSS",
+		fullscreen: "F11",
+		menuFile: "File",
+		openFile: "Open",
+		saveFile: "Save",
+		saveAsFile: "Save as...",
+		downloadFile: "Download",
+		share: "Share",
+		link: "Link",
+		iframe: "iFrame",
+		reset: "Reset",
+		preview: "Preview [F9]",
+		hintHtml: "= [r,c] | Reminder: first line as <!-- Firstname / Subject-ItemPWxx --> or <!-- nnn.html -->.  You can drop .html into the editor",
+		resize: "Resize",
+		previewTitle: "Preview",
+		clear: "Clear",
+		help: "Glossary",
+
+		jsTitle: "Javascript",
+		hintJs: "= [r,c] | Reminder: put the first line in the form <!-- Firstname / Subject-ItemPWxx -->.  You can drop .js into the editor",
+		result: "Result",
+
+		mdTitle: "Markdown",
+		hintMd: "= [r,c] | Reminder: put the first line in the form #### Firstname / Subject-ItemPWxx</code>.  You can drop .md into the editor",
+		exportHtml: "Export .html",
+		exportPdf: "Export .pdf",
+		print: "Print",
+
+		notSupported: "Not supported in Safari",
+		run: "Run [F9]",
+		hintPy: "= [r,c] | Reminder: put the first line in the form # Firstname / Subject-ItemPWxx.  You can drop .py into the editor.",
+		pyTitle: "Python",
+
+		openDb: "Open .sqlite",
+		importDb: "Import .sqlite",
+		saveDb: "Save .sqlite",
+		saveDbAs: "Save as…",
+		exportDb: "Export .sqlite",
+		loadLabel: "Load...",
+		loadVisits: "Visit statistics",
+		loadGlossary: "Glossary",
+		seedSchool: "School database",
+		hintSql: "Reminder: first line -- Firstname / Subject-ItemPWxx to name the .sql file. You can drop .sql into the editor and .sqlite into the right panel.",
+		schema: "Schema",
+		tablesCols: "Tables & columns",
+		foreignKeys: "Foreign keys",
+		metadata: "Metadata",
+		erDiagram: "ER diagram"
+	}
+};
+
+	// === Application d’une langue ===
+	function applyLang(lang) {
+		document.querySelectorAll("[data-i18n]").forEach(el => {
+		const key = el.dataset.i18n;
+		el.textContent = translations[lang]?.[key] || el.textContent || key;
+		});
+		document.documentElement.lang = lang;
+	}
+
+function applyLang(lang) {
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.dataset.i18n;
+    el.textContent = translations[lang]?.[key] || el.textContent || key;
+  });
+  document.documentElement.setAttribute("lang", lang); // <-- modifie <html lang="...">
+}
+
+	// === Persistance ===
+	function setLang(lang) {
+		localStorage.setItem("lang", lang);
+		applyLang(lang);
+	}
+
+	// Langue par défaut : localeStorage ou navigateur
+	const savedLang = localStorage.getItem("lang") || navigator.language.slice(0,2) || "fr";
+	applyLang(translations[savedLang] ? savedLang : "fr");

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Aide</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../css/dist/bootstrap@5.3.8/bootstrap_min.css">
+  <script src="../js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+  <style>
+    h4 { margin-top:1.5rem; font-weight:600; border-bottom:2px solid #dee2e6; padding-bottom:.3rem; }
+    h6 { margin-top:.8rem; font-weight:500; color:#6c757d; }
+    .accordion-button { display:flex; justify-content:space-between; align-items:center; }
+    .term-label { font-weight:600; display:flex; align-items:center; gap:.4rem; }
+    .term-context { color:#6c757d; font-size:.9rem; display:flex; align-items:center; gap:.3rem; }
+    pre { background:#f1f3f5; padding:.5rem; border-radius:.25rem; }
+    .btn-check:checked + .btn { background:#0d6efd; color:#fff; }
+    code { white-space: pre-wrap; }
+  </style>
+</head>
+<body class="p-3">
+  <!-- Barre recherche + tri intégré -->
+  <div class="input-group mb-3">
+    <span class="input-group-text"><i class="bi bi-search"></i></span>
+    <input id="search" type="text" class="form-control" placeholder="Rechercher">
+    <div class="btn-group" role="group">
+      <input type="radio" class="btn-check" name="sortMode" id="sortAlpha" value="alpha" autocomplete="off">
+      <label class="btn btn-outline-secondary" for="sortAlpha" title="Tri alphabétique">
+        <i class="bi bi-sort-alpha-down"></i>
+      </label>
+      <input type="radio" class="btn-check" name="sortMode" id="sortChap" value="chap" autocomplete="off" checked>
+      <label class="btn btn-outline-secondary" for="sortChap" title="Par rubrique">
+        <i class="bi bi-journal-bookmark"></i>
+      </label>
+    </div>
+  </div>
+
+  <div class="accordion" id="accordionResults"></div>
+
+<script>
+let db;
+
+window.addEventListener("message", (e) => {
+	if (e.data && e.data.action === "focusSearch") {
+		const input = document.getElementById("search");
+		if (input) input.focus();
+	}
+});
+
+// Récupération des paramètres URL
+function getParams() {
+  const params = new URLSearchParams(window.location.search);
+  const norm = s => (s || "").trim().toLowerCase();
+  return {
+    atelier: norm(params.get("atelier")), // ex: "python"
+    lang:    norm(params.get("lang"))     // ex: "fr"
+  };
+}
+
+async function init() {
+  const SQL = await initSqlJs({ locateFile: f =>
+    `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}`
+  });
+
+  const response = await fetch("aide.db", {cache: "no-store"});
+  const buffer = await response.arrayBuffer();
+  db = new SQL.Database(new Uint8Array(buffer));
+
+  const { atelier, lang } = getParams();
+
+  // Stockage global (utilisé dans render)
+  window.selectedLang = lang;
+  window.selectedAtelier = atelier;
+
+  render("", "chap");
+}
+
+function normalizeExample(s) {
+  if (!s) return "";
+  return String(s)
+    .replace(/\\n/g, "\n")
+    .replace(/\\t/g, "    ");
+}
+
+function renderSafeHtml(input) {
+  // 1) on échappe tout
+  let s = escapeHtml(input);
+
+	// 2) on ré-autorise quelques balises (liste blanche)
+	// <b> <strong> <i> <em> <br> <pre> <code>
+	s = s
+	  .replace(/&lt;(\/?)(b|strong|i|em|pre|code)&gt;/gi, "<$1$2>")
+	  .replace(/&lt;br\s*\/?&gt;/gi, "<br>");
+
+  return s;
+}
+
+function render(q, mode) {
+  const terms = q.trim().split(/\s+/).filter(Boolean);
+
+  const perWord = (i) => `
+    (t.terme LIKE $p${i}
+     OR t.explication LIKE $p${i}
+     OR t.exemple LIKE $p${i}
+     OR c.titre LIKE $p${i}
+     OR sc.titre LIKE $p${i})
+  `;
+  const whereAnd = terms.length ? "AND " + terms.map((_, i) => perWord(i)).join(" AND ") : "";
+
+  let orderBy = "";
+  if (mode === "alpha") {
+    orderBy = "ORDER BY t.terme COLLATE NOCASE";
+  } else if (mode === "chap") {
+    orderBy = "ORDER BY c.rang, sc.rang, t.rang";
+  }
+
+  let whereLang = "";
+  if (window.selectedLang) {
+    whereLang = "AND l.code = $lang";
+  }
+
+  let whereAtelier = "";
+  if (window.selectedAtelier) {
+    whereAtelier = "AND LOWER(th.nom) = $atelier";
+  }
+
+  const sql = `
+    SELECT
+      t.id, t.terme, t.explication, t.exemple,
+      c.id AS id_chapitre, c.titre AS chapitre,
+      sc.id AS id_souschapitre, sc.titre AS souschapitre
+    FROM termes t
+    LEFT JOIN chapitres c       ON t.id_chapitre = c.id
+    LEFT JOIN sous_chapitres sc ON t.id_souschapitre = sc.id
+    LEFT JOIN themes th         ON th.id = c.id_theme
+    LEFT JOIN langues l         ON c.id_langue = l.id
+    WHERE 1=1 ${whereLang} ${whereAtelier} ${whereAnd}
+    ${orderBy};
+  `;
+
+  const stmt = db.prepare(sql);
+  const bindings = {};
+  if (window.selectedLang)     bindings["$lang"]    = window.selectedLang;
+  if (window.selectedAtelier)  bindings["$atelier"] = window.selectedAtelier;
+  terms.forEach((term, i) => { bindings[`$p${i}`] = `%${term}%`; });
+  stmt.bind(bindings);
+
+  const rows = [];
+  while (stmt.step()) rows.push(stmt.getAsObject());
+  stmt.free();
+
+  const acc = document.getElementById("accordionResults");
+  acc.innerHTML = "";
+
+  if (mode === "chap") {
+    const chapitres = {};
+    rows.forEach(r => {
+      if (!chapitres[r.id_chapitre]) {
+        chapitres[r.id_chapitre] = {
+          titre: r.chapitre,
+          termes: [],
+          souschapitres: {}
+        };
+      }
+      if (r.id_souschapitre) {
+        if (!chapitres[r.id_chapitre].souschapitres[r.id_souschapitre]) {
+          chapitres[r.id_chapitre].souschapitres[r.id_souschapitre] = {
+            titre: r.souschapitre,
+            termes: []
+          };
+        }
+        chapitres[r.id_chapitre].souschapitres[r.id_souschapitre].termes.push(r);
+      } else {
+        chapitres[r.id_chapitre].termes.push(r);
+      }
+    });
+
+    Object.values(chapitres).forEach(ch => {
+      acc.innerHTML += `<h4><i class="bi bi-journals me-2"></i>${ch.titre}</h4>`;
+      const container = document.createElement("div");
+      container.classList.add("ms-3", "mb-2");
+
+      ch.termes.forEach(t => {
+        container.innerHTML += renderTerm(t);
+      });
+
+      Object.values(ch.souschapitres).forEach(sc => {
+        let scHtml = `
+          <div class="ms-3 mb-2">
+            <h6><i class="bi bi-bookmark me-2"></i>${sc.titre}</h6>
+        `;
+        sc.termes.forEach(t => {
+          scHtml += renderTerm(t);
+        });
+        scHtml += `</div>`;
+        container.innerHTML += scHtml;
+      });
+
+      acc.appendChild(container);
+    });
+  } else {
+    rows.forEach(r => {
+      const context = `${r.chapitre || ""}${r.souschapitre ? " › " + r.souschapitre : ""}`;
+      acc.innerHTML += renderTerm(r, context);
+    });
+  }
+}
+
+function escapeHtml(s) {
+  return String(s || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function nlToBrExceptQuoted(input) {
+  if (input === null || input === undefined) return "";
+
+  let s = String(input);
+
+  // Protéger le cas exact : "\n  (guillemet + backslash + n)
+  const TOKEN = "__QUOTED_LIT_NL__";
+  s = s.replace(/"\\n/g, `"${TOKEN}`);
+
+  // Convertir les \n littéraux restants -> <br>
+  s = s.replace(/\\n/g, "<br>");
+
+  // Convertir les vrais retours ligne -> <br>
+  s = s.replace(/\r\n|\r|\n/g, "<br>");
+
+  // Restaurer le cas protégé
+  s = s.replace(new RegExp(`"${TOKEN}`, "g"), `"\\n`);
+
+  return s;
+}
+
+function normalizeCodeTextExceptQuoted(input) {
+  if (input === null || input === undefined) return "";
+
+  let s = String(input);
+
+  const TOKEN = "__QUOTED_LIT_NL__";
+  s = s.replace(/"\\n/g, `"${TOKEN}`);
+
+  // \n littéraux -> vrais retours (pour afficher le code)
+  s = s.replace(/\\n/g, "\n");
+
+  // normaliser retours Windows
+  s = s.replace(/\r\n|\r/g, "\n");
+
+  // tabulations
+  s = s.replace(/\\t/g, "    ").replace(/\t/g, "    ");
+
+  // restaurer "\n
+  s = s.replace(new RegExp(`"${TOKEN}`, "g"), `"\\n`);
+
+  return s;
+}
+
+function renderTerm(row, context = "") {
+  const collapseId = "collapse" + row.id;
+  return `
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button"
+                data-bs-toggle="collapse" data-bs-target="#${collapseId}">
+          <span class="term-label">${escapeHtml(row.terme)}</span>
+          ${context ? `&nbsp;<span class="term-context">[<i class="bi bi-diagram-3"></i>${context}]</span>` : ""}
+        </button>
+      </h2>
+      <div id="${collapseId}" class="accordion-collapse collapse">
+        <div class="accordion-body">
+          <p>${renderSafeHtml(nlToBrExceptQuoted(row.explication))}</p>
+          ${row.exemple ? `<pre><code>${escapeHtml(normalizeCodeTextExceptQuoted(row.exemple))}</code></pre>` : ""}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Gestion recherche + tri
+const searchBox = document.getElementById("search");
+function getSortMode() {
+  return document.querySelector('input[name="sortMode"]:checked').value;
+}
+function update() {
+  render(searchBox.value, getSortMode());
+}
+searchBox.addEventListener("input", update);
+document.querySelectorAll('input[name="sortMode"]').forEach(el =>
+  el.addEventListener("change", update)
+);
+
+// Reset avec ESC
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    searchBox.value = "";
+    render("", getSortMode());
+  }
+});
+
+// Démarrage
+init();
+</script>
+</body>
+</html>

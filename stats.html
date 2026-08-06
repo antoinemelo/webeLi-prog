@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Statistiques</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="icon" href="./assets/images/grid.svg" type="image/svg+xml">
+  <link rel="icon" href="./assets/images/grid.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#0b1220">
+
+	<!-- Bootstrap & Icons -->
+	<link rel="stylesheet" href="./assets/css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css">
+	<link rel="stylesheet" href="./assets/css/dist/bootstrap@5.3.8/bootstrap_min.css">
+	<link rel="stylesheet" href="./assets/css/app.css">
+	<script src="../../assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
+
+	<!-- Chart.js -->
+	<script src="../../assets/js/dist/chart@4.5.0/chart-umd_min.js" defer></script>
+</head>
+<body data-app="stats">
+  <!-- NAV -->
+  <nav class="navbar navbar-dark">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+        <i class="bi bi-grid"></i>
+        <span>INFORMATIC - Statistiques</span>
+      </a>
+      <span class="brand-mini">
+        <a class="btn btn-outline-light" href="/" title="Accueil">
+          <i class="bi bi-house-door"></i>
+        </a>
+      </span>
+    </div>
+  </nav>
+
+  <!-- CONTENU -->
+  <main class="services">
+    <div class="container">
+      <!-- Bandeau info -->
+      <div class="col-12">
+        <div class="alert alert-info mb-0" role="alert">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-bell-fill h3"></i>
+            <div>
+              Ces statistiques sont calculées côté serveur sur trois ans, pour l’ensemble des visites du site.
+              Les adresses IP ne sont pas stockées, les empreintes visiteurs ne sont pas personnalisées et aucun cookie n’est utilisé.
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+
+      <div class="row g-4">
+		<!-- Par période (année/mois/semaine) -->
+		<div class="col-12 col-lg-6">
+		  <div class="card h-100">
+			<div class="card-body">
+			  <div class="d-flex justify-content-between align-items-center mb-3">
+				<h2 class="h5 mb-0">Visites</h2>
+				<div class="btn-group" role="group">
+				  <button id="btnYear" class="btn btn-sm btn-outline-primary active">Année</button>
+				  <button id="btnMonth" class="btn btn-sm btn-outline-primary">Mois</button>
+				  <button id="btnWeek" class="btn btn-sm btn-outline-primary">Semaine</button>
+				</div>
+			  </div>
+			  <canvas id="byPeriod" height="360"></canvas>
+			</div>
+		  </div>
+		</div>
+
+        <!-- Par produit -->
+        <div class="col-12 col-lg-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h2 class="h5 mb-3">Par produit</h2>
+              <canvas id="byProduct" height="360"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Par heure -->
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <h2 class="h5 mb-3">Par heure de la journée</h2>
+              <canvas id="byHour" height="360"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+      <div>
+        © <span id="y"></span> / InformaticLi - Environnement informatique pédagogique
+        <span class="text-success"><i class="bi bi-heart-fill"></i></span> SIMCE
+      </div>
+    </div>
+  </footer>
+
+  <!-- FAB -->
+  <div class="fab-group">
+    <a href="https://www.simce.swiss/helpdesk" target="_blank" rel="noopener"
+       class="btn btn-danger btn-lg" title="Signaler un bug" aria-label="Signaler un bug">
+      <i class="bi bi-bug-fill"></i>
+    </a>
+    <a class="btn btn-warning btn-lg" href="mailto:msg@informatic.li"
+       title="Nous écrire" aria-label="Nous écrire">
+      <i class="bi bi-envelope-at-fill"></i>
+    </a>
+  </div>
+
+  <script>
+    // année dynamique
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Tracking (compte la page stats)
+    (() => {
+      const PRODUCT = "stats";
+      const PATH    = location.pathname;
+      const SITE    = location.hostname;
+      const KEY = `trk:${SITE}:${PRODUCT}:${PATH}`;
+      const last = +sessionStorage.getItem(KEY) || 0;
+      if (Date.now() - last < 90*60*1000) return;
+      sessionStorage.setItem(KEY, Date.now());
+      fetch("https://parapente.world/lab/api/track.php", {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type":"application/json" },
+        keepalive: true,
+        body: JSON.stringify({ site: SITE, product: PRODUCT, path: PATH })
+      }).catch(()=>{});
+    })();
+
+    // -------- Graphiques --------
+    async function loadStats(){
+      const site = 'informatic.li';
+      const res  = await fetch(`https://parapente.world/lab/api/stats.php?site=${site}`);
+      const data = await res.json();
+
+      // tri
+      const yearRows = [...data.year].sort((a,b)=>Number(a.year)-Number(b.year));
+      const monthRows = [...data.month].sort((a,b)=>a.month.localeCompare(b.month));
+		const weekRows = [...data.week].sort((a,b)=>a.week.localeCompare(b.week));
+
+      // graphique dynamique année/mois
+      let chart;
+function render(mode){
+  let rows, labels;
+  if(mode==="year"){
+    rows = yearRows;
+    labels = rows.map(r => r.year);
+  } else if(mode==="month"){
+    rows = monthRows;
+    labels = rows.map(r => r.month);
+  } else if(mode==="week"){
+    rows = weekRows;
+    labels = rows.map(r => r.week);
+  }
+  const counts = rows.map(r => Number(r.count));
+
+  if(chart) chart.destroy();
+  chart = new Chart(document.getElementById('byPeriod'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Visites",
+        data: counts,
+        borderColor: "#0d6efd",
+        backgroundColor: "rgba(13,110,253,0.2)",
+        fill: true,
+        tension: 0.3,
+        pointRadius: 3,
+        pointHoverRadius: 5
+      }]
+    },
+    options: {
+      responsive:true,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{ legend:{ display:false }},
+      scales:{
+        y:{ beginAtZero:true, ticks:{ precision:0 }},
+        x:{ ticks:{ autoSkip:true, maxRotation:0 }}
+      }
+    }
+  });
+}
+
+	// événements boutons
+	document.getElementById("btnYear").addEventListener("click", ()=>{
+	  document.getElementById("btnYear").classList.add("active");
+	  document.getElementById("btnMonth").classList.remove("active");
+	  document.getElementById("btnWeek").classList.remove("active");
+	  render("year");
+	});
+
+	document.getElementById("btnMonth").addEventListener("click", ()=>{
+	  document.getElementById("btnMonth").classList.add("active");
+	  document.getElementById("btnYear").classList.remove("active");
+	  document.getElementById("btnWeek").classList.remove("active");
+	  render("month");
+	});
+
+	document.getElementById("btnWeek").addEventListener("click", ()=>{
+	  document.getElementById("btnWeek").classList.add("active");
+	  document.getElementById("btnYear").classList.remove("active");
+	  document.getElementById("btnMonth").classList.remove("active");
+	  render("week");
+	});
+
+      // affichage par défaut
+      render("year");
+
+      // Produits (camembert)
+      const products = data.product.map(r => r.product);
+      const pcounts  = data.product.map(r => r.count);
+
+      new Chart(document.getElementById('byProduct'), {
+        type: 'pie',
+        data: { labels: products, datasets: [{ data: pcounts }] },
+        options: { responsive:true, plugins: { legend: { display:true } } }
+      });
+
+      // Heures (histogramme)
+      const hoursAll = Array.from({length:24}, (_,h)=>h);
+      const hmap = Object.fromEntries(data.hour.map(r=>[Number(r.hour), Number(r.count)]));
+      const hcounts = hoursAll.map(h => hmap[h] ?? 0);
+
+      new Chart(document.getElementById('byHour'), {
+        type: 'bar',
+        data: { labels: hoursAll.map(h=>`${h}h`), datasets: [{ data: hcounts }] },
+        options: {
+          responsive:true,
+          plugins: { legend: { display:false } },
+          scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }
+        }
+      });
+    }
+
+    loadStats();
+  </script>
+
+  <script src="/assets/js/theme.js"></script>
+  <script>
+    Theme.init({ canWrite:false });  // applique + suit, sans changer localStorage
+  </script>
+</body>
+</html>

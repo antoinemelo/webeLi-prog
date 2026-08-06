@@ -1,0 +1,526 @@
+/* =========================================================
+   THEME TOKENS (dark par défaut) + thème clair
+   ========================================================= */
+
+/* Thème sombre (défaut) */
+:root{
+  /* Surfaces */
+  --bg: #0b1220;
+  --nav: #0f1a33;
+  --card: #0c1731;
+  --surface-1:#0c1731; /* toolbars */
+  --surface-2:#0b162f; /* panneau droit */
+  --surface-3:#0a1122; /* code / output */
+  --surface-4:#375291;
+  --surface-5:inset 0 0 50px rgba(255,255,255,0.3);
+
+  /* Texte & bordures */
+  --text-main:#e7eefc;
+  --text-muted:#9fb3d2;
+  --border: rgba(255,255,255,.12);
+
+  /* Divers */
+  --shadow: 0 12px 28px rgba(0,0,0,.45);
+  --link: #8ab4ff;
+
+  /* Éditeur (split) */
+  --left: 50%;
+  --divider: 8px;
+  --gutter-bg:#0d1a36;
+  --gutter-fg:#9fb3d2;
+
+  /* Tables zébrées */
+  --tbl-striped: rgba(255,255,255,.06);
+  --tbl-hover:   rgba(255,255,255,.09);
+
+  --key-rose: #c97a8a;
+  --key-bleu: #6c8cd5;
+}
+
+/* Thème clair */
+html[data-theme="light"]{
+  --bg: #f8fafc;           /* gris très clair */
+  --nav:#ffffff;           /* barre claire */
+  --card:#ffffff;          /* cartes blanches */
+  --surface-1:#f1f5f9;     /* toolbars */
+  --surface-2:#eef2f7;     /* panneau droit */
+  --surface-3:#f3f6fb;     /* code / output */
+  --surface-4:#d3d3d3;
+  --surface-5:inset 0 0 50px rgba(0,0,0,0.12);
+
+  --text-main:#0f172a;     /* texte principal foncé */
+  --text-muted:#475569;    /* texte secondaire */
+  --border: rgba(0,0,0,.12);
+
+  --shadow: 0 10px 24px rgba(0,0,0,.10);
+  --link:#0b66ff;
+
+  --gutter-bg:#e7edf6;
+  --gutter-fg:#5b677a;
+
+  --tbl-striped: rgba(0,0,0,.04);
+  --tbl-hover:   rgba(0,0,0,.06);
+
+  --key-rose: #f9edf2;
+  --key-bleu: #e5f0ff;
+}
+
+/* Option: suivre la préférence système si aucun choix stocké */
+@media (prefers-color-scheme: light){
+  html:not([data-theme]){ color-scheme: light; }
+}
+@media (prefers-color-scheme: dark){
+  html:not([data-theme]){ color-scheme: dark; }
+}
+
+/* ---------------------------------------------------------
+   MODE COMPACT : quand le panneau gauche devient trop étroit
+   --------------------------------------------------------- */
+
+/* Dans ce mode : cacher les textes des boutons, garder les icônes */
+body.compact-toolbar .toolbar .btn span,
+body.compact-toolbar .toolbar .btn .d-sm-inline {
+  display: none !important;
+}
+
+/* Option : réduire les boutons, facultatif */
+body.compact-toolbar .toolbar .btn {
+  padding-left: .4rem !important;
+  padding-right: .4rem !important;
+}
+
+/* =========================================================
+   BASE COMMUNE
+   ========================================================= */
+
+html, body{ height:100%; }
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text-main);
+}
+
+/* Liens + texte secondaire (Bootstrap-friendly) */
+a{ color:var(--link); }
+.text-secondary{ color:var(--text-muted) !important; }
+
+/* Navbar, cartes, badges, footer */
+.navbar{ background:var(--nav); }
+.navbar .btn,
+.navbar .navbar-brand,
+.navbar .nav-link{ color:var(--text-main); }
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:1rem;
+  box-shadow:var(--shadow);
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  height:100%;
+}
+.card:hover{ transform: translateY(-2px); border-color: color-mix(in oklab, var(--text-main) 18%, transparent); }
+.card .bi{ opacity:.95; }
+
+.badge-soft{
+  background:color-mix(in oklab, var(--text-main) 8%, transparent);
+  color:var(--text-main);
+  border:1px solid var(--border);
+  font-weight:500;
+}
+
+.brand-mini{ opacity:.8; font-size:.85rem; }
+
+.footer{
+  border-top:1px solid var(--border);
+  color:var(--text-muted);
+  padding:1rem 0;
+  background: linear-gradient(180deg, transparent, color-mix(in oklab, var(--text-main) 2%, transparent));
+}
+
+/* Sections (index/stats) */
+.hero{
+  position:relative; padding:4.5rem 0 3rem;
+  border-bottom:1px solid var(--border);
+  background:
+    radial-gradient(1200px 600px at 20% -10%, color-mix(in oklab, var(--link) 35%, transparent) .15, transparent 60%),
+    radial-gradient(800px 400px at 100% 0, color-mix(in oklab, #b48cf2 30%, transparent) .12, transparent 55%);
+}
+.hero h1{ font-weight:700; letter-spacing:.2px; }
+.hero p.lead{ color:var(--text-muted); }
+.services{ padding:2rem 0 3rem; }
+
+/* FAB group */
+.fab-group{
+  position: fixed; right: 26px; bottom: 77px; z-index: 1055;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.fab-group .btn{
+  width: 56px; height: 56px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%;
+  box-shadow: var(--shadow);
+}
+
+/* Icônes d’état */
+.status-yes{color:#198754;}
+.status-partial{color:#fd7e14;}
+.status-no{color:#dc3545;}
+.legend i{font-size:1rem;}
+.feat-line i{font-size:1.1rem;vertical-align:-0.1em;margin-right:.4rem;}
+.table-compare td,.table-compare th{vertical-align:middle;}
+
+/* Modales (si .bg-dark est utilisée) */
+.modal-content.bg-dark{ background:var(--bg); color:var(--text-main); }
+
+/* Bouton clair/foncé — UI */
+.theme-toggle{
+  display:inline-flex; align-items:center; gap:.5rem; font:inherit; color:inherit;
+  background:transparent; border:1px solid var(--border); border-radius:999px;
+  padding:.25rem .5rem; cursor:pointer;
+}
+.theme-toggle .track{ position:relative; width:54px; height:22px; border-radius:999px; background:color-mix(in oklab, var(--text-main) 15%, transparent); }
+.theme-toggle .thumb{ position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:currentColor; transition:left .18s ease; }
+.theme-toggle.is-dark  .thumb{ left:34px; }
+.theme-toggle.is-light .thumb{ left:2px;  }
+
+/* Boutons compacts récurrents + outline “neutre” */
+.btn-sm{ padding:.3rem .6rem; }
+.btn-outline-light{
+  --bs-btn-color: var(--text-main);
+  --bs-btn-border-color: var(--border);
+  --bs-btn-hover-bg: color-mix(in oklab, var(--text-main) 10%, transparent);
+  --bs-btn-hover-color: var(--text-main);
+  --bs-btn-hover-border-color: var(--border);
+}
+
+/* Responsive global */
+@media (max-width: 575px){
+  .hero{padding:3rem 0 2rem}
+  .fab-group{ right:12px; bottom:12px; gap:10px; }
+  .fab-group .btn{ width:52px; height:52px; }
+}
+
+/* =========================================================
+   BLOC COMMUN “ATELIERS”
+   ========================================================= */
+
+main{ flex:1 1 auto; min-height:0; }
+.workbench{ height: calc(100vh - 56px); }
+.fullscreen .workbench{ height: 100vh; }
+
+.split{ position:relative; height:100%; width:100%; overflow:hidden; }
+.pane{ position:absolute; top:0; bottom:0; overflow:auto; min-width:200px; overflow:hidden; } /* SQL override 220px */
+.left{ left:0; width: calc(var(--left)); }
+.right{ right:0; left: calc(var(--left) + var(--divider)); }
+.divider{
+  position:absolute; top:0; bottom:0; left: calc(var(--left));
+  width: var(--divider); cursor: col-resize;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--text-main) 8%, transparent), color-mix(in oklab, var(--text-main) 2%, transparent));
+  border-left: 1px solid var(--border);
+  border-right: 1px solid color-mix(in oklab, #000 35%, transparent);
+}
+.dragging .divider{ background: color-mix(in oklab, var(--text-main) 12%, transparent); }
+
+/* Toolbars */
+.toolbar{
+  display:flex; gap:.5rem; align-items:center; padding:.5rem .75rem;
+  border-bottom:1px solid var(--border); background:var(--surface-1);
+}
+.toolbar .spacer{ flex:1; }
+
+/* Éditeur (gouttière + overlay) */
+.editor-wrap{ display:grid; grid-template-columns: auto 1fr; gap:0; height:calc(100% - 44px); }
+.gutter{
+  background:var(--gutter-bg); color:var(--gutter-fg);
+  min-width:3.2rem; padding:.5rem 1rem; text-align:right; user-select:none;
+  font:13px/1.5 ui-monospace,Menlo,Consolas,monospace; overflow:hidden;
+}
+.gutter div{ height:1.5em; }
+
+.codecell{ position:relative; }
+#highlighting{
+  position:absolute; inset:0; padding:.5rem .25rem; overflow:hidden;
+  white-space:pre-wrap; word-wrap:break-word;
+  font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;
+  pointer-events:none; color:var(--text-main);
+}
+.codearea{
+  position:relative; z-index:1; border:0; outline:none; resize:none; background:transparent; color:transparent;
+  caret-color:var(--text-main); padding:.5rem .25rem; width:100%;
+  font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;
+}
+
+/* Panneau droit générique */
+.right .toolbar{ background:var(--surface-2); }
+
+/* Hints */
+.hint{ font-size:.875rem; color:var(--text-muted); padding:.5rem .75rem; border-top:1px dashed var(--border); }
+
+/* Masquer scrollbars natives en gardant le scroll */
+.gutter, #highlighting, #code, .preview, pre#output, .result .table{
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.gutter::-webkit-scrollbar,
+#highlighting::-webkit-scrollbar,
+#code::-webkit-scrollbar,
+.preview::-webkit-scrollbar,
+pre#output::-webkit-scrollbar,
+.result .table::-webkit-scrollbar{ width:0; height:0; }
+
+/* Autocomplete */
+.autocomplete{
+  position:absolute; z-index:20; min-width:200px; max-height:220px; overflow:auto;
+  background:var(--surface-2); border:1px solid var(--border); border-radius:.5rem; box-shadow: var(--shadow);
+  font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;
+}
+.autocomplete.hidden{ display:none; }
+.autocomplete .item{ padding:.25rem .5rem; cursor:pointer; }
+.autocomplete .item.active,
+.autocomplete .item:hover{
+  background: color-mix(in oklab, var(--text-main) 8%, transparent);
+}
+
+/* Responsive ateliers */
+@media (max-width: 768px){
+  .workbench{ height:auto; }
+  .split{ display:flex; flex-direction:column; height:auto; }
+  .pane{ position:relative; top:auto; bottom:auto; min-height:0; }
+  .left, .right{ left:auto; right:auto; width:100%; }
+  .divider{ display:none; }
+  .gutter{ min-width: 2.4rem; }
+  .btn-sm{ padding:.5rem .75rem; }
+}
+
+/* =========================================================
+   OVERRIDES PAR PAGE (via [data-app="..."])
+   ========================================================= */
+
+/* ---------- INDEX ---------- */
+body[data-app="index"] .card h2.h5{ color:var(--text-main); }
+body[data-app="index"] .card .fs-3,
+body[data-app="index"] .card .fs-3 .bi{ color:var(--text-main); opacity:1; }
+
+/* ---------- STATS ---------- */
+body[data-app="stats"] .card h2{ color:var(--text-main); font-weight:600; }
+
+/* ---------- ANNULATION & MERCI ---------- */
+body[data-app="annulation"],
+body[data-app="merci"]{
+  background:var(--bg); color:var(--text-main);
+}
+body[data-app="annulation"] .card,
+body[data-app="merci"] .card{
+  background:var(--nav); border:1px solid var(--border);
+}
+body[data-app="annulation"] .muted,
+body[data-app="merci"] .muted{ color:var(--text-muted); }
+body[data-app="annulation"] .heart-red,
+body[data-app="merci"] .heart-red{ color:#ef4444; }
+body[data-app="annulation"] .btn-lg,
+body[data-app="merci"] .btn-lg{ padding:.7rem 1.1rem; }
+body[data-app="annulation"] .list-check i,
+body[data-app="merci"] .list-check i{ width:1.25rem; }
+
+/* ---------- MARKDOWN ---------- */
+body[data-app="markdown"] #highlighting{ overflow:auto; background:transparent; }
+body[data-app="markdown"] .right .toolbar{ background:var(--surface-2); }
+body[data-app="markdown"] .preview{
+  padding:1rem; height: calc(100% - 44px); overflow:auto;
+}
+body[data-app="markdown"] .preview :is(h1,h2,h3,h4,h5,h6){ color:var(--text-main); }
+body[data-app="markdown"] .preview p,
+body[data-app="markdown"] .preview li,
+body[data-app="markdown"] .preview blockquote{ color:color-mix(in oklab, var(--text-main) 88%, transparent); }
+body[data-app="markdown"] .preview table{ width:100%; border-collapse: collapse; margin:.5rem 0; }
+body[data-app="markdown"] .preview td,
+body[data-app="markdown"] .preview th{ border:1px solid var(--border); padding:.4rem .5rem; }
+body[data-app="markdown"] .preview blockquote{
+  border-left:3px solid color-mix(in oklab, var(--link) 70%, #3b82f6);
+  padding-left:.75rem; color:color-mix(in oklab, var(--text-main) 85%, transparent);
+}
+body[data-app="markdown"] .preview pre code{
+  display:block; padding:.75rem; border-radius:.5rem; background:var(--surface-3);
+}
+
+/* Tokens Markdown */
+body[data-app="markdown"] #highlighting .md-h1{ color:#93c5fd; font-weight:700; }
+body[data-app="markdown"] #highlighting .md-h2{ color:#7dd3fc; font-weight:700; }
+body[data-app="markdown"] #highlighting .md-h3{ color:#a5b4fc; font-weight:700; }
+body[data-app="markdown"] #highlighting .bold{ color:#ffd166; font-weight:700; }
+body[data-app="markdown"] #highlighting .italic{ color:#fca5a5; font-style:italic; }
+body[data-app="markdown"] #highlighting .underline{ color:#a8d0ff; text-decoration: underline; }
+body[data-app="markdown"] #highlighting .code{ color:#86efac; }
+body[data-app="markdown"] #highlighting .blockquote{ color:#c4b5fd; }
+body[data-app="markdown"] #highlighting .link{ color:#60a5fa; text-decoration:underline dotted; }
+body[data-app="markdown"] #highlighting .ulbul,
+body[data-app="markdown"] #highlighting .olnum{ color:#f59e0b; }
+body[data-app="markdown"] #highlighting .hr{ color:var(--text-muted); }
+body[data-app="markdown"] #highlighting .img{ color:#67e8f9; }
+
+/* ---------- SQL ---------- */
+body[data-app="sql"] .pane{ min-width:220px; } /* différence signalée */
+body[data-app="sql"] .codecell{
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--surface-3);
+}
+body[data-app="sql"] #code{
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+}
+body[data-app="sql"] #highlighting{
+  overflow: auto !important;
+  white-space: pre;      /* CRITIQUE : évite les retours automatiques qui désalignent */
+  word-wrap: normal;
+}
+body[data-app="sql"] #gutter{
+  margin: 0;
+  white-space: pre;
+}
+body[data-app="sql"] #highlighting .kw{  color:#60a5fa; font-weight:600; }
+body[data-app="sql"] #highlighting .fn{  color:#ff6b6b; font-weight:600; }
+body[data-app="sql"] #highlighting .str{ color:#98e089; }
+body[data-app="sql"] #highlighting .num{ color:#f59e0b; }
+
+body[data-app="sql"] .right .toolbar{ background:var(--surface-2); }
+
+/* Table résultats */
+body[data-app="sql"] .result .table{
+  padding:1rem; height: calc(100% - 44px); overflow:auto;
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--text-main);
+  --bs-table-border-color: var(--border);
+  --bs-table-striped-bg: var(--tbl-striped);
+  --bs-table-striped-color: var(--text-main);
+  --bs-table-hover-bg: var(--tbl-hover);
+  --bs-table-hover-color: var(--text-main);
+}
+body[data-app="sql"] .badge-db{ font-size:.75rem; }
+
+/* Dropdown items désactivés */
+body[data-app="sql"] .dropdown-menu-dark .dropdown-item.disabled,
+body[data-app="sql"] .dropdown-menu-dark .dropdown-item[aria-disabled="true"]{
+  opacity:.5; pointer-events:none; user-select:none;
+}
+
+/* Mobile SQL */
+@media (max-width:768px){
+  body[data-app="sql"] .left .editor-wrap{ height:45vh; }
+  body[data-app="sql"] .right .result{ height:38vh !important; }
+}
+
+/* ---------- PYTHON ---------- */
+body[data-app="python"] #highlighting{ overflow:hidden; }
+body[data-app="python"] #highlighting .tok.red  { color:#ff6b6b; font-weight:600; }
+body[data-app="python"] #highlighting .tok.blue { color:#60a5fa; font-weight:600; }
+body[data-app="python"] #highlighting .tok.str  { color:#98e089; }
+body[data-app="python"] #highlighting .tok.vio  { color:#b48cf2; font-weight:600; }
+body[data-app="python"] #highlighting .tok.num  { color:#f59e0b; }
+body[data-app="python"] #highlighting .tok.tstr { color:#ff9ad5; }
+body[data-app="python"] #highlighting .tok.com  { color:#a0acc0; }
+
+/* ===== Fix overlay Python : l'overlay doit scroller comme le textarea ===== */
+body[data-app="python"] .codecell{
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;      /* on coupe ce qui dépasse, mais on laisse scroller les enfants */
+  background: var(--surface-3);
+}
+
+body[data-app="python"] #code{
+  height: 100%;
+  width: 100%;
+  overflow: auto;        /* le scroll principal */
+}
+
+body[data-app="python"] #highlighting{
+  overflow: auto;        /* CRITIQUE : sinon scrollTop ne fonctionne pas */
+}
+
+body[data-app="python"] pre#output{
+  white-space:pre-wrap; background:var(--surface-3); color:var(--text-main);
+  margin:0; padding:1rem; height: calc(100% - 44px); overflow:auto;
+}
+@media (max-width:768px){
+  body[data-app="python"] .left .editor-wrap{ height:45vh; }
+  body[data-app="python"] .right pre#output{ height:38vh !important; }
+}
+
+/* ---------- JAVASCRIPT ---------- */
+body[data-app="javascript"] #highlighting{ overflow:hidden; }
+body[data-app="javascript"] #highlighting .tok.kw   { color:#60a5fa; font-weight:600; }
+body[data-app="javascript"] #highlighting .tok.fn   { color:#f87171; font-weight:600; }
+body[data-app="javascript"] #highlighting .tok.lit  { color:#a855f7; font-weight:600; }
+body[data-app="javascript"] #highlighting .tok.str  { color:#98e089; }
+body[data-app="javascript"] #highlighting .tok.num  { color:#f59e0b; }
+body[data-app="javascript"] #highlighting .tok.com  { color:#888; font-style:italic; }
+
+body[data-app="javascript"] .preview-wrap{ height: calc(100% - 44px); background:var(--surface-3); }
+body[data-app="javascript"] #preview{ width:100%; height:100%; border:0; background:#fff; }
+@media (max-width:768px){
+  body[data-app="javascript"] .left .editor-wrap{ height:45vh; }
+  body[data-app="javascript"] .preview-wrap{ height:38vh !important; }
+}
+
+/* ---------- HTML ---------- */
+body[data-app="html"] #highlighting{ overflow:auto; background:transparent; }
+body[data-app="html"] #highlighting .tok.tag  { color:#ff6b6b; font-weight:700; }
+body[data-app="html"] #highlighting .tok.attr { color:#60a5fa; font-weight:600; }
+body[data-app="html"] #highlighting .tok.str  { color:#98e089; }
+body[data-app="html"] #highlighting .tok.com  { color:#a0acc0; font-style:italic; }
+body[data-app="html"] #highlighting .tok.cssp { color:#a78bfa; }
+
+body[data-app="html"] .preview-wrap{ height: calc(100% - 44px); background:var(--surface-3); }
+body[data-app="html"] #preview{ width:100%; height:100%; border:0; background:#fff; }
+@media (max-width:768px){
+  body[data-app="html"] .left .editor-wrap{ height:45vh; }
+  body[data-app="html"] .preview-wrap{ height:38vh !important; }
+}
+
+/* ---------- SQL : AJOUTS ---------- */
+/* Thème sombre */
+body[data-app="sql"] #highlighting .com { color:#a0acc0; font-style:italic; }
+body[data-app="sql"] #highlighting .tbl { color:#fca5a5; font-weight:600; } /* rose clair */
+
+/* =========================================================
+   Variantes CLAIR pour le code
+   ========================================================= */
+html[data-theme="light"] #highlighting .tok.com  { color:#808080  !important; } /* commentaires python gris */
+html[data-theme="light"] #highlighting .com      { color:#808080  !important; } /* commentaires sql gris */
+html[data-theme="light"] #highlighting .tok.blockquote { color:#808080  !important; } /* blockquote gris */
+html[data-theme="light"] #highlighting .hr       { color:#808080 !important; } /* séparation gris */
+html[data-theme="light"] #highlighting .md-h4    { color:#808080 !important; } /* sous-sous-sous-titre markdown gris */
+html[data-theme="light"] #highlighting .italic   { color:#d6336c; font-style:italic; } /* rose */
+html[data-theme="light"] #highlighting .tbl      { color:#d6336c !important; } /* table sql rose */
+html[data-theme="light"] #highlighting .tok.str  { color:#22863a !important; } /* chaînes python vert */
+html[data-theme="light"] #highlighting .code     { color:#22863a !important; } /* chaînes html vert */
+html[data-theme="light"] #highlighting .str      { color:#22863a !important; } /* chaînes sql vert */
+html[data-theme="light"] body[data-app="python"] #highlighting .tok.num { color:#e67200  !important; } /* nombres python orange-brun */
+html[data-theme="light"] body[data-app="sql"]    #highlighting .num     { color:#e67200  !important; } /* nombres sql orange-brun */
+html[data-theme="light"] #highlighting .bold     { color:#e67200 !important; } /* gras markdown orange-brun */
+html[data-theme="light"] #highlighting .olnum    { color:#e67200 !important; } /* nombres markdown orange-brun */
+html[data-theme="light"] #highlighting .ulbul    { color:#e67200 !important; } /* liste markdown orange-brun */
+html[data-theme="light"] #highlighting .tok.red  { color:#cf222e !important; } /* mots-clés python rouges */
+html[data-theme="light"] #highlighting .tok.tag  { color:#cf222e !important; } /* tag html rouges */
+html[data-theme="light"] #highlighting .fn       { color:#cf222e !important; } /* fonctions sql rouges */
+html[data-theme="light"] #highlighting .tok.tstr { color:#6f42c1 !important; } /* '''...''' violet */
+html[data-theme="light"] #highlighting .tok.vio  { color:#6f42c1 !important; } /* mots-clés python violet */
+html[data-theme="light"] #highlighting .tok.cssp { color:#6f42c1 !important; } /* mots-clés html violet */
+html[data-theme="light"] #highlighting .md-h3    { color:#6f42c1 !important; } /* sous-sous-titre md violet */
+html[data-theme="light"] #highlighting .tok.blue { color:#0550ae !important; } /* mots-clés python bleus */
+html[data-theme="light"] #highlighting .tok.attr { color:#0550ae !important; } /* mots-clés html bleus */
+html[data-theme="light"] #highlighting .md-h1    { color:#0550ae !important; } /* titre markdown bleus */
+html[data-theme="light"] #highlighting .kw       { color:#0550ae !important; } /* mots clés sql bleus */
+html[data-theme="light"] #highlighting .link     { color:#0550ae; text-decoration:underline dotted; } /* liens markdown bleus */
+html[data-theme="light"] #highlighting .md-h2    { color:#56c3bf !important; } /* sous-titre markdown turquoise */
+html[data-theme="light"] #highlighting .img      { color:#56c3bf !important; } /* sous-titre markdown turquoise */
+
+/* ---------- TYPING ---------- */
+body[data-app="typing"] .toolbar {
+  background: var(--surface-1);
+}
+body[data-app="typing"] .pane.right .toolbar {
+  background: var(--surface-2);
+}

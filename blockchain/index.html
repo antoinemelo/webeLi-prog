@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>BLOCKCHAIN P2P</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Favicon -->
+  <link rel="icon" href="../assets/images/grid.svg" type="image/svg+xml">
+  <link rel="icon" href="../assets/images/grid.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#0b1220">
+
+  <!-- Bootstrap & Icons -->
+  <link rel="stylesheet" href="../assets/css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css">
+  <link rel="stylesheet" href="../assets/css/dist/bootstrap@5.3.8/bootstrap_min.css">
+  <link rel="stylesheet" href="../assets/css/app.css">
+  <script src="../assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
+</head>
+
+<body data-app="blockchain">
+
+<!-- NAV -->
+<nav class="navbar navbar-dark">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="https://informatic.li">
+      <i class="bi bi-grid"></i>
+      <span>INFORMATIC</span>
+    </a>
+    <span class="brand-mini d-flex gap-2">
+      <a class="btn btn-outline-light" href="/labs/" title="Guide utilisateur">
+        <i class="bi bi-journal-text me-1"></i>
+      </a>
+    </span>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="hero">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-9">
+        <h1 class="display-6 mb-2">BLOCKCHAIN ET CRYPTOMONNAIE</h1>
+        <p class="lead mb-0">
+          Bienvenue sur le portail pédagogique de codage d'une <strong>cryptomonnaie</strong>.
+          <br>
+          <small>
+				<a href="https://informatic.li/labs/markdown/?c=IyMjIyBQcsOpbm9tIC8gQmxvY2tjaGFpbkNyeXB0b21vbm5haWUtQ2xpZW50TG9jYWxUUDAwCi0tLQpbQmllbnZlbnVlXTo6CgojIEJMT0NLQ0hBSU4gLyBDUllQVE9NT05OQUlFCgpDZSBzeXN0w6htZSBibG9ja2NoYWluIG1pbmltYWxpc3RlLCBtYWlzIGZvbmN0aW9ubmVsbGUsIGEgw6l0w6kgY29uw6d1ZSBwb3VyIGzigJllbnNlaWduZW1lbnQuIElsIHBlcm1ldCBk4oCZZXhwbG9yZXIgbGVzICoqcHJpbmNpcGVzIGZvbmRhbWVudGF1eCBkZXMgY3J5cHRvbW9ubmFpZXMqKiwgIApub3RhbW1lbnQgbGEgc2lnbmF0dXJlIG51bcOpcmlxdWUsIGxhIHZhbGlkYXRpb24gZMOpY2VudHJhbGlzw6llIChQcm9vZiBvZiBXb3JrKSwgZXQgbGEgc3luY2hyb25pc2F0aW9uIGVudHJlIHBhaXJzIChQMlApLgoKLS0tCgojIyBQcsOpc2VudGF0aW9uCgpDZSBwcm9qZXQgcmVwb3NlIHN1ciBkZXV4IGVudmlyb25uZW1lbnRzIGNvbXBsw6ltZW50YWlyZXMgOgoKfCBDb21wb3NhbnQgfCBMYW5nYWdlIHwgUsO0bGUgcHJpbmNpcGFsIHwKfC0tLS0tLS0tLS0tLXwtLS0tLS0tLS0tfC0tLS0tLS0tLS0tLS0tLS18CnwgKipTZXJ2ZXVyIFBIUCoqIHwgUEhQIHwgU3RvY2thZ2UgZXQgc3luY2hyb25pc2F0aW9uIGVuIGxpZ25lIGRlcyBibG9jcyBldCB0cmFuc2FjdGlvbnMgfAp8ICoqQ2xpZW50IGxvY2FsKiogfCBKYXZhU2NyaXB0IHwgSW50ZXJmYWNlIGF1dG9ub21lLCBtaW5hZ2UgbG9jYWwgZXQgY29tbXVuaWNhdGlvbiBQMlAgKFdlYlJUQykgfAoKQ2hhY3VuIHBldXQgOgotIGNyw6llciB1biAqKmNvbXB0ZSBsb2NhbCoqIChhdmVjIGNsw6lzIFJTQSBnw6luw6lyw6llcyBjw7R0w6kgbmF2aWdhdGV1ciBvdSBzZXJ2ZXVyKSwKLSBlZmZlY3R1ZXIgZGVzICoqdHJhbnNhY3Rpb25zIHNpZ27DqWVzKiogKMOpbWlzc2lvbiwgcsOpY2VwdGlvbiksCi0gKiptaW5lcioqIGRlcyBibG9jcyBsb2NhbGVtZW50IChwcmV1dmUgZGUgdHJhdmFpbCksCi0gKipkaWZmdXNlcioqIGxlcyB0cmFuc2FjdGlvbnMgb3UgYmxvY3MgYXV4IGF1dHJlcyBwYWlycywKLSAqKnN5bmNocm9uaXNlcioqIGxhIGJsb2NrY2hhaW4gYXZlYyBsZSBzZXJ2ZXVyIGNlbnRyYWwuCgotLS0KCiMjIE9iamVjdGlmIHDDqWRhZ29naXF1ZQoKQ2UgcHJvamV0IHBlcm1ldCBk4oCZaWxsdXN0cmVyIGNvbmNyw6h0ZW1lbnQgOgoKLSBsZSBmb25jdGlvbm5lbWVudCAqKmTigJl1bmUgYmxvY2tjaGFpbiBkw6ljZW50cmFsaXPDqWUqKiAKLSBsZXMgbm90aW9ucyBkZSAqKnByZXV2ZSBkZSB0cmF2YWlsIGV0IGRlIGNvbnNlbnN1cyoqCi0gbGEgKipzaWduYXR1cmUgbnVtw6lyaXF1ZSoqIGV0IGxhICoqdsOpcmlmaWNhdGlvbiBjcnlwdG9ncmFwaGlxdWUqKgotIGzigJlpbnTDqXLDqnQgZHUgKipzdG9ja2FnZSBkaXN0cmlidcOpKiogZXQgZGUgbGEgKipzeW5jaHJvbmlzYXRpb24gUDJQKioKCkxlcyB1dGlsaXNhdGV1cnMgcGV1dmVudCBhaW5zaSBleHDDqXJpbWVudGVyIGxlcyDDqWNoYW5nZXMsIG9ic2VydmVyIGxlIG1pbmFnZSwgZXQgY29tcHJlbmRyZSBsZXMgZW5qZXV4IGRlIGZpYWJpbGl0w6kgZXQgZGUgc8OpY3VyaXTDqS4KCi0tLQoKIyMgU3RydWN0dXJlIGRlcyBmaWNoaWVycwoKYGBgCi9ibG9ja2NoYWluLwrilIIK4pSc4pSA4pSAIG1haW4vIOKAlCBWZXJzaW9uIHNlcnZldXIgKFBIUCkgw6lnYWxlbWVudCBkaXNwb25pYmxlIHNvdXMgYmlzLwrilIIgICDilJzilIDilIAgaW5kZXgucGhwIOKAlCBJbnRlcmZhY2Ugc2VydmV1cgrilIIgICDilJzilIDilIAgYXV0aC5waHAg4oCUIEF1dGhlbnRpZmljYXRpb24gLyBnZXN0aW9uIGNvbXB0ZXMK4pSCICAg4pSc4pSA4pSAIGNoYWluLnBocCDigJQgRm9uY3Rpb25zIGJsb2NrY2hhaW4K4pSCICAg4pSc4pSA4pSAIGRiLnBocCDigJQgQ29ubmV4aW9uIFNRTArilIIgICDilJzilIDilIAgY29uZmlnLnBocCDigJQgUGFyYW3DqHRyZXMgZ2xvYmF1eArilIIgICDilJzilIDilIAgYXBpLnBocCDigJQgUm91dGVzIChwZWVycywgY2hhaW4sIHBvb2wpCuKUgiAgIOKUlOKUgOKUgCBzdHlsZS5jc3Mg4oCUIEFwcGFyZW5jZSBCb290c3RyYXAgY2xhaXJlCuKUggrilJzilIDilIAgbm9kZS8K4pSCICAg4pSU4pSA4pSAIHNpZ25hbC5waHAg4oCUIFdlYlJUQyBzaW1wbGUgZCdpbmRpY2F0aW9uIGRlIHNhIHByw6lzZW5jZQrilIIK4pSc4pSA4pSAIGNsaWVudC8K4pSCICAg4pSc4pSA4pSAIGluZGV4Lmh0bWwg4oCUIEludGVyZmFjZSBjbGllbnQK4pSCICAg4pSc4pSA4pSAIGFwcC5qcyDigJQgQmxvY2tjaGFpbiArIFAyUCArIG1pbmFnZSArIHN5bmNocm8K4pSCICAg4pSU4pSA4pSAIHN0eWxlLmNzcyDigJQgVGjDqG1lIGNsYWlyIChCb290c3RyYXApCuKUggrilJTilIDilIAgUkVBRE1FLnR4dApgYGAKCi0tLQoKIyMgSW5zdGFsbGF0aW9uCgpUw6lsw6ljaGFyZ2V6IGxlIGRvc3NpZXIgYC9jbGllbnQvYCBldCBvdXZyaXIgYGluZGV4Lmh0bWxgIGRhbnMgdW4gbmF2aWdhdGV1ciAoQ2hyb21lLCBFZGdlLCBGaXJlZm94LCBldGMuKS4KCkxlIGNsaWVudCA6Ci0gdXRpbGlzZSAqKnNxbC5qcyoqIChTUUxpdGUgZW1iYXJxdcOpIGVuIFdlYkFzc2VtYmx5KSwKLSBwZXJtZXQgdW4gKiptaW5hZ2UgbG9jYWwqKiwKLSBldCBwZXV0ICoqc2Ugc3luY2hyb25pc2VyIGF2ZWMgbGUgc2VydmV1ciBQSFAqKi4KCi0tLQoKIyMgRm9uY3Rpb25uYWxpdMOpcyBwcmluY2lwYWxlcwoKfCBGb25jdGlvbiB8IERlc2NyaXB0aW9uIHwKfC0tLS0tLS0tLS0tfC0tLS0tLS0tLS0tLS18CnwgKipDcsOpYXRpb24gZGUgY29tcHRlKiogfCBHw6luw6lyYXRpb24gbG9jYWxlIGTigJl1biBjb3VwbGUgUlNBIChjbMOpIHB1YmxpcXVlL3ByaXbDqWUpIGV0IGTigJl1bmUgYWRyZXNzZSB1bmlxdWUgfAp8ICoqQ29ubmV4aW9uIHBlcnNpc3RhbnRlKiogfCBMZSBjb21wdGUgcmVzdGUgYWN0aWYgYXByw6hzIHJlY2hhcmdlbWVudCAoc3RvY2thZ2UgbG9jYWwpIHwKfCAqKlRyYW5zYWN0aW9ucyBzaWduw6llcyoqIHwgQ2hhcXVlIG9ww6lyYXRpb24gZXN0IHNpZ27DqWUgbnVtw6lyaXF1ZW1lbnQgKGdhcmFudGllIGTigJlhdXRoZW50aWNpdMOpKSB8CnwgKipQcm9vZiBvZiBXb3JrIChQb1cpKiogfCBNaW5hZ2UgbG9jYWwgYXZlYyBkaWZmaWN1bHTDqSBwYXJhbcOpdHJhYmxlIHwKfCAqKkNvbnNlbnN1cyoqIHwgUmVtcGxhY2VtZW50IGF1dG9tYXRpcXVlIGRlIGxhIGNoYcOubmUgc2kgdW5lIHZlcnNpb24gcGx1cyBsb25ndWUgZXN0IHRyb3V2w6llIHwKfCAqKlAyUCBXZWJSVEMqKiB8IENvbW11bmljYXRpb24gZGlyZWN0ZSBlbnRyZSBuYXZpZ2F0ZXVycyAow6ljaGFuZ2UgZGUgYmxvY3MvdHJhbnNhY3Rpb25zKSB8CnwgKipTeW5jaHJvbmlzYXRpb24gc2VydmV1cioqIHwgVMOpbMOpY2hhcmdlbWVudCAvIGVudm9pIGRlIGxhIGNoYcOubmUgdmlhIGzigJlBUEkgUEhQIHwKfCAqKkV4cG9ydCAvIEltcG9ydCBjaGlmZnLDqSoqIHwgU2F1dmVnYXJkZSBsb2NhbGUgZGUgbGEgYmFzZSBTUUxpdGUgY2hpZmZyw6llIChBRVMtR0NNKSB8CgotLS0KCiMjIEV4ZW1wbGUgZGUgc2PDqW5hcmlvCgpDcsOpYXRpb24gZCd1biAqKmNvbXB0ZSBsb2NhbCoqLiAgClVuZSBjbMOpIHB1YmxpcXVlIChQRU0gUlNBKSBldCB1bmUgYWRyZXNzZSB1bmlxdWUgc29udCBhdHRyaWJ1w6llcy4KCkVmZmVjdHVlciB1bmUgKip0cmFuc2FjdGlvbioqIHZlcnMgdW4gYXV0cmUgdXRpbGlzYXRldXIgKGFkcmVzc2UgY2libGUpLiAgCkxhIHRyYW5zYWN0aW9uIGVzdCBzaWduw6llIHB1aXMgYWpvdXTDqWUgYXUgKipwb29sKiouCgoqKk1pbmVyIHVuIGJsb2MqKiBsb2NhbGVtZW50LiAgCkxlIHByb29mIG9mIHdvcmsgdmFsaWRlIGxlcyB0cmFuc2FjdGlvbnMgZXQgYWpvdXRlIGxlIGJsb2Mgw6AgbGEgY2hhw65uZS4KCioqRGlmZnVzZXIqKiBsZSBibG9jIG91IGxlIHBvb2wgdmlhIFAyUCwgb3UgKipzeW5jaHJvbmlzZSoqIGF2ZWMgbGUgc2VydmV1ci4gIApMZXMgYXV0cmVzIHBhaXJzIHJlw6dvaXZlbnQgbGEgbWlzZSDDoCBqb3VyIGV0IG1ldHRlbnQgw6Agam91ciBsZXVyIHByb3ByZSBjaGHDrm5lLgoKLS0tCgojIyBDb25jZXB0cyBww6lkYWdvZ2lxdWVzIGFib3Jkw6lzCgotIEhhY2hhZ2UgKFNIQS0yNTYpCi0gU2lnbmF0dXJlcyBSU0EKLSBDaGHDrm5hZ2UgZGVzIGJsb2NzIChgcHJldl9oYXNoYCkKLSBQcm9vZiBvZiB3b3JrIGV0IG5vbmNlCi0gQ29uc2Vuc3VzIGRpc3RyaWJ1w6kKLSBDb21tdW5pY2F0aW9uIFAyUCAoV2ViUlRDKQotIEJhc2UgZGUgZG9ubsOpZXMgU1FMaXRlCi0gRXhwb3J0IGNoaWZmcsOpIEFFUy1HQ00KCi0tLQoKIyMgU8OpY3VyaXTDqQoKQ2UgcHJvamV0IGVzdCB2b2xvbnRhaXJlbWVudCAqKnNpbXBsaWZpw6kgcG91ciBs4oCZZW5zZWlnbmVtZW50KiogOgotIExlcyBjbMOpcyBSU0Egc29udCBzdG9ja8OpZXMgbG9jYWxlbWVudCBzYW5zIGNoaWZmcmVtZW50IGZvcnQKLSBMZSBQb1cgZXN0IGZhaWJsZSAoZGlmZmljdWx0w6kgcsOpZ2zDqWUgYXUgbWluaW11bSkKLSBMZSByw6lzZWF1IFAyUCByZXBvc2Ugc3VyIHVuIHNlcnZldXIgZGUgc2lnbmFsaXNhdGlvbiBjZW50cmFsCi0gTOKAmW9iamVjdGlmIGVzdCBww6lkYWdvZ2lxdWUsICoqcGFzIGRlIGNyw6llciB1bmUgdnJhaWUgY3J5cHRvbW9ubmFpZSoqCgoqKlJlbWFycXVlKiogIApMYSBwcm90ZWN0aW9uIGVzdCAqbG9jYWxlKiAoY8O0dMOpIG5hdmlnYXRldXIpLiBOZSBzdG9ja2V6IHBhcyBsZSBmaWNoaWVyIGAuZGJgIHN1ciB1biBlc3BhY2UgcHVibGljIHNhbnMgY2hpZmZyZW1lbnQgc3VwcGzDqW1lbnRhaXJlLgoKLS0tCgojIyBUZWNobm9sb2dpZXMgdXRpbGlzw6llcwoKfCBDb21wb3NhbnQgfCBTdGFjayB8CnwtLS0tLS0tLS0tLS18LS0tLS0tLXwKfCBGcm9udGVuZCB8IEhUTUw1LCBCb290c3RyYXAgNSwgSmF2YVNjcmlwdCB8CnwgQmFzZSBkZSBkb25uw6llcyB8IFNRTGl0ZSBldCBXZWJBc3NlbWJseSB8CnwgQmFja2VuZCB8IFBIUCArIFBETyB8CnwgUDJQIHwgV2ViUlRDICsgU2lnbmFsaXNhdGlvbiB2aWEgUEhQIHwKfCBTw6ljdXJpdMOpIHwgUlNBIChPcGVuU1NMKSwgU0hBLTI1NiwgQUVTLUdDTSAoV2ViQ3J5cHRvIEFQSSkgfAoKLS0tCgojIyBMaWNlbmNlCgpQcm9qZXQgbGlicmUgw6AgdXNhZ2Ugw6lkdWNhdGlmLiAgCihjKSAyMDI1IEluZm9ybWF0aWNMaSDigJQgUmVwcm9kdWN0aW9uIGV0IHVzYWdlIGF1dG9yaXPDqXMgw6AgZGVzIGZpbnMgcMOpZGFnb2dpcXVlcy4KCi0tLQoKKipNVlAgw6lkdWNhdGlmIOKAlCBQSFAgKyBTUUxpdGUgKyBKUyArIFdlYlJUQyDigJQgU2lnbmF0dXJlcyBSU0Eg4oCUIFByb29mIG9mIFdvcmsg4oCUIENvbnNlbnN1cyBkaXN0cmlidcOpKioK&view=preview" target="_blank">
+					Guide d’utilisation
+				</a>
+          </small>
+        </p>
+      </div>
+      <div class="col-lg-3 text-lg-center">
+        <a href="https://parapente.world/lab/blockchain/main/" class="btn btn-success btn-lg">
+          <i class="bi bi-filetype-php"></i>&nbsp; Serveur PHP
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="services">
+  <div class="container my-1">
+    <div class="row g-4">
+
+      <div class="col-12 col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="fs-3"><i class="bi bi-server"></i></span>
+              <span class="badge badge-soft rounded-pill">Serveur</span>
+            </div>
+            <h2 class="h5 mb-2">Objectifs</h2>
+            <ul class="small text-secondary ps-3 mb-3">
+              <li>Coordonner les connexions entre ordinateurs via un serveur <code><a href="https://parapente.world/lab/blockchain/main/">php</a></code> ou ce client <code><a href="./node">javascript</a></code></li>
+              <li>Stocker temporairement les messages de signalisation (offers / answers / ICE)</li>
+              <li>Permettre aux utilisateurs d'établir un lien P2P (WebRTC)</li>
+            </ul>
+            <a class="btn btn-outline-success w-100" href="php.zip">
+              Télécharger PHP <i class="bi bi-download ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="fs-3"><i class="bi bi-people"></i></span>
+              <span class="badge badge-soft rounded-pill">Clients</span>
+            </div>
+            <h2 class="h5 mb-2">Objectifs</h2>
+            <ul class="small text-secondary ps-3 mb-3">
+              <li>À compléter</li>
+            </ul>
+            <div class="d-flex gap-2">
+              <a class="btn btn-primary flex-fill" href="html.zip"><i class="bi bi-filetype-html"></i> HTML</a>
+              <a class="btn btn-secondary flex-fill" href="py.zip"><i class="bi bi-filetype-py"></i> Python</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3 text-center text-sm-start">
+    <div class="d-flex flex-wrap align-items-center gap-2 justify-content-center justify-content-sm-start">
+			(c) <span id="y"></span> / InformaticLi - 
+			Environnement informatique pédagogique
+			<span class="text-success"><i class="bi bi-heart-fill"></i></span> SIMCE
+		  </span>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('y').textContent = new Date().getFullYear();
+</script>
+
+<script src="../assets/js/theme.js"></script>
+<script>
+  Theme.init({ canWrite:false });
+</script>
+
+</body>
+</html>

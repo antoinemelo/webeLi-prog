@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; text-align:center; padding:3rem; }
+    h1 { font-weight:400; margin-bottom:1rem; }
+    p { opacity:.8; }
+  </style>
+</head>
+<body>
+  <h1>Redirection en cours...</h1>
+  <p id="msg">Veuillez patienter.</p>
+
+  <script>
+  async function main() {
+    const params = new URLSearchParams(window.location.search);
+    const key = [...params.keys()][0];
+    const msg = document.getElementById('msg');
+
+    if (!key) {
+      msg.textContent = "mais aucun lien spécifiée dans l’URL.";
+      return;
+    }
+
+    try {
+      const SQL = await initSqlJs({
+        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${file}`
+      });
+
+      const response = await fetch('./liens/link.db');
+      if (!response.ok) throw new Error("Base de données inaccessible");
+      const buffer = await response.arrayBuffer();
+      const db = new SQL.Database(new Uint8Array(buffer));
+
+      const query = db.prepare("SELECT type, code FROM ateliers WHERE base_id = ?");
+      query.bind([key]);
+      let found = false;
+      while (query.step()) {
+        const row = query.getAsObject();
+        found = true;
+        const target = `../labs/${row.type}/?c=${encodeURIComponent(row.code)}`;
+        msg.textContent = `Redirection vers ${target}`;
+        window.location.replace(target);
+        return;
+      }
+
+      if (!found) {
+        msg.textContent = `mais lien inconnu : ${key}`;
+      }
+      query.free();
+      db.close();
+
+    } catch (err) {
+      msg.textContent = "Erreur : " + err.message;
+      console.error(err);
+    }
+  }
+
+  main();
+  </script>
+</body>
+</html>

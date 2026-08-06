@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="fr" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <title>INFORMATIC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Vous avez annulé votre don. Aucun montant n’a été débité. Merci d'avoir pensé à nous soutenir.">
+  <!-- Favicon (SVG) -->
+  <link rel="icon" href="./assets/images/grid.svg" type="image/svg+xml">
+  <!-- Fallback multi-navigateurs -->
+  <link rel="icon" href="./assets/images/grid.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#0b1220">
+
+	<!-- Bootstrap & Icons -->
+	<link rel="stylesheet" href="./assets/css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css">
+	<link rel="stylesheet" href="./assets/css/dist/bootstrap@5.3.8/bootstrap_min.css">
+	<link rel="stylesheet" href="./assets/css/app.css">
+</head>
+<body data-app="annulation">
+  <!-- Barre de tête -->
+  <header class="border-bottom border-opacity-25">
+    <div class="container py-3 d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-2 brand">
+        <!-- Icône grid inline (compatible no-CDN) -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-grid" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
+        </svg>
+        <span>INFORMATIC - Annulation</span>
+      </div>
+      <a class="link-light text-decoration-none" href="#" id="link-home">
+        <i class="bi bi-arrow-left-circle me-1"></i> Retour au site
+      </a>
+    </div>
+  </header>
+
+  <main class="container my-4 my-md-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-10 col-xl-8">
+
+        <!-- Carte principale -->
+        <div class="card shadow-sm rounded-4 p-3 p-md-4">
+          <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3">
+            <div class="hero-icon text-danger"><i class="bi bi-x-circle-fill" aria-hidden="true"></i></div>
+            <div>
+              <h1 class="h3 mb-1">Don annulé</h1>
+              <p class="mb-0 muted">Vous avez interrompu la procédure. <strong>Aucun montant n’a été débité</strong>.</p>
+            </div>
+          </div>
+
+          <hr class="border-secondary border-opacity-25 my-4">
+
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <div class="p-3 rounded-3 bg-dark-subtle bg-opacity-10 h-100">
+                <h2 class="h5 mb-2">Envie de réessayer ?</h2>
+                <p class="muted mb-3">Chaque contribution nous aide à maintenir un service gratuit, sans publicité, et pensé pour l’enseignement.</p>
+                <div class="d-grid gap-2">
+                  <a href="#" class="btn btn-primary btn-lg"><i class="bi bi-paypal me-2"></i>Réessayer via PayPal</a>
+                  <a href="#" class="btn btn-outline-light"><span class="me-1">☕</span> Offrir un café</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <div class="p-3 rounded-3 bg-dark-subtle bg-opacity-10 h-100">
+                <h2 class="h5 mb-2">Besoin d’aide ?</h2>
+                <ul class="list-unstyled list-check mb-3">
+                  <li class="mb-1"><i class="bi bi-check2-square text-success me-2"></i>Pas de débit effectué</li>
+                  <li class="mb-1"><i class="bi bi-diamond-half text-warning me-2"></i>Les éventuelles empreintes bancaires sont temporaires</li>
+                  <li class="mb-1"><i class="bi bi-square text-success me-2"></i>Aucune données de paiement stockées de notre côté</li>
+                </ul>
+                <a class="btn btn-outline-info" href="mailto:msg@informatic.li">
+                  <i class="bi bi-envelope-at-fill me-2"></i>Nous écrire (support)
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <hr class="border-secondary border-opacity-25 my-4">
+
+          <div class="d-md-flex align-items-center justify-content-between">
+            <p class="mb-3 mb-md-0 muted">
+              Informatic.li est mis à disposition <strong>gratuitement et sans publicité</strong>. Votre soutien finance l’hébergement, la maintenance et le développement de nouveaux ateliers.
+            </p>
+            <div class="d-flex gap-2">
+              <a href="#" class="btn btn-outline-light">
+                <i class="bi bi-arrow-left"></i> Continuer sur le site
+              </a>
+              <a href="#" class="btn btn-success">
+                <i class="bi bi-heart heart-red me-1"></i> Faire un don
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mini FAQ -->
+        <div class="mt-4">
+          <div class="accordion accordion-flush" id="faq">
+            <div class="accordion-item bg-transparent border-secondary border-opacity-25">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
+                  Suis-je prélevé si j’annule ?
+                </button>
+              </h2>
+              <div id="q1" class="accordion-collapse collapse" data-bs-parent="#faq">
+                <div class="accordion-body muted">
+                  Non. L’annulation interrompt le processus avant tout débit. Selon votre banque, une <em>empreinte temporaire</em> peut apparaître puis disparaître automatiquement.
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item bg-transparent border-secondary border-opacity-25">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
+                  Puis-je donner autrement ?
+                </button>
+              </h2>
+              <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faq">
+                <div class="accordion-body muted">
+                  Oui. Vous pouvez <a href="#" class="link-light">offrir un café</a> ou utiliser un autre moyen proposé sur notre page de soutien.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pied de page compact -->
+        <div class="text-center mt-4 muted">
+          <small>Merci d'avoir pensé à nous soutenir <i class="bi bi-heart heart-red"></i></small>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+	<!-- Bootstrap bundle -->
+	<script src="../../assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
+	<script>
+		document.getElementById('link-home').href = '/';        // Accueil
+		// document.querySelectorAll('[href="#"]').forEach(a => a.href = '/don'); // Optionnel
+	</script>
+	<script src="/assets/js/theme.js"></script>
+	<script>
+	  Theme.init({ canWrite:false });  // applique + suit, sans changer localStorage
+	</script>
+</body>
+</html>

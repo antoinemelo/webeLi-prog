@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Guide</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Guide d’utilisateur des ateliers : Généralités, Python, HTML/CSS, Markdown, SQL." />
+  <meta name="theme-color" content="#0b1220" />
+  <!-- Favicon -->
+  <link rel="icon" href="/assets/images/grid.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/images/grid.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  <!-- Bootstrap & Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/assets/css/app.css">
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body { position: relative; }
+    .sidebar { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow: auto; }
+
+    .callout {
+      border-left: .35rem solid color-mix(in oklab, var(--link) 55%, transparent);
+      background: var(--surface-2);
+      color: var(--text-main);
+      padding: .75rem 1rem;
+      border-radius: .5rem;
+      margin: 1rem 0;
+    }
+    .callout.tip  { border-left-color: color-mix(in oklab, #198754 65%, transparent); }
+    .callout.warn { border-left-color: color-mix(in oklab, #fd7e14 65%, transparent); }
+
+    pre code { white-space: pre; }
+    .section-actions { display:flex; gap:.5rem; align-items:center; font-size:.9rem; }
+
+    h2[id]::after, h3[id]::after { content: " #"; opacity: 0; transition: opacity .2s; font-weight: 400; color: var(--text-muted); }
+    h2:hover::after, h3:hover::after { opacity: 1; }
+
+	.card-body p {
+	  color: var(--text-main);
+	}
+	.card-body li {
+	  color: var(--text-main);
+	}
+
+    .back-top-fixed{
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 1030;
+      display: none; /* contrôlé par .show */
+      width: 3rem; height: 3rem; border-radius: 50%;
+      background: color-mix(in oklab, var(--text-main) 8%, transparent);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .back-top-fixed.show{ display: inline-flex; align-items: center; justify-content: center; }
+    .back-top-fixed:hover{ background: color-mix(in oklab, var(--text-main) 12%, transparent); }
+
+    .page-header{ background: var(--surface-1); border-bottom: 1px solid var(--border); }
+
+    .card-header{ background: var(--surface-1); border-bottom: 1px solid var(--border); color: var(--text-main); }
+
+    .list-group-item{ background: var(--card); color: var(--text-main); border-color: var(--border); }
+    .list-group-item-action:hover,
+    .list-group-item-action:focus{ background: color-mix(in oklab, var(--text-main) 8%, transparent); color: var(--text-main); }
+
+    @media print {
+      .navbar, .sidebar, .btn-print, .back-top { display: none !important; }
+      a[href]::after { content: " (" attr(href) ")"; font-size: .9em; color: #666; }
+      body { font-size: 12pt; }
+      h1, h2 { page-break-after: avoid; }
+      pre, table { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#toc" data-bs-offset="100" tabindex="0">
+
+  <!-- Barre de navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="../">
+        <i class="bi bi-journal-text"></i>
+        <span>INFORMATIC - Guide utilisateur</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topnav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div id="topnav" class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <li class="nav-item"><a class="nav-link" href="../assets/aide/lexique.html">Lexique complet</a></li>
+          <li class="nav-item ms-lg-3">
+            <a class="btn btn-outline-light btn-sm btn-print" href="#" onclick="window.print()">
+              <i class="bi bi-printer"></i> Imprimer / PDF
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- En-tête -->
+  <header class="py-5 page-header">
+    <div class="container">
+      <p class="lead mb-2">Petit mode d’emploi concis pour travailler plus efficacement dans les ateliers <strong>Python</strong>, <strong>HTML/CSS</strong>, <strong>Markdown</strong> et <strong>SQL</strong>.</p>
+      <p class="text-secondary mb-0">
+        <strong>Référence principale</strong> : polycopié de théorie et des exercices (sur demande)
+        <!-- TODO: adapter le lien au bon emplacement si nécessaire -->
+      </p>
+    </div>
+  </header>
+
+  <main class="container my-4">
+    <div class="row g-4">
+      <!-- Sommaire -->
+      <aside class="col-12 col-lg-3">
+        <div class="sidebar">
+          <div class="card">
+            <div class="card-header d-flex align-items-center gap-2">
+              <i class="bi bi-list-check"></i><span>Sommaire</span>
+            </div>
+            <div class="list-group list-group-flush" id="toc">
+              <a class="list-group-item list-group-item-action" href="#generalites">Généralités</a>
+              <a class="list-group-item list-group-item-action" href="#python">Python</a>
+              <a class="list-group-item list-group-item-action" href="#html-css">HTML / CSS</a>
+              <a class="list-group-item list-group-item-action" href="#markdown">Markdown</a>
+              <a class="list-group-item list-group-item-action" href="#sql">SQL</a>
+              <a class="list-group-item list-group-item-action" href="#ressources">Ressources & Liens</a>
+              <a class="list-group-item list-group-item-action" href="#changelog">Historique</a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Contenu -->
+      <section class="col-12 col-lg-9">
+
+        <!-- GENERALITES -->
+        <article id="generalites" class="mb-5">
+          <h2>GÉNÉRALITÉS</h2>
+          <div class="callout tip">
+            Ce petit mode d'emploi devrait vous permettre de mieux comprendre la logique des ateliers, l’organisation des documents et les attentes de vos enseignant·e·s / formateurs·rices.
+          </div>
+
+          <h3 id="gen-objectifs">Objectifs</h3>
+          A la fin de la lecture vous devriez:
+          <ul>
+            <li>Savoir où trouver les aides et exemples</li>
+            <li>Adopter une méthode de travail Agile (petits pas, tests fréquents, sauvegardes régulières)</li>
+            <li>Maîtriser la redition (raccourcis, format et partage)</li>
+          </ul>
+
+          <h3 id="gen-prerequis">Prérequis</h3>
+          <ul>
+            <li>Accès à un navigateur / buttineur et une connexion Internet</li>
+            <li>Connaissances basiques des manipulations informatiques : copier/coller, arborescence, sauvegarde</li>
+          </ul>
+
+          <h3 id="gen-demarrage">Comment bien commencer</h3>
+          <ol>
+            <li>Ouvrir l’atelier désiré (boites Atelier / Lab sur la page d'accueil)</li>
+            <li>Lire les énoncés donnés et exercice correspondants fournis par vos enseignant·e·s / formateurs·rices</li>
+            <li>Reproduire à partir d'un exemple → tester → enrichir !</li>
+          </ol>
+          Note: si vous savez maintenant comment bien commencer, il ne faut pas oublier d'également bien terminer et remettre votre travail, même incomplètement réalisé !
+          <div class="row g-3 my-3">
+            <div class="col-md-12">
+              <div class="card h-100">
+                <div class="card-header">Comparaison et positionnement de l'outils InformaticLi</div>
+				<div class="card-body">
+					<p>Les brèves études comparatives souivantes vous permettront, dans un premier temps, de mieux connaître le forces et faiblesses de notre outils. À noter que l'affichage se fait par le biais de notre outils / atelier Markdown.</p>
+						<a href="fonctionnalites.html" target="_blank"
+						   class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
+						  <span><i class="bi bi-file-earmark-text me-2"></i> Brève étude des fonctionnalités</span>
+						  <i class="bi bi-link-45deg"></i>
+						</a>
+
+						<a href="langages.html" target="_blank"
+						   class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
+						  <span><i class="bi bi-code-slash me-2"></i> Comparatif des langages de programmation</span>
+						  <i class="bi bi-link-45deg"></i>
+						</a>
+
+						<a href="pedagogique.html" target="_blank"
+						   class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
+						  <span><i class="bi bi-diagram-3 me-2"></i> Tableau décisionnel pour un usage pédagogique</span>
+						  <i class="bi bi-link-45deg"></i>
+						</a>
+				</div>
+				</div>
+			</div>
+			</div>
+          <div class="row g-3 my-3">
+            <div class="col-md-6">
+              <div class="card h-100">
+                <div class="card-header">Raccourcis Ateliers / LAB</div>
+                <div class="card-body">
+                  <ul class="mb-0">
+                    <li><a href="./python">Atelier Python</a></li>
+                    <li><a href="/html">Atelier HTML / CSS</a></li>
+                    <li><a href="/markdown">Atelier Markdown</a></li>
+                    <li><a href="/sql">Lab SQL (SQLite)</a></li>
+                  </ul>
+                  <!-- TODO: ajuster les URLs selon votre site -->
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card h-100">
+                <div class="card-header">Redition et nom des fichiers</div>
+                <div class="card-body">
+                  <ul class="mb-0">
+                    <li>Nom de fichier proposé : <code>PrenomNOM_Objet-TPi.ext</code></li>
+                    <li>Un seul dossier par TP, un fichier par exercice</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3 id="gen-erreurs">Erreurs fréquentes</h3>
+          <ul>
+            <li>Ne pas tester suffisamenent souvent → tester à chaque petite étape.</li>
+            <li>Fichiers mal nommés → respecter le schéma demandé.</li>
+            <li>Copier sans comprendre → toujours expliquer en 1-2 phrases ce qui est effectué par votre code.</li>
+          </ul>
+        Regardons maintenant de manière plus détaillée les différents ateliers.
+        </article>
+
+		<hr>
+        <!-- PYTHON -->
+        <article id="python" class="mb-5">
+          <h2>PYTHON</h2>
+          <p class="text-secondary">Environnement simple de codage (en ligne); syntaxe lisible; idéal pour apprendre la logique de programmation.</p>
+
+          <h3>Objectifs de l'atelier</h3>
+          <ul>
+            <li>Savoir exécuter un script Python et lire un message d’erreur</li>
+            <li>Être capable d'intégrer des variables, conditions, boucles, fonctions, fichiers (selon niveau)</li>
+          </ul>
+
+          <h3>Prérequis</h3>
+          <ul>
+            <li>Base logique : si/alors/sinon, répétitions, algorythmique</li>
+            <li>Règles d’indentation (espaces) et nommage (snake_case)</li>
+          </ul>
+
+          <h3>Bien démarrer</h3>
+          <ol>
+            <li>Ouvrir <a href="./python">Atelier Python</a> → écrire <code>print("Bonjour")</code></li>
+            <li>Ajouter une variable, une condition, une boucle (selon exercices)</li>
+            <li>Tester et corriger immédiatement (erreur → numéro de ligne)</li>
+          </ol>
+
+          <div class="callout warn">
+            <strong>Astuce</strong> : “IndentationError” = décalage d’espaces ; “NameError” = nom inconnu (variable non définie).
+          </div>
+
+          <h3>Exemple d'exercice</h3>
+          <pre><code># Exemple :: Somme des chiffres de 1 jusqu'à n / Correction d'erreurs
+n = int(input("n ? "))
+s = 0
+for _ in rang(1, n+1):
+s += i
+print("Somme =", s)</code></pre>
+
+          <h3>Ressources</h3>
+          <ul>
+            <li>Références des exercices : document polycopié (disponible sur demande)</li>
+            <li>Aide mémoire : variables, types, boucles (à joindre si dispo).</li>
+          </ul>
+        </article>
+
+		<hr>
+        <!-- HTML / CSS -->
+        <article id="html-css" class="mb-5">
+          <h2>HTML / CSS</h2>
+          <p class="text-secondary">Cet environnement permet de structurer le contenu (HTML) et le mettre en forme (CSS). Il est possible de coupler son utilisation avec l'atelier MArkdown qui inclut l'exportation de fichier en .html.</p>
+
+          <h3>Objectifs de l'atelier</h3>
+          <ul>
+            <li>Comprendre les balises de base : <code>&lt;h1&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;a&gt;</code>, <code>&lt;img&gt;</code>, <code>&lt;ul&gt;</code>/<code>&lt;ol&gt;</code>, <code>&lt;table&gt;</code></li>
+            <li>Appliquer des classes en CSS et réaliser des mises en page simple</li>
+          </ul>
+
+          <h3>Démarrage rapide</h3>
+          <ol>
+            <li>Ouvrir <a href="./html">Atelier HTML / CSS</a></li>
+            <li>Coller le squelette minimal (ci-dessous ou prendre celui proposé - plus complet), puis adapter le contenu</li>
+          </ol>
+
+          <h3>Squelette minimal</h3>
+          <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="fr"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8" /&gt;
+  &lt;title&gt;Ma page&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Titre&lt;/h1&gt;
+  &lt;p&gt;Paragraphe.&lt;/p&gt;
+  &lt;a href="#"&gt;lien&lt;/a&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+          <h3>Erreurs fréquentes</h3>
+          <ul>
+            <li>Balises non fermées → valider et corriger</li>
+            <li>Chemins d’images faux → préférer des chemins relatifs cohérents</li>
+          </ul>
+        </article>
+
+		<hr>
+        <!-- MARKDOWN -->
+        <article id="markdown" class="mb-5">
+          <h2>MARKDOWN</h2>
+          <p class="text-secondary">Écrire rapidement des documents propres (titres, listes, images, tableaux), notamment avec l'apuis de l'IA.</p>
+
+          <h3>Objectifs</h3>
+          <ul>
+            <li>Maîtriser les titres <code>#</code> à <code>######</code>, listes, emphases, code</li>
+            <li>Insérer des images, des liens et exporter / partager si besoin </li>
+          </ul>
+
+          <h3>Démarrage rapide</h3>
+          <ol>
+            <li>Ouvrir <a href="./markdown">Atelier Markdown</a></li>
+            <li>Commencer par un plan (titres) → compléter les sections</li>
+          </ol>
+
+          <h3>Exemple minimal</h3>
+          <pre><code># Mon titre
+Un paragraphe **important** et du *texte en italique*.
+
+## Liste
+- Élément 1
+- Élément 2
+
+`code court` et
+```python
+print("bloc de code")
+```</code></pre>
+        </article>
+
+		<hr>
+        <!-- SQL -->
+        <article id="sql" class="mb-5">
+          <h2>SQL (SQLite)</h2>
+          <p class="text-secondary">Interroger et manipuler des données structurées (tables, colonnes, lignes).</p>
+
+          <h3>Objectifs</h3>
+          <ul>
+            <li>SELECT avec <code>WHERE</code>, <code>ORDER BY</code>, <code>LIMIT</code></li>
+            <li>Jointures simples, agrégations (<code>COUNT</code>, <code>SUM</code>...)</li>
+          </ul>
+
+          <h3>Démarrage rapide</h3>
+          <ol>
+            <li>Ouvrir <a href="./sql">LABS SQL</a></li>
+            <li>Lister toutes les lignes d’une table, puis filtrer et trier</li>
+          </ol>
+
+          <h3>Exemples</h3>
+          <pre><code>-- 10 clients triés par nom
+SELECT * FROM clients ORDER BY nom LIMIT 10;
+
+-- Nombre de commandes en 2025
+SELECT COUNT(*) FROM commandes WHERE strftime('%Y', date) = '2025';</code></pre>
+
+          <h3>Erreurs fréquentes</h3>
+          <ul>
+            <li>Noms de colonnes incorrects → vérifier le schéma</li>
+            <li>Oubli de conditions → requêtes trop larges, résultats confus</li>
+          </ul>
+        </article>
+
+		<hr>
+        <!-- Ressources -->
+        <article id="ressources" class="mb-5">
+          <h2>RESSOURCES</h2>
+          <ul>
+            <li>Polycopié : <a href="../assets/supports/Th_Ex.pdf" target="_blank" rel="noopener">Th_Ex.pdf</a></li>
+            <li>Atelier : <a href="./python">Python</a>, <a href="./html">HTML / CSS</a>, <a href="./markdown">Markdown</a>, <a href="./sql">SQL</a></li>
+          </ul>
+        </article>
+
+        <!-- Historique -->
+        <article id="changelog" class="mb-5">
+          <h2>Historique</h2>
+          <ul>
+            <li><strong>v1.0</strong> — Structure initiale, sections et exemples minimaux. <!-- Ajoutez vos dates --></li>
+          </ul>
+        </article>
+
+		<p id="note"><i>* Couleur claire pour faciliter sa lecture</i></p>
+
+      </section>
+    </div>
+  </main>
+
+<footer class="footer">
+    <div class="container d-flex justify-content-between flex-wrap gap-3">
+      <small>© <span id="y"></span> / InformaticLi - Environnement informatique pédagogique 
+        <span class="text-success"><i class="bi bi-heart-fill"></i></span> SIMCE</small>
+      <small>Dernière mise à jour : <span id="last-upd">—</span></small>
+    </div>
+  </footer>
+
+  <a href="#" class="btn btn-secondary rounded-circle back-top-fixed" id="backTopBtn" title="Retour en haut">
+    <i class="bi bi-arrow-up"></i>
+  </a>
+
+  <script>
+    const backTopBtn = document.getElementById('backTopBtn');
+    window.addEventListener('scroll', () => {
+      backTopBtn.classList.toggle('show', window.scrollY > 300);
+    });
+    // Dates dynamiques
+    document.getElementById('y').textContent = new Date().getFullYear();
+    const d = new Date(document.lastModified);
+    document.getElementById('last-upd').textContent =
+      d.toLocaleDateString('fr-CH', { year:'numeric', month:'long', day:'numeric' });
+  </script>
+  <script src="/assets/js/theme.js"></script>
+  <script>
+    Theme.init({ canWrite:false });  // applique le clair/foncé
+  </script>
+</body>
+</html>

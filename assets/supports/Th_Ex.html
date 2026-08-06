@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Site en construction</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Évite l'indexation pendant les travaux -->
+  <meta name="robots" content="noindex, nofollow">
+
+  <style>
+    :root{
+      --bg1:#0b1220; --bg2:#161d2f; --fg:#e7edf7; --muted:#a8b3c7; --accent:#64b5f6;
+      --card:#111827; --ring:#243244;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg1:#f7f9fc; --bg2:#eef2f9; --fg:#0d1b2a; --muted:#4b5563; --accent:#2563eb; --card:#ffffff; --ring:#dbe4f0; }
+    }
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0; font:16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji", "Segoe UI Symbol";
+      color:var(--fg);
+      background: radial-gradient(1200px 800px at 20% 10%, var(--bg2), transparent 60%),
+                  radial-gradient(1200px 800px at 80% 90%, var(--bg2), transparent 60%),
+                  var(--bg1);
+      display:grid; place-items:center; padding:24px;
+    }
+    .card{
+      width:min(640px, 92vw);
+      background:var(--card);
+      border:1px solid var(--ring);
+      border-radius:20px;
+      padding:28px 28px 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      text-align:center;
+    }
+    .logo{
+      width:72px; height:72px; margin:0 auto 10px; display:grid; place-items:center;
+      border-radius:16px; background:linear-gradient(135deg, var(--accent), #7dd3fc);
+      color:white;
+      box-shadow: 0 8px 18px rgba(100,181,246,.35);
+    }
+    h1{ margin:8px 0 6px; font-size:clamp(22px, 3.6vw, 28px); letter-spacing:.2px }
+    p{ margin:8px auto 18px; color:var(--muted); max-width:48ch }
+    .bar{
+      height:10px; background:linear-gradient(180deg, #0000, rgba(255,255,255,.06));
+      border:1px solid var(--ring); border-radius:999px; overflow:hidden; position:relative;
+    }
+    .bar::before{
+      content:""; position:absolute; inset:0;
+      background: repeating-linear-gradient(90deg, var(--accent) 0 40px, #7dd3fc 40px 80px);
+      width:40%; border-radius:inherit; animation:load 2.2s ease-in-out infinite;
+      filter:saturate(120%);
+    }
+    @keyframes load{ 0%{transform:translateX(-60%)} 50%{transform:translateX(30%)} 100%{transform:translateX(120%)} }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:16px }
+    .btn{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid var(--ring); border-radius:12px; padding:10px 14px;
+      background:transparent; color:var(--fg); text-decoration:none; font-weight:600;
+    }
+    .btn:hover{ border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent) }
+    .small{ font-size:13px; color:var(--muted); margin-top:12px }
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0 }
+    .badge{
+      display:inline-block; font-size:12px; padding:4px 8px; border-radius:999px;
+      background:color-mix(in srgb, var(--accent) 18%, transparent); color:var(--fg); border:1px solid var(--ring);
+      margin-bottom:8px;
+    }
+    code{ background:rgba(148,163,184,.15); padding:.1em .35em; border-radius:6px }
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="titre">
+    <div class="logo" aria-hidden="true">
+      <!-- Petit pictogramme inline, aucun CDN nécessaire -->
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 7h7M3 12h10M3 17h7" />
+        <path d="M17.5 6.5l3 3-6 6H12v-2.5l5.5-5.5z" />
+      </svg>
+    </div>
+
+    <span class="badge">En cours de réalisation</span>
+    <h1 id="titre">Pour bientôt&nbsp;!</h1>
+    <p>
+      Cete partie du site est actuellement en construction. Revenez prochainement pour découvrir la nouvelle version.
+      En attendant, vous pouvez <strong>nous contacter</strong> ou consulter notre support de cours en pdf.
+    </p>
+
+    <div class="bar" aria-hidden="true"></div>
+    <span class="sr-only">Chargement en cours…</span>
+
+    <div class="row" role="navigation" aria-label="Liens utiles">
+      <a class="btn" href="mailto:contact@example.com">
+        <!-- icône enveloppe -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/>
+        </svg>
+        msg@informatic.li
+      </a>
+      <a class="btn" href="Th_Ex.pdf" rel="noopener">
+        <!-- icône PDF -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M6 2h8l6 6v14a0 0 0 0 1 0 0H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" fill="currentColor" opacity=".2"/>
+          <path d="M14 2v6h6M7 14h2a2 2 0 0 1 0 4H7v-4zm5 0h1.5a1.5 1.5 0 0 1 0 3H12v1h-1v-5h1zm5 0h-2v5h1v-1h1a1.5 1.5 0 0 0 0-3zM13 16h.5a.5.5 0 0 0 0-1H13v1zm5 0h1a.5.5 0 0 0 0-1h-1v1z" fill="currentColor"/>
+        </svg>
+        PDF
+      </a>
+    </div>
+
+    <div class="small">
+      Dernière mise à jour : <span id="maj"></span>
+      · <span>© <span id="year"></span> InformaticLi</span>
+      · <span>Page temporaire</span>
+      <br><span> Contenus SYST, ALGO, BASE, COCO, TURT, HTML, SGBD</span>
+
+    </div>
+  </main>
+
+  <script>
+    // Remplit la date automatiquement
+    (function(){
+      const d = new Date();
+      document.getElementById('year').textContent = d.getFullYear();
+      document.getElementById('maj').textContent  = d.toLocaleDateString('fr-CH', {year:'numeric', month:'long', day:'numeric'});
+    })();
+  </script>
+</body>
+</html>

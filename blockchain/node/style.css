@@ -1,0 +1,19 @@
+:root{
+  --primary:#2f63df;
+  --bg:#f6f8fb;
+  --card:#ffffff;
+  --border:#e5e7eb;
+}
+html,body{background:var(--bg);}
+.card{border:1px solid var(--border);border-radius:.75rem;box-shadow:0 2px 6px rgba(0,0,0,.05);background:var(--card);}
+code.small{word-break:break-all;}
+.badge-soft{background:#eef2ff;color:#1d4ed8;}
+.list-group-item{border-color:#edf0f4;}
+#chainView .block{border:1px solid var(--border);border-radius:.5rem;background:#fff;}
+#chainView .tx-sent{color:#c0392b;}
+#chainView .tx-rcv{color:#1b7d2b;}
+#chainView .tx-ext{color:#6b7280;}
+/* Icônes seuls sur mobile pour les boutons nav */
+@media (max-width:576px){
+  .navbar .btn span{display:none;}
+}
