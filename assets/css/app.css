@@ -461,6 +461,13 @@ body[data-app="python"] #highlighting .tok.num  { color:#f59e0b; }
 body[data-app="python"] #highlighting .tok.tstr { color:#ff9ad5; }
 body[data-app="python"] #highlighting .tok.com  { color:#a0acc0; }
 
+/* Le texte sélectionné reste fourni par le miroir coloré. Le redessiner une
+   seconde fois dans le textarea crée un effet flou, notamment sur Safari. */
+body[data-app="python"] #code::selection{
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+}
+
 /* ===== Fix overlay Python : l'overlay doit scroller comme le textarea ===== */
 body[data-app="python"] .codecell{
   height: 100%;

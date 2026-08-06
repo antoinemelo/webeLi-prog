@@ -30,12 +30,13 @@
 		#fileTabContent textarea {
 		  resize: none; /* non redimensionnable */
 		}
-		/* Soft wrap dans l'éditeur ET dans le miroir */
+		/* Le code ne revient pas automatiquement à la ligne : textarea et miroir
+		   gardent ainsi une géométrie identique quand la scrollbar apparaît. */
 		.editor-wrap #code,
 		.editor-wrap #highlighting{
-		  white-space: pre-wrap;      /* conserve \n + retour à la ligne auto */
-		  overflow-wrap: break-word;  /* casse les très longs mots */
-		  word-break: break-word;
+		  white-space: pre;
+		  overflow-wrap: normal;
+		  word-break: normal;
 		}
 
 		/* Lignes visuelles de continuation : un petit marqueur "…" dans la gouttière */
@@ -185,7 +186,7 @@
         <div id="gutter" class="gutter"><div>1</div></div>
         <div class="codecell">
           <pre id="highlighting"></pre>
-          <textarea id="code" class="codearea" spellcheck="false" aria-label="Éditeur Python"></textarea>
+          <textarea id="code" class="codearea" wrap="off" spellcheck="false" aria-label="Éditeur Python"></textarea>
           <div id="ac" class="autocomplete hidden" role="listbox" aria-label="Suggestions"></div>
         </div>
       </div>

@@ -22,13 +22,20 @@ class LongDocumentEditorTests(unittest.TestCase):
             self.assertNotRegex(source, r"codeEl\.style\.height\s*=")
 
     def test_markdown_and_python_gutters_expose_line_targets(self):
-        for relative_path in ("assets/js/markdown.js", "assets/js/python.js"):
-            source = (ROOT / relative_path).read_text(encoding="utf-8")
-            self.assertIn('data-line="${n}"', source)
+        markdown = (ROOT / "assets/js/markdown.js").read_text(encoding="utf-8")
+        python = (ROOT / "assets/js/python.js").read_text(encoding="utf-8")
+        self.assertIn('data-line="${n}"', markdown)
+        self.assertIn('data-line="${line}"', python)
 
         common = (ROOT / "assets/js/app.js").read_text(encoding="utf-8")
         self.assertIn('querySelector(".gutter")', common)
         self.assertIn("textarea.setSelectionRange", common)
+
+    def test_python_uses_logical_lines_without_soft_wrap(self):
+        html = (ROOT / "labs/python/index.html").read_text(encoding="utf-8")
+        javascript = (ROOT / "assets/js/python.js").read_text(encoding="utf-8")
+        self.assertIn('wrap="off"', html)
+        self.assertNotIn("visibleWrapsForLine", javascript)
 
 
 if __name__ == "__main__":

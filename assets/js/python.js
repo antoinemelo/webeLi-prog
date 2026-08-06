@@ -20,44 +20,14 @@
 		  document.getElementById("saveAsLocal")?.classList.add("d-none");
 		}
 
-		// Mesure "mono" pour estimer la largeur d'un caractère
-		function measureMonoCharWidth(el){
-		  const cs = getComputedStyle(el);
-		  const canvas = document.createElement('canvas');
-		  const ctx = canvas.getContext('2d');
-		  ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-		  const w = ctx.measureText('M').width || 8;
-		  return { charWidth: w, padL: parseFloat(cs.paddingLeft)||0, padR: parseFloat(cs.paddingRight)||0 };
-		}
-
-		function visibleWrapsForLine(line, cols){
-		  // tabs ~ 4 espaces pour l'estimation
-		  const expanded = line.replace(/\t/g, '    ');
-		  return Math.max(1, Math.ceil(expanded.length / Math.max(1, cols)));
-		}
-
 		function updateGutter(){
 		  if(!codeEl || !gutter) return;
 
-		  // Colonnes visibles utiles (largeur intérieure / largeur d'un caractère)
-		  const { charWidth, padL, padR } = measureMonoCharWidth(codeEl);
-		  const inner = Math.max(1, codeEl.clientWidth - padL - padR);
-		  const cols  = Math.max(1, Math.floor(inner / Math.max(1, charWidth)));
-
 		  const lines = codeEl.value.split(/\r?\n/);
 		  let html = '';
-		  let n = 1;
-
-		  for (let i=0; i<lines.length; i++){
-			const wraps = visibleWrapsForLine(lines[i], cols);
-
-			// Première rangée visuelle : numéro
-			html += `<div data-line="${n}">${n}</div>`;
-			// Rangées suivantes : marqueur de continuation
-			for (let k=1; k<wraps; k++){
-			  html += `<div class="cont" data-line="${n}"></div>`;
-			}
-			n++;
+		  for (let index = 0; index < lines.length; index++){
+			const line = index + 1;
+			html += `<div data-line="${line}">${line}</div>`;
 		  }
 
 		  gutter.innerHTML = html;
