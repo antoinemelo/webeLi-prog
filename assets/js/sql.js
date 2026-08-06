@@ -501,7 +501,7 @@ INSERT INTO ABSENCES(eleve_id,date,motif) VALUES (2,'2024-09-18','Maladie'),(4,'
 	function loadSchoolDB(){ try{ db.run(SCHOOL_SEED_SQL); setDBName('Base scolaire (Th_Ex)'); persistDB(); outEl.innerHTML = `<div class="text-success">> La base scolaire Th_Ex est maintenant chargée.</div>`; }catch(e){ outEl.innerHTML = `<div class="text-danger">Erreur lors du chargement de la base scolaire : ${e.message||e}</div>`; } }
 
 	async function initDB(){
-	  SQL = await initSqlJs({ locateFile: file => `../../assets/js/dist/sql-js@1.13.0//${file}` });
+	  SQL = await initSqlJs({ locateFile: file => `../../assets/js/dist/sql-js@1.13.0/${file}` });
 	  const saved = localStorage.getItem(LS_DB);
 	  if(saved){
 		db = new SQL.Database(b64ToU8(saved));
@@ -624,7 +624,7 @@ INSERT INTO ABSENCES(eleve_id,date,motif) VALUES (2,'2024-09-18','Maladie'),(4,'
 		  const table = document.createElement('table');
 		  table.className = 'table table-sm table-bordered table-striped table-hover align-middle mb-3';
 		  const thead = document.createElement('thead');
-		  thead.innerHTML = `<tr>${res.columns.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+		  thead.innerHTML = `<tr>${res.columns.map(c=>`<th>${escapeHtml(c)}</th>`).join('')}</tr>`;
 		  table.appendChild(thead);
 		  const tbody = document.createElement('tbody');
 			res.values.forEach(row=>{

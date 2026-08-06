@@ -532,6 +532,8 @@ function highlightHTMLLike(raw){
 
 		// Écoute les messages envoyés par l’iframe (console.log)
 		window.addEventListener("message", (e)=>{
+		  const preview = document.getElementById('preview');
+		  if (!preview || e.source !== preview.contentWindow) return;
 		  if(e.data?.type === "console"){
 			const pre = openConsoleTab();        // crée l’onglet si besoin
 			pre.textContent += e.data.message + "\n";

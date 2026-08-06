@@ -1,25 +1,37 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import argparse
+import base64
+import hmac
 import html
 import io
 import os
 import posixpath
+import secrets
 import socket
 import sqlite3
 import sys
 import urllib.parse
 from datetime import datetime
+from email import policy
+from email.parser import BytesParser
 from http import HTTPStatus
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 
 # ========= CONFIG =========
+BASE_DIR = Path(__file__).resolve().parent
+HOST = "127.0.0.1"
 PORT = 8021
-ROOT = os.path.abspath("./partage")  # Dossier racine partagé
+ROOT = str((BASE_DIR / "partage").resolve())
 ALLOW_DELETE = True
 ALLOW_RENAME = True
 ALLOW_MKDIR = True
+ALLOW_UPLOAD = True
+MAX_CONTENT_LENGTH = 100 * 1024 * 1024
+AUTH_USER = "atelier"
+AUTH_PASSWORD = ""
 
 # Ne pas afficher les fichiers/dossiers cachés (commençant par ".")
 HIDE_DOTFILES = True
@@ -42,11 +54,12 @@ def get_main_ip() -> str:
 
 def safe_join(root: str, url_path: str) -> str:
     url_path = urllib.parse.unquote(url_path)
-    url_path = posixpath.normpath(url_path)
-    if url_path.startswith("../") or "/../" in url_path or url_path == "..":
+    if any(part == ".." for part in url_path.replace("\\", "/").split("/")):
         raise ValueError("Chemin non autorisé")
+    url_path = posixpath.normpath(url_path)
     rel = url_path.lstrip("/")
-    full = os.path.abspath(os.path.join(root, rel))
+    root = os.path.realpath(root)
+    full = os.path.realpath(os.path.join(root, rel))
     if os.path.commonpath([full, root]) != root:
         raise ValueError("Chemin non autorisé")
     return full
@@ -62,49 +75,33 @@ def build_breadcrumbs(url_path: str):
     return crumbs
 
 
-def parse_multipart(boundary: bytes, data: bytes):
+def parse_multipart(content_type: str, data: bytes):
+    """Analyse un formulaire multipart sans modifier le contenu des fichiers."""
     fields = {}
     files = []
-    dash_boundary = b"--" + boundary
-    end_boundary = b"--" + boundary + b"--"
+    envelope = (
+        f"Content-Type: {content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode("ascii")
+        + data
+    )
+    message = BytesParser(policy=policy.default).parsebytes(envelope)
+    if not message.is_multipart():
+        raise ValueError("Formulaire multipart invalide")
 
-    parts = data.split(dash_boundary)
-    for part in parts:
-        part = part.strip(b"\r\n")
-        if not part or part == b"--" or part == end_boundary.strip(b"\r\n"):
-            continue
-        if b"\r\n\r\n" not in part:
-            continue
-
-        raw_headers, body = part.split(b"\r\n\r\n", 1)
-        body = body.rstrip(b"\r\n")
-
-        header_lines = raw_headers.split(b"\r\n")
-        headers = {}
-        for line in header_lines:
-            if b":" in line:
-                k, v = line.split(b":", 1)
-                headers[k.strip().lower()] = v.strip()
-
-        cd = headers.get(b"content-disposition", b"").decode("utf-8", "ignore")
-        params = {}
-        for item in cd.split(";"):
-            item = item.strip()
-            if "=" in item:
-                a, b = item.split("=", 1)
-                params[a.strip()] = b.strip().strip('"')
-
-        name = params.get("name", "")
-        filename = params.get("filename")
-
+    for part in message.iter_parts():
+        name = part.get_param("name", header="content-disposition") or ""
+        filename = part.get_filename()
+        payload = part.get_payload(decode=True) or b""
         if filename is not None and name:
-            files.append({"name": name, "filename": filename, "content": body})
+            files.append({"name": name, "filename": filename, "content": payload})
         elif name:
-            try:
-                fields[name] = body.decode("utf-8", "ignore")
-            except Exception:
-                fields[name] = ""
+            charset = part.get_content_charset() or "utf-8"
+            fields[name] = payload.decode(charset, "replace")
     return fields, files
+
+
+def contains_hidden_part(path: str) -> bool:
+    clean = urllib.parse.unquote(path).replace("\\", "/")
+    return any(part.startswith(".") for part in clean.split("/") if part)
 
 
 # =========================
@@ -157,8 +154,12 @@ def db_delete(relpath: str):
 
 def db_delete_prefix(prefix: str):
     prefix = _norm_rel(prefix).rstrip("/") + "/"
+    escaped = prefix.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
     with sqlite3.connect(DB_PATH) as con:
-        con.execute("DELETE FROM file_meta WHERE relpath LIKE ?", (prefix + "%",))
+        con.execute(
+            "DELETE FROM file_meta WHERE relpath LIKE ? ESCAPE '\\'",
+            (escaped + "%",),
+        )
         con.commit()
 
 
@@ -173,10 +174,11 @@ def db_rename(old_relpath: str, new_relpath: str):
 def db_rename_prefix(old_prefix: str, new_prefix: str):
     old_prefix = _norm_rel(old_prefix).rstrip("/") + "/"
     new_prefix = _norm_rel(new_prefix).rstrip("/") + "/"
+    escaped = old_prefix.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
     with sqlite3.connect(DB_PATH) as con:
         rows = con.execute(
-            "SELECT relpath, user, ts FROM file_meta WHERE relpath LIKE ?",
-            (old_prefix + "%",),
+            "SELECT relpath, user, ts FROM file_meta WHERE relpath LIKE ? ESCAPE '\\'",
+            (escaped + "%",),
         ).fetchall()
 
         if not rows:
@@ -238,29 +240,101 @@ def db_checkpoint():
 # HTTP HANDLER
 # =========================
 class FileWebHandler(SimpleHTTPRequestHandler):
+    server_version = "InformaticFileHTTP/2.0"
+
+    def _is_authenticated(self) -> bool:
+        supplied = self.headers.get("Authorization", "")
+        raw = f"{AUTH_USER}:{AUTH_PASSWORD}".encode("utf-8")
+        expected = "Basic " + base64.b64encode(raw).decode("ascii")
+        return hmac.compare_digest(supplied, expected)
+
+    def _guard_request(self) -> bool:
+        parsed = urllib.parse.urlparse(self.path)
+        if HIDE_DOTFILES and contains_hidden_part(parsed.path):
+            self.send_error(HTTPStatus.NOT_FOUND, "Ressource introuvable")
+            return False
+        if not self._is_authenticated():
+            self.send_response(HTTPStatus.UNAUTHORIZED)
+            self.send_header("WWW-Authenticate", 'Basic realm="Informatic fichiers", charset="UTF-8"')
+            self.send_header("Content-Type", "text/plain; charset=utf-8")
+            self.end_headers()
+            self.wfile.write("Authentification requise.\n".encode("utf-8"))
+            return False
+        return True
+
+    def _origin_is_allowed(self) -> bool:
+        origin = self.headers.get("Origin")
+        if not origin:
+            return True
+        parsed = urllib.parse.urlparse(origin)
+        return parsed.scheme in {"http", "https"} and parsed.netloc == self.headers.get("Host", "")
+
+    def do_GET(self):
+        if self._guard_request():
+            super().do_GET()
+
+    def do_HEAD(self):
+        if self._guard_request():
+            super().do_HEAD()
+
+    def end_headers(self):
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "no-referrer")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        self.send_header(
+            "Content-Security-Policy",
+            "default-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "font-src 'self' https://cdn.jsdelivr.net; img-src 'self' data:; "
+            "frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+        )
+        super().end_headers()
+
     def translate_path(self, path):
         parsed = urllib.parse.urlparse(path)
+        if HIDE_DOTFILES and contains_hidden_part(parsed.path):
+            return str(BASE_DIR / ".invalid-request")
         try:
             return safe_join(ROOT, parsed.path)
         except ValueError:
-            return ROOT
+            return str(BASE_DIR / ".invalid-request")
 
     def log_message(self, format, *args):
         sys.stdout.write("[{:%H:%M:%S}] {} - {}\n".format(datetime.now(), self.client_address[0], format % args))
 
     def do_POST(self):
+        if not self._guard_request():
+            return
+        if not self._origin_is_allowed():
+            self.send_error(HTTPStatus.FORBIDDEN, "Origine non autorisee")
+            return
+
         parsed = urllib.parse.urlparse(self.path)
 
         ctype = self.headers.get("Content-Type", "")
-        length = int(self.headers.get("Content-Length", "0"))
-        data = self.rfile.read(length)
-
         if "multipart/form-data" not in ctype or "boundary=" not in ctype:
             self.send_error(HTTPStatus.BAD_REQUEST, "Formulaire invalide")
             return
 
-        boundary = ctype.split("boundary=", 1)[1].encode("utf-8", "ignore")
-        fields, files = parse_multipart(boundary, data)
+        try:
+            length = int(self.headers.get("Content-Length", ""))
+        except ValueError:
+            self.send_error(HTTPStatus.BAD_REQUEST, "Taille de requete invalide")
+            return
+        if length < 0:
+            self.send_error(HTTPStatus.BAD_REQUEST, "Taille de requete invalide")
+            return
+        if length > MAX_CONTENT_LENGTH:
+            self.send_error(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, "Envoi trop volumineux")
+            return
+
+        data = self.rfile.read(length)
+        try:
+            fields, files = parse_multipart(ctype, data)
+        except (ValueError, UnicodeError) as exc:
+            self.send_error(HTTPStatus.BAD_REQUEST, str(exc))
+            return
         action = fields.get("action", "")
         user = (fields.get("u") or "").strip()[:60] or "Invité"
 
@@ -295,25 +369,25 @@ class FileWebHandler(SimpleHTTPRequestHandler):
 
         # ---- UPLOAD ----
         if action == "upload":
+            if not ALLOW_UPLOAD:
+                self.send_error(HTTPStatus.FORBIDDEN, "Envoi de fichier desactive")
+                return
             count = 0
             for f in files:
-                filename = os.path.basename(f["filename"])
-                if not filename:
+                filename = os.path.basename(f["filename"].replace("\\", "/"))
+                if not filename or (HIDE_DOTFILES and contains_hidden_part(filename)):
                     continue
-                dest = os.path.join(target_dir, filename)
-
-                if os.path.exists(dest):
-                    base, ext = os.path.splitext(filename)
-                    n = 1
-                    while True:
-                        cand = os.path.join(target_dir, f"{base} ({n}){ext}")
-                        if not os.path.exists(cand):
-                            dest = cand
-                            break
+                base, ext = os.path.splitext(filename)
+                n = 0
+                while True:
+                    candidate = filename if n == 0 else f"{base} ({n}){ext}"
+                    dest = os.path.join(target_dir, candidate)
+                    try:
+                        with open(dest, "xb") as out:
+                            out.write(f["content"])
+                        break
+                    except FileExistsError:
                         n += 1
-
-                with open(dest, "wb") as out:
-                    out.write(f["content"])
 
                 db_upsert(rel_from_abs(dest), user)
                 count += 1
@@ -328,7 +402,7 @@ class FileWebHandler(SimpleHTTPRequestHandler):
                 return
             name = (fields.get("dirname") or "").strip()
             name = name.replace("/", "").replace("\\", "")
-            if not name:
+            if not name or (HIDE_DOTFILES and contains_hidden_part(name)):
                 self._redirect_back(parsed.path, msg="Nom de dossier vide.")
                 return
             new_dir = os.path.join(target_dir, name)
@@ -348,6 +422,13 @@ class FileWebHandler(SimpleHTTPRequestHandler):
                 self.send_error(HTTPStatus.FORBIDDEN, "Suppression désactivée")
                 return
             rel = (fields.get("rel") or "").strip()
+            if (
+                not rel
+                or posixpath.basename(rel.replace("\\", "/")) != rel
+                or (HIDE_DOTFILES and contains_hidden_part(rel))
+            ):
+                self.send_error(HTTPStatus.FORBIDDEN, "Chemin non autorise")
+                return
             try:
                 target = safe_join(ROOT, posixpath.join(parsed.path, rel))
             except ValueError:
@@ -376,7 +457,13 @@ class FileWebHandler(SimpleHTTPRequestHandler):
             rel = (fields.get("rel") or "").strip()
             newname = (fields.get("newname") or "").strip()
             newname = os.path.basename(newname)
-            if not newname:
+            if (
+                not rel
+                or posixpath.basename(rel.replace("\\", "/")) != rel
+                or not newname
+                or (HIDE_DOTFILES and contains_hidden_part(rel))
+                or (HIDE_DOTFILES and contains_hidden_part(newname))
+            ):
                 self._redirect_back(parsed.path, msg="Nouveau nom vide.")
                 return
 
@@ -389,6 +476,8 @@ class FileWebHandler(SimpleHTTPRequestHandler):
 
             try:
                 is_dir = os.path.isdir(src)
+                if os.path.exists(dst):
+                    raise FileExistsError("un fichier ou dossier porte deja ce nom")
                 os.rename(src, dst)
 
                 if is_dir:
@@ -591,7 +680,8 @@ class FileWebHandler(SimpleHTTPRequestHandler):
         f.write("<div class='glass p-3 mb-3'>")
         f.write("<div class='row g-3 align-items-stretch'>")
 
-        f.write(f"""
+        if ALLOW_UPLOAD:
+            f.write(f"""
 <div class="col-12 col-lg-7">
   <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{html.escape(enc_path)}">
     <input type="hidden" name="action" value="upload">
@@ -618,6 +708,15 @@ class FileWebHandler(SimpleHTTPRequestHandler):
       </button>
     </div>
   </form>
+</div>
+""")
+
+        if not ALLOW_UPLOAD and not ALLOW_MKDIR:
+            f.write("""
+<div class="col-12">
+  <div class="alert alert-info mb-0">
+    <i class="bi bi-lock me-2"></i>Serveur en lecture seule.
+  </div>
 </div>
 """)
 
@@ -844,36 +943,37 @@ class FileWebHandler(SimpleHTTPRequestHandler):
   const picked = document.getElementById('picked');
   const clearBtn = document.getElementById('clearBtn');
 
-  function renderPicked(){
-    if (!inputFiles.files || inputFiles.files.length === 0){
-      picked.textContent = "Aucun fichier sélectionné.";
-      return;
+  if (dz && inputFiles && formUpload && picked) {
+    function renderPicked(){
+      if (!inputFiles.files || inputFiles.files.length === 0){
+        picked.textContent = "Aucun fichier sélectionné.";
+        return;
+      }
+      const names = [...inputFiles.files].map(f => f.name + " (" + f.size + " o)");
+      picked.textContent = names.join(" • ");
     }
-    const names = [...inputFiles.files].map(f => f.name + " (" + f.size + " o)");
-    picked.textContent = names.join(" • ");
-  }
 
-  dz.addEventListener('click', () => inputFiles.click());
-  inputFiles.addEventListener('change', () => { renderPicked(); });
+    dz.addEventListener('click', () => inputFiles.click());
+    inputFiles.addEventListener('change', () => { renderPicked(); });
+    clearBtn?.addEventListener('click', () => { inputFiles.value = ""; renderPicked(); });
 
-  clearBtn?.addEventListener('click', () => { inputFiles.value = ""; renderPicked(); });
+    ['dragenter','dragover'].forEach(evt => {
+      dz.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); dz.classList.add('dragover'); });
+    });
+    ['dragleave','drop'].forEach(evt => {
+      dz.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); dz.classList.remove('dragover'); });
+    });
 
-  ['dragenter','dragover'].forEach(evt => {
-    dz.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); dz.classList.add('dragover'); });
-  });
-  ['dragleave','drop'].forEach(evt => {
-    dz.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); dz.classList.remove('dragover'); });
-  });
+    dz.addEventListener('drop', (e) => {
+      const files = e.dataTransfer.files;
+      if (!files || files.length === 0) return;
+      inputFiles.files = files;
+      renderPicked();
+      formUpload.submit();
+    });
 
-  dz.addEventListener('drop', (e) => {
-    const files = e.dataTransfer.files;
-    if (!files || files.length === 0) return;
-    inputFiles.files = files;
     renderPicked();
-    formUpload.submit();
-  });
-
-  renderPicked();
+  }
 
   // Actions rename/delete
   const af = document.getElementById("actionForm");
@@ -916,19 +1016,61 @@ class FileWebHandler(SimpleHTTPRequestHandler):
         return io.BytesIO(encoded)
 
 
-def main():
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description="Serveur HTTP de fichiers authentifie")
+    parser.add_argument("--host", default=HOST, help="Adresse d'ecoute")
+    parser.add_argument("--port", type=int, default=PORT, help="Port HTTP")
+    parser.add_argument("--root", type=Path, default=Path(ROOT), help="Dossier partage")
+    parser.add_argument("--user", default=os.getenv("FILEWEB_USER", AUTH_USER))
+    parser.add_argument(
+        "--password",
+        default=os.getenv("FILEWEB_PASSWORD"),
+        help="Secret HTTP Basic (preferer FILEWEB_PASSWORD)",
+    )
+    parser.add_argument(
+        "--lecture-seule",
+        action="store_true",
+        help="Desactiver toutes les operations d'ecriture",
+    )
+    parser.add_argument(
+        "--max-upload-mio",
+        type=int,
+        default=100,
+        help="Taille maximale d'une requete en Mio",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    global ROOT, DB_PATH, AUTH_USER, AUTH_PASSWORD, MAX_CONTENT_LENGTH
+    global ALLOW_DELETE, ALLOW_RENAME, ALLOW_MKDIR, ALLOW_UPLOAD
+
+    args = parse_args(argv)
+    ROOT = str(args.root.expanduser().resolve())
+    DB_PATH = os.path.join(ROOT, ".metadata.db")
+    AUTH_USER = args.user.strip() or "atelier"
+    AUTH_PASSWORD = args.password or secrets.token_urlsafe(12)
+    MAX_CONTENT_LENGTH = max(1, args.max_upload_mio) * 1024 * 1024
+    ALLOW_DELETE = not args.lecture_seule
+    ALLOW_RENAME = not args.lecture_seule
+    ALLOW_MKDIR = not args.lecture_seule
+    ALLOW_UPLOAD = not args.lecture_seule
+
     os.makedirs(ROOT, exist_ok=True)
     db_init()
 
-    ip = get_main_ip()
+    ip = get_main_ip() if args.host == "0.0.0.0" else args.host
     print("\n======= Serveur de fichiers HTTP ========")
     print(f"Racine  : {ROOT}")
-    print(f"URL     : http://{ip}:{PORT}/")
+    print(f"URL     : http://{ip}:{args.port}/")
+    print(f"Compte  : {AUTH_USER}")
+    print(f"Secret  : {AUTH_PASSWORD}")
+    print(f"Mode    : {'lecture seule' if args.lecture_seule else 'lecture/ecriture'}")
     print("Arrêt   : CTRL+C")
     print("=========================================\n")
 
     os.chdir(ROOT)
-    server = ThreadingHTTPServer(("0.0.0.0", PORT), FileWebHandler)
+    server = ThreadingHTTPServer((args.host, args.port), FileWebHandler)
 
     try:
         server.serve_forever()

@@ -17,11 +17,7 @@
 	  document.body.classList.add('view-only');
 	  try { renderPreview(); } catch(_) {}
 
-	  // Switch to a light code theme for white background
-	  const l = document.getElementById('hljs-theme');
-	  if (l && l.href.includes('github-dark')) {
-		l.href = l.href.replace('github-dark','github'); // -> github.min.css
-	  }
+	  // Le thème de coloration embarqué reste identique en aperçu seul.
 	}
 
 	// --- Petit utilitaire de partage/copie (UX propre) ---
@@ -270,6 +266,48 @@
 
 	marked.use({ extensions: [underlineExt] });
 
+	function sanitizeRenderedHtml(rawHtml) {
+	  const template = document.createElement('template');
+	  template.innerHTML = rawHtml;
+	  const forbidden = new Set([
+		'SCRIPT', 'IFRAME', 'OBJECT', 'EMBED', 'LINK', 'META', 'BASE',
+		'FORM', 'INPUT', 'BUTTON', 'TEXTAREA', 'SELECT', 'OPTION',
+		'STYLE', 'SVG', 'MATH'
+	  ]);
+	  const urlAttributes = new Set(['href', 'src', 'xlink:href']);
+
+	  for (const element of [...template.content.querySelectorAll('*')]) {
+		if (forbidden.has(element.tagName)) {
+		  element.remove();
+		  continue;
+		}
+		for (const attribute of [...element.attributes]) {
+		  const name = attribute.name.toLowerCase();
+		  const value = attribute.value.trim();
+		  if (name.startsWith('on') || name === 'srcdoc' || name === 'style') {
+			element.removeAttribute(attribute.name);
+			continue;
+		  }
+		  if (urlAttributes.has(name) && value) {
+			let allowed = value.startsWith('#');
+			try {
+			  const parsed = new URL(value, location.href);
+			  allowed ||= ['http:', 'https:', 'mailto:'].includes(parsed.protocol);
+			  allowed ||= name === 'src' && parsed.protocol === 'data:'
+				&& /^data:image\/(?:png|gif|jpe?g|webp);/i.test(value);
+			} catch (_) {
+			  allowed = false;
+			}
+			if (!allowed) element.removeAttribute(attribute.name);
+		  }
+		}
+		if (element.tagName === 'A' && element.target === '_blank') {
+		  element.rel = 'noopener noreferrer';
+		}
+	  }
+	  return template.innerHTML;
+	}
+
 	function getCursorLine(ta){
 	  const upto = ta.value.slice(0, ta.selectionStart);
 	  return upto.split(/\r?\n/).length - 1; // 0-index
@@ -299,7 +337,7 @@
 	  const prevRatio = pv.scrollTop / maxScroll;
 
 	  const md = document.getElementById('code').value;
-	  const html = marked.parse(md);
+	  const html = sanitizeRenderedHtml(marked.parse(md));
 	  pv.innerHTML = html;
 
 	  // restaurer un scroll cohérent après rerendu,
@@ -585,7 +623,7 @@ return `#### Prénom / Thème-ObjetTPxx
 		  const title = (typeof escapeHTML === 'function') ? escapeHTML(h1) : h1;
 
 		  // Conversion Markdown -> HTML (marked est déjà configuré plus haut)
-		  const body = marked.parse(md);
+		  const body = sanitizeRenderedHtml(marked.parse(md));
 
 		  // Petit CSS autonome et lisible (pas de dépendances externes)
 		  const css = `
@@ -622,7 +660,7 @@ return `#### Prénom / Thème-ObjetTPxx
 
 		document.getElementById('exportPdf').addEventListener('click', () => {
 		  const md = document.getElementById('code').value;
-		  const body = marked.parse(md);
+		  const body = sanitizeRenderedHtml(marked.parse(md));
 
 		  // Conteneur dédié à l’export
 		  const container = document.createElement('div');
@@ -643,7 +681,7 @@ return `#### Prénom / Thème-ObjetTPxx
 
 		$('#print').addEventListener('click', ()=>{
 		  const w = window.open('', '_blank');
-		  const body = marked.parse(ta.value);
+		  const body = sanitizeRenderedHtml(marked.parse(ta.value));
 		  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
 		<link id="hljs-theme" rel="stylesheet" href="../../assets/css/dist/highlight@11.11.1/github-dark_min.css">
 		<style>

@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Donnees generees par le serveur de partage
+partage/*
+!partage/.gitkeep
+
+# Rapports locaux
+.coverage
+htmlcov/
+playwright-report/
+test-results/

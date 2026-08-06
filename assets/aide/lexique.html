@@ -8,17 +8,16 @@
   <meta name="theme-color" content="#0b1220" />
 
   <!-- Favicon -->
-  <link rel="icon" href="/assets/images/grid.svg" type="image/svg+xml">
-  <link rel="icon" href="/assets/images/grid.ico" sizes="any">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="icon" href="../images/grid.svg" type="image/svg+xml">
+  <link rel="icon" href="../images/grid.ico" sizes="any">
 
   <!-- Bootstrap & Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="/assets/css/app.css">
+  <link rel="stylesheet" href="../css/dist/bootstrap@5.3.8/bootstrap_min.css">
+  <link rel="stylesheet" href="../css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css">
+  <link rel="stylesheet" href="../css/app.css">
 
   <!-- SQL.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+  <script src="../js/dist/sql-js@1.13.0/sql-wasm.js"></script>
 
   <style>
     html { scroll-behavior: smooth; }
@@ -194,7 +193,7 @@ let db;
 
 async function init() {
   const SQL = await initSqlJs({
-    locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}`
+    locateFile: f => `../js/dist/sql-js@1.13.0/${f}`
   });
 
   try {
@@ -361,7 +360,7 @@ init();
 </script>
 
   <!-- Gestion du clair/foncé -->
-  <script src="/assets/js/theme.js"></script>
+  <script src="../js/theme.js"></script>
   <script>
     Theme.init({ canWrite:false });
   </script>

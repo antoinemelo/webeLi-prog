@@ -585,6 +585,7 @@
 
 		  const iframe = document.getElementById("preview");
 		  if (!iframe || !iframe.contentWindow) return;
+		  if (ev.source !== iframe.contentWindow) return;
 
 		  const { type } = ev.data;
 

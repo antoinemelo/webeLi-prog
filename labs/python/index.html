@@ -8,7 +8,6 @@
   <link rel="icon" href="../../assets/images/grid.svg" type="image/svg+xml">
   <!-- Fallback multi-navigateurs -->
   <link rel="icon" href="../../assets/images/grid.ico" sizes="any">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta name="theme-color" content="#0b1220">
   
 	<!-- Bootstrap & Icons -->
@@ -18,11 +17,8 @@
 
 	<script src="../../assets/js/app.js"></script>
 	<script src="../../assets/js/dist/jszip@3.10.1/jszip_min.js"></script>
-	<!-- Brython
-	<script src="../../assets/js/dist/brython@3.13.2/brython_stdlib.js"></script>
-	-->
-	<script src="../../assets/js/dist/brython@3.13.2/brython_min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/brython@3.13/brython_stdlib.js"></script>
+		<script src="../../assets/js/dist/brython@3.13.2/brython_min.js"></script>
+		<script src="../../assets/js/dist/brython@3.13.2/brython_stdlib.js"></script>
 	<style>
 		#gutter > div.err { background: rgba(220,53,69,.15); color:#ff6b6b; font-weight:600; }
 		#fileTabContent,
@@ -97,7 +93,7 @@
       <a href="../../" class="text-decoration-none d-inline-flex align-items-center gap-2">
         <i class="bi bi-filetype-py"></i>
       </a> 
-      <span data-i18n="pyTitle"></span>
+      <span data-i18n="pyEditorTitle"></span>
       <span id="dirtyDot" class="ms-2" style="display:none;color:#ff4507;">●</span>
     </span>
     <span id="fileBadge" class="badge rounded-pill text-bg-info ms-2 d-none">
@@ -316,8 +312,8 @@ turtle.done()</code></pre>
 			</li>
 			<li><strong>Partage rapide</strong> : génération d’un lien (URL encodée en Base64)</li>
 			<li><strong>Protection anti-boucle infinie</strong> : avertissement si un <code>while</code> risque de bloquer</li>
-			<li><strong>Protection serveur</strong> : le code est exécuté via 
-				<code>new Function()</code> dans l’onglet (pas d’accès serveur)</li>
+			<li><strong>Exécution locale</strong> : le code Python est interprété par
+				<code>Brython</code> dans l’onglet, sans exécution sur le serveur</li>
 			<li><strong>Résultats console</strong> avec mise en évidence des erreurs et surlignage de la ligne fautive</li>
 			<li><strong>Interface mobile-friendly</strong> avec redimensionnement dynamique</li>
 			<li><strong>Raccourcis pratiques</strong>: <kbd>F9</kbd> = exécuter le code</li>

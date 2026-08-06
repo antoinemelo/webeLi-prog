@@ -24,7 +24,7 @@ const translations = {
 		btnOpenJs: "Atelier Javascript",
 
 		htmlTitle: "Atelier HTML/CSS",
-		htmlDesc: "Éditer/voir vos pages yc. avec des feuiles de style.",
+		htmlDesc: "Éditer et prévisualiser vos pages, y compris leurs feuilles de style.",
 		htmlFeat1: "Aperçu intégré",
 		htmlFeat2: "Snippets et modèle",
 		htmlFeat3: "Intègre la gestion CSS",
@@ -69,7 +69,7 @@ const translations = {
 
   		casTitle: "Cas pratiques",
 		// --- DACTYLO ---
-		typingTitle: "Dactylographique",
+		typingTitle: "Dactylographie",
 		typingFeat1: "Exercices techniques et vitesse",
 		typingFeat2: "Analyse des erreurs en temps réel",
 		typingFeat3: "Calcul des frappes & erreurs / minute",
@@ -120,7 +120,7 @@ const translations = {
 		hintJs: "= [l,c] | Rappel : mettre la 1e ligne sous forme <!-- Prénom / Thème-ObjetTPxx -->. Vous pouvez déposer les .js dans l’éditeur.",
 		result: "Résultat",
 
-		mdTitle: "Markdown",
+		mdEditorTitle: "Markdown",
 		hintMd: "= [l,c] | Rappel : mettre la 1e ligne sous forme #### Prénom / Thème-ObjetTPxx. Vous pouvez déposer les .md dans l’éditeur.",
 		exportHtml: "Exporter .html",
 		exportPdf: "Exporter .pdf",
@@ -129,7 +129,7 @@ const translations = {
 		notSupported: "Non supporté dans Safari",
 		run: "Exécuter [F9]",
 		hintPy: "= [l,c] | Rappel : mettre la 1e ligne sous forme # Prénom / Thème-ObjetTPxx. Vous pouvez déposer les .py dans l’éditeur.",
-		pyTitle: "Python",
+		pyEditorTitle: "Python",
 
 		openDb: "Ouvrir .sqlite",
 		importDb: "Importer .sqlite",
@@ -268,7 +268,7 @@ const translations = {
 		hintJs: "= [z,s] | Hinweis: Setze die erste Zeile in die Form <!-- Vorname / Thema–ObjektPAxx -->. Sie können .js in den Editor ziehen.",
 		result: "Ergebnis",
 
-		mdTitle: "Markdown",
+		mdEditorTitle: "Markdown",
 		hintMd: "= [z,s] | Hinweis: Setze die erste Zeile in die Form <code># Vorname / Thema–ObjektPAxx</code>. Sie können .md in den Editor ziehen.",
 		exportHtml: ".html exportieren",
 		exportPdf: ".pdf exportieren",
@@ -277,7 +277,7 @@ const translations = {
 		notSupported: "In Safari nicht unterstützt",
 		run: "Ausführen [F9]",
 		hintPy: "= [z,s] | Erinnerung: Die erste Zeile in der Form # Vorname / Thema–ObjektPAxx. Sie können .py in den Editor ziehen.",
-		pyTitle: "Python",
+		pyEditorTitle: "Python",
 
 		openDb: ".sqlite öffnen",
 		importDb: ".sqlite importieren",
@@ -416,7 +416,7 @@ const translations = {
 		hintJs: "= [r,c] | Reminder: put the first line in the form <!-- Firstname / Subject-ItemPWxx -->.  You can drop .js into the editor",
 		result: "Result",
 
-		mdTitle: "Markdown",
+		mdEditorTitle: "Markdown",
 		hintMd: "= [r,c] | Reminder: put the first line in the form #### Firstname / Subject-ItemPWxx</code>.  You can drop .md into the editor",
 		exportHtml: "Export .html",
 		exportPdf: "Export .pdf",
@@ -425,7 +425,7 @@ const translations = {
 		notSupported: "Not supported in Safari",
 		run: "Run [F9]",
 		hintPy: "= [r,c] | Reminder: put the first line in the form # Firstname / Subject-ItemPWxx.  You can drop .py into the editor.",
-		pyTitle: "Python",
+		pyEditorTitle: "Python",
 
 		openDb: "Open .sqlite",
 		importDb: "Import .sqlite",
@@ -444,15 +444,6 @@ const translations = {
 		erDiagram: "ER diagram"
 	}
 };
-
-	// === Application d’une langue ===
-	function applyLang(lang) {
-		document.querySelectorAll("[data-i18n]").forEach(el => {
-		const key = el.dataset.i18n;
-		el.textContent = translations[lang]?.[key] || el.textContent || key;
-		});
-		document.documentElement.lang = lang;
-	}
 
 function applyLang(lang) {
   document.querySelectorAll("[data-i18n]").forEach(el => {

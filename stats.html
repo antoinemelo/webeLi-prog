@@ -8,28 +8,27 @@
   <!-- Favicon -->
   <link rel="icon" href="./assets/images/grid.svg" type="image/svg+xml">
   <link rel="icon" href="./assets/images/grid.ico" sizes="any">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta name="theme-color" content="#0b1220">
 
 	<!-- Bootstrap & Icons -->
 	<link rel="stylesheet" href="./assets/css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css">
 	<link rel="stylesheet" href="./assets/css/dist/bootstrap@5.3.8/bootstrap_min.css">
 	<link rel="stylesheet" href="./assets/css/app.css">
-	<script src="../../assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
+	<script src="./assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
 
 	<!-- Chart.js -->
-	<script src="../../assets/js/dist/chart@4.5.0/chart-umd_min.js" defer></script>
+	<script src="./assets/js/dist/chart@4.5.0/chart-umd_min.js" defer></script>
 </head>
 <body data-app="stats">
   <!-- NAV -->
   <nav class="navbar navbar-dark">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="./">
         <i class="bi bi-grid"></i>
         <span>INFORMATIC - Statistiques</span>
       </a>
       <span class="brand-mini">
-        <a class="btn btn-outline-light" href="/" title="Accueil">
+        <a class="btn btn-outline-light" href="./" title="Accueil">
           <i class="bi bi-house-door"></i>
         </a>
       </span>
@@ -247,7 +246,7 @@ function render(mode){
     loadStats();
   </script>
 
-  <script src="/assets/js/theme.js"></script>
+  <script src="./assets/js/theme.js"></script>
   <script>
     Theme.init({ canWrite:false });  // applique + suit, sans changer localStorage
   </script>
