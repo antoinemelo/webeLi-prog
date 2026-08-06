@@ -166,5 +166,32 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     }
+
+    // Navigation précise dans les documents longs : un clic sur un numéro
+    // place le caret au début de la ligne, un double-clic sélectionne la ligne.
+    const gutter = textarea.closest(".editor-wrap")?.querySelector(".gutter");
+    if (gutter) {
+      gutter.title = "Cliquer pour atteindre la ligne; double-cliquer pour la sélectionner";
+      gutter.setAttribute("aria-label", "Numéros de ligne cliquables");
+      gutter.addEventListener("mousedown", event => {
+        if (event.button !== 0) return;
+        const marker = event.target.closest("[data-line]");
+        if (!marker || !gutter.contains(marker)) return;
+
+        const requestedLine = Number.parseInt(marker.dataset.line || "", 10);
+        if (!Number.isInteger(requestedLine) || requestedLine < 1) return;
+
+        event.preventDefault();
+        const lines = textarea.value.split("\n");
+        const line = Math.min(requestedLine, lines.length);
+        let start = 0;
+        for (let index = 1; index < line; index++) start += lines[index - 1].length + 1;
+        const end = start + lines[line - 1].replace(/\r$/, "").length;
+
+        textarea.focus({preventScroll: true});
+        textarea.setSelectionRange(start, event.detail >= 2 ? end : start);
+        textarea.dispatchEvent(new Event("select", {bubbles: true}));
+      });
+    }
   });
 });

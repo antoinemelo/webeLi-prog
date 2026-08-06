@@ -88,10 +88,10 @@
 		  const wraps = computeVisibleWrapsForLine(lines[i], cols);
 
 		  // 1re "rangée" de la ligne -> numéro
-		  html += `<div>${n}</div>`;
+		  html += `<div data-line="${n}">${n}</div>`;
 		  // rangées suivantes (continuations visuelles) -> emplacements vides
 		  for (let w = 1; w < wraps; w++) {
-			html += `<div class="cont"></div>`;
+			html += `<div class="cont" data-line="${n}"></div>`;
 			// Variante: montrer un marqueur → `<div class="cont">⋯</div>`
 		  }
 		  n++;
@@ -118,16 +118,8 @@
 
 	  window.addEventListener('load', updateGutter);
 
-	  function sizeTextarea(){
-		const wrap = document.querySelector('.editor-wrap');
-		const h = wrap.getBoundingClientRect().height;
-		codeEl.style.height = h + 'px';
-		$('#highlighting').style.height = h + 'px';
-		// Quand la largeur change, le nb de colonnes change → renumérote
-		updateGutter();
-	  }
-	  window.addEventListener('resize', sizeTextarea);
-	  window.addEventListener('load', sizeTextarea);
+	  // La hauteur est pilotée par CSS; le ResizeObserver recalcule uniquement
+	  // les retours visuels et évite les hauteurs figées sur mobile.
 	})();
 
     // ---------- Splitter ----------
@@ -353,6 +345,12 @@
       const ta = $('#code');
       const hi = $('#highlighting');
       const INDENT = '    ';
+	  let previewTimer = 0;
+
+	  function schedulePreview(){
+		window.clearTimeout(previewTimer);
+		previewTimer = window.setTimeout(renderPreview, 100);
+	  }
 
       function getLineStartIndex(text, pos){ return text.lastIndexOf('\n', pos - 1) + 1; }
       function getLineEndIndex(text, pos){ const idx = text.indexOf('\n', pos); return idx === -1 ? text.length : idx; }
@@ -537,7 +535,12 @@ return `#### Prénom / Thème-ObjetTPxx
 			try { renderPreview(); } catch(_) {}
 		  }
 		});
-      ta.addEventListener('input', ()=>{ persist(); syncHighlight(); renderPreview(); updateAC(); updateGutter(); scrollPreviewToCaret(); });
+      ta.addEventListener('input', ()=>{
+		persist();
+		syncHighlight();
+		schedulePreview();
+		updateAC();
+	  });
 		ta.addEventListener('scroll', ()=>{
 			try { localStorage.setItem(LS_SCROLL, ta.scrollTop.toString()); } catch(_){}
 			const hi = document.getElementById('highlighting');

@@ -229,25 +229,41 @@ main{ flex:1 1 auto; min-height:0; }
 .toolbar .spacer{ flex:1; }
 
 /* Éditeur (gouttière + overlay) */
-.editor-wrap{ display:grid; grid-template-columns: auto 1fr; gap:0; height:calc(100% - 44px); }
+.editor-wrap{
+  display:grid; grid-template-columns:auto minmax(0, 1fr); gap:0;
+  height:calc(100% - 44px); min-height:0; overflow:hidden;
+}
 .gutter{
   background:var(--gutter-bg); color:var(--gutter-fg);
   min-width:3.2rem; padding:.5rem 1rem; text-align:right; user-select:none;
   font:13px/1.5 ui-monospace,Menlo,Consolas,monospace; overflow:hidden;
 }
 .gutter div{ height:1.5em; }
+.gutter [data-line]{ cursor:pointer; }
+.gutter [data-line]:hover{
+  color:var(--text-main);
+  background:color-mix(in oklab, var(--text-main) 9%, transparent);
+}
 
-.codecell{ position:relative; }
+.codecell{ position:relative; min-width:0; min-height:0; height:100%; overflow:hidden; }
 #highlighting{
-  position:absolute; inset:0; padding:.5rem .25rem; overflow:hidden;
+  position:absolute; inset:0; box-sizing:border-box; margin:0; padding:.5rem .25rem; overflow:hidden;
   white-space:pre-wrap; word-wrap:break-word;
-  font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;
+  tab-size:4; font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;
   pointer-events:none; color:var(--text-main);
 }
 .codearea{
-  position:relative; z-index:1; border:0; outline:none; resize:none; background:transparent; color:transparent;
-  caret-color:var(--text-main); padding:.5rem .25rem; width:100%;
-  font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;
+  position:relative; z-index:1; display:block; box-sizing:border-box;
+  border:0; outline:none; resize:none; background:transparent; color:transparent;
+  caret-color:var(--text-main); padding:.5rem .25rem; width:100%; height:100%; overflow:auto;
+  tab-size:4; font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;
+}
+.codearea::selection{
+  color:var(--text-main);
+  background:color-mix(in oklab, var(--link) 48%, transparent);
+}
+.codearea:focus-visible{
+  box-shadow:inset 0 0 0 2px color-mix(in oklab, var(--link) 62%, transparent);
 }
 
 /* Panneau droit générique */
@@ -256,16 +272,27 @@ main{ flex:1 1 auto; min-height:0; }
 /* Hints */
 .hint{ font-size:.875rem; color:var(--text-muted); padding:.5rem .75rem; border-top:1px dashed var(--border); }
 
-/* Masquer scrollbars natives en gardant le scroll */
-.gutter, #highlighting, #code, .preview, pre#output, .result .table{
+/* Les aperçus gardent des scrollbars discrètes. L'éditeur conserve une
+   scrollbar visible : elle est indispensable pour les documents longs. */
+.gutter, #highlighting, .preview, pre#output, .result .table{
   scrollbar-width: none; -ms-overflow-style: none;
 }
 .gutter::-webkit-scrollbar,
 #highlighting::-webkit-scrollbar,
-#code::-webkit-scrollbar,
 .preview::-webkit-scrollbar,
 pre#output::-webkit-scrollbar,
 .result .table::-webkit-scrollbar{ width:0; height:0; }
+
+#code{
+  scrollbar-width:thin;
+  scrollbar-color:color-mix(in oklab, var(--text-muted) 65%, transparent) transparent;
+}
+#code::-webkit-scrollbar{ width:10px; height:10px; }
+#code::-webkit-scrollbar-thumb{
+  background:color-mix(in oklab, var(--text-muted) 65%, transparent);
+  border:2px solid transparent; border-radius:999px; background-clip:padding-box;
+}
+#code::-webkit-scrollbar-corner{ background:transparent; }
 
 /* Autocomplete */
 .autocomplete{
@@ -289,6 +316,10 @@ pre#output::-webkit-scrollbar,
   .divider{ display:none; }
   .gutter{ min-width: 2.4rem; }
   .btn-sm{ padding:.5rem .75rem; }
+  body[data-app="markdown"] .left .editor-wrap,
+  body[data-app="python"] .left .editor-wrap{
+    height:55dvh; min-height:20rem; max-height:42rem;
+  }
 }
 
 /* =========================================================
@@ -356,6 +387,15 @@ body[data-app="markdown"] #highlighting .ulbul,
 body[data-app="markdown"] #highlighting .olnum{ color:#f59e0b; }
 body[data-app="markdown"] #highlighting .hr{ color:var(--text-muted); }
 body[data-app="markdown"] #highlighting .img{ color:#67e8f9; }
+
+/* Le miroir coloré doit conserver exactement les métriques du textarea.
+   Les graisses/italiques sont rendus dans l'aperçu, mais pas dans le miroir :
+   sinon le clic et la sélection dérivent sur les lignes longues. */
+body[data-app="markdown"] #highlighting *,
+body[data-app="python"] #highlighting *{
+  font-weight:inherit !important;
+  font-style:inherit !important;
+}
 
 /* ---------- SQL ---------- */
 body[data-app="sql"] .pane{ min-width:220px; } /* différence signalée */
@@ -444,7 +484,7 @@ body[data-app="python"] pre#output{
   margin:0; padding:1rem; height: calc(100% - 44px); overflow:auto;
 }
 @media (max-width:768px){
-  body[data-app="python"] .left .editor-wrap{ height:45vh; }
+  body[data-app="python"] .left .editor-wrap{ height:55dvh; min-height:20rem; }
   body[data-app="python"] .right pre#output{ height:38vh !important; }
 }
 

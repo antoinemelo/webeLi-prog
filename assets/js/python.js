@@ -52,10 +52,10 @@
 			const wraps = visibleWrapsForLine(lines[i], cols);
 
 			// Première rangée visuelle : numéro
-			html += `<div>${n}</div>`;
+			html += `<div data-line="${n}">${n}</div>`;
 			// Rangées suivantes : marqueur de continuation
 			for (let k=1; k<wraps; k++){
-			  html += `<div class="cont"></div>`;
+			  html += `<div class="cont" data-line="${n}"></div>`;
 			}
 			n++;
 		  }
@@ -79,15 +79,7 @@
 		  }
 		});
 
-		// Recalcule aussi quand la zone change de taille (splitter/plein écran)
-		function sizeTextarea(){
-		  const wrap = document.querySelector('.editor-wrap');
-		  const h = wrap.getBoundingClientRect().height;
-		  codeEl.style.height = h + 'px';
-		  updateGutter();
-		}
-		window.addEventListener('resize', sizeTextarea);
-		window.addEventListener('load',  sizeTextarea);
+		// La hauteur reste pilotée par CSS; le ResizeObserver gère la largeur.
 		window.addEventListener('load',  updateGutter);
 	  })();
 
