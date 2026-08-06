@@ -449,10 +449,23 @@
 		  let src = srcOriginal;
 		  for (const { tag, href } of tagsToReplace) {
 			const taCss = openCssFile(href); // crée l’onglet s’il n’existe pas
-			const styleTag = `<style>\n${taCss.value}\n</style>`;
+			const styleTag = `<style>\n${replaceCachedImageReferences(taCss.value)}\n</style>`;
 			// remplacer ce <link ...> précis dans le code d’origine
 			src = src.replace(tag, styleTag);
 		  }
+
+		  // Une image plus large que le panneau doit être réduite, pas rognée.
+		  // La règle reste volontairement minimale afin de respecter le CSS élève.
+		  const imageFitStyle = `
+		<style id="lab-html-image-fit">
+		  img { max-width: 100%; height: auto; object-fit: contain; }
+		</style>`;
+		  if (/<\/head\s*>/i.test(src)) {
+			src = src.replace(/<\/head\s*>/i, imageFitStyle + "\n</head>");
+		  } else {
+			src = imageFitStyle + src;
+		  }
+		  src = replaceCachedImageReferences(src);
 
 		  // 4) Script injecté dans l'iframe :
 		  //    - intercepte les clics sur <a>
@@ -579,6 +592,157 @@
 
 		// ---- Messages iframe → parent : liens + fichiers locaux + images locales (DataURL) ----
 		const dataUrlCache = {};
+		let projectDirectoryHandle = null;
+		let fallbackImageFiles = new Map();
+
+		function isLocalImageSource(src) {
+		  const value = String(src || "").trim();
+		  return Boolean(value)
+			&& !/^(?:https?:|data:|blob:|\/\/|#)/i.test(value);
+		}
+
+		function cleanLocalPath(src) {
+		  let value = String(src || "").trim().split(/[?#]/, 1)[0];
+		  try { value = decodeURIComponent(value); } catch (_) {}
+		  value = value.replace(/\\/g, "/").replace(/^\.\//, "").replace(/^\/+/, "");
+		  const parts = value.split("/").filter(part => part && part !== ".");
+		  if (!parts.length || parts.includes("..")) return null;
+		  return parts;
+		}
+
+		function replaceCachedImageReferences(text) {
+		  let result = String(text || "");
+		  result = result.replace(
+			/(<img\b[^>]*?\bsrc\s*=\s*)(["'])([^"']+)\2/gi,
+			(match, prefix, quote, src) => dataUrlCache[src] || dataUrlCache[src.trim()]
+			  ? `${prefix}${quote}${dataUrlCache[src] || dataUrlCache[src.trim()]}${quote}`
+			  : match
+		  );
+		  result = result.replace(
+			/url\(\s*(["']?)([^"')]+)\1\s*\)/gi,
+			(match, quote, src) => dataUrlCache[src] || dataUrlCache[src.trim()]
+			  ? `url("${dataUrlCache[src] || dataUrlCache[src.trim()]}")`
+			  : match
+		  );
+		  return result;
+		}
+
+		function collectLocalImageSources(html) {
+		  const sources = new Set();
+		  const documentPreview = new DOMParser().parseFromString(html, "text/html");
+		  documentPreview.querySelectorAll("img[src]").forEach(image => {
+			const src = image.getAttribute("src");
+			if (isLocalImageSource(src)) sources.add(src.trim());
+		  });
+
+		  // Les images utilisées dans un style inline ou une feuille CSS ouverte
+		  // bénéficient du même chargement groupé.
+		  let css = [...documentPreview.querySelectorAll("style")]
+			.map(style => style.textContent || "").join("\n");
+		  css += "\n" + [...documentPreview.querySelectorAll("[style]")]
+			.map(element => element.getAttribute("style") || "").join("\n");
+		  if (window.openCssFiles) {
+			css += "\n" + Object.values(window.openCssFiles)
+			  .map(textarea => textarea?.value || "").join("\n");
+		  }
+		  const urlPattern = /url\(\s*(["']?)([^"')]+)\1\s*\)/gi;
+		  let match;
+		  while ((match = urlPattern.exec(css))) {
+			if (isLocalImageSource(match[2])) sources.add(match[2].trim());
+		  }
+		  return [...sources];
+		}
+
+		function fileToDataUrl(file) {
+		  return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => resolve(reader.result);
+			reader.onerror = () => reject(reader.error || new Error("read-error"));
+			reader.readAsDataURL(file);
+		  });
+		}
+
+		async function fileFromDirectory(src) {
+		  if (!projectDirectoryHandle) return null;
+		  const parts = cleanLocalPath(src);
+		  if (!parts) return null;
+		  let directory = projectDirectoryHandle;
+		  for (const part of parts.slice(0, -1)) {
+			directory = await directory.getDirectoryHandle(part);
+		  }
+		  const handle = await directory.getFileHandle(parts.at(-1));
+		  return handle.getFile();
+		}
+
+		async function loadLocalImage(src) {
+		  if (dataUrlCache[src]) return dataUrlCache[src];
+		  let file = null;
+		  try { file = await fileFromDirectory(src); } catch (_) {}
+		  if (!file) {
+			const parts = cleanLocalPath(src);
+			const path = parts?.join("/");
+			file = (path && fallbackImageFiles.get(path))
+			  || (parts?.length && fallbackImageFiles.get(parts.at(-1)))
+			  || null;
+		  }
+		  if (!file || (file.type && !file.type.startsWith("image/"))) return null;
+		  const dataUrl = await fileToDataUrl(file);
+		  dataUrlCache[src] = dataUrl;
+		  return dataUrl;
+		}
+
+		function chooseFallbackImages() {
+		  return new Promise(resolve => {
+			const input = document.createElement("input");
+			input.type = "file";
+			input.accept = "image/*";
+			input.multiple = true;
+			input.addEventListener("change", () => {
+			  fallbackImageFiles = new Map();
+			  [...(input.files || [])].forEach(file => {
+				const relative = (file.webkitRelativePath || file.name).replace(/\\/g, "/");
+				fallbackImageFiles.set(relative, file);
+				const relativeParts = relative.split("/");
+				if (relativeParts.length > 1) fallbackImageFiles.set(relativeParts.slice(1).join("/"), file);
+				fallbackImageFiles.set(file.name, file);
+			  });
+			  resolve();
+			}, {once: true});
+			input.addEventListener("cancel", resolve, {once: true});
+			input.click();
+		  });
+		}
+
+		async function chooseProjectImages(force = false) {
+		  const sources = collectLocalImageSources(document.getElementById("code")?.value || "");
+		  if (!sources.length && !force) return;
+
+		  if (force) {
+			projectDirectoryHandle = null;
+			fallbackImageFiles = new Map();
+			Object.keys(dataUrlCache).forEach(key => delete dataUrlCache[key]);
+		  }
+
+		  if (!projectDirectoryHandle && typeof window.showDirectoryPicker === "function") {
+			projectDirectoryHandle = await window.showDirectoryPicker({mode: "read"});
+		  } else if (!projectDirectoryHandle && fallbackImageFiles.size === 0) {
+			await chooseFallbackImages();
+		  }
+
+		  await Promise.all(sources.map(async src => {
+			try { await loadLocalImage(src); }
+			catch (error) { console.warn("Image locale introuvable :", src, error); }
+		  }));
+		}
+
+		window.HtmlPreviewAssets = {
+		  choose: () => chooseProjectImages(true),
+		  reset() {
+			projectDirectoryHandle = null;
+			fallbackImageFiles = new Map();
+			Object.keys(dataUrlCache).forEach(key => delete dataUrlCache[key]);
+		  }
+		};
 
 		window.addEventListener("message", async (ev) => {
 		  if (!ev.data || typeof ev.data !== "object") return;
@@ -663,39 +827,11 @@
 			}
 
 			try {
-			  const [handle] = await window.showOpenFilePicker({
-				multiple: false,
-				suggestedName: src,
-				types: [{
-				  description: "Images",
-				  accept: {
-					"image/*": [".png",".jpg",".jpeg",".gif",".webp"]
-				  }
-				}]
-			  });
-
-			  const file = await handle.getFile();
-
-			  // Convertir en DataURL
-			  const reader = new FileReader();
-			  reader.onload = () => {
-				const dataUrl = reader.result;
-
-				// Mise en cache
-				dataUrlCache[src] = dataUrl;
-
-				// Envoi à l’iframe pour remplacement
-				iframe.contentWindow.postMessage({
-				  type: "image-loaded",
-				  src,
-				  dataUrl
-				}, "*");
-			  };
-
-			  reader.readAsDataURL(file);
-
+			  const dataUrl = await loadLocalImage(src);
+			  if (!dataUrl) return;
+			  iframe.contentWindow.postMessage({type: "image-loaded", src, dataUrl}, "*");
 			} catch (err) {
-			  console.warn("Image locale annulée :", src);
+			  console.warn("Image locale introuvable :", src, err);
 			}
 
 			return;
@@ -847,7 +983,22 @@
 		});
 
       // Boutons
-      document.getElementById('run').addEventListener('click', runPreview);
+		document.getElementById('run').addEventListener('click', async () => {
+		  try { await chooseProjectImages(false); }
+		  catch (error) {
+			if (error?.name !== "AbortError") console.warn("Dossier d’images indisponible :", error);
+		  }
+		  runPreview();
+		});
+		document.getElementById('openAssets')?.addEventListener('click', async event => {
+		  event.preventDefault();
+		  try {
+			await chooseProjectImages(true);
+			runPreview();
+		  } catch (error) {
+			if (error?.name !== "AbortError") console.warn("Dossier d’images indisponible :", error);
+		  }
+		});
 		document.getElementById('clear').addEventListener('click', ()=>{
 			const preview = document.getElementById('preview');
 			if(preview) preview.srcdoc = '';
@@ -1248,6 +1399,7 @@
 	  clear(){
 		fileHandle = null;
 		fileName   = null;
+		window.HtmlPreviewAssets?.reset();
 		setDocTitle();
 		updateBadge();
 	  }
@@ -1284,6 +1436,7 @@ async function openWithFSAccess(){
     // 1) Lire le HTML
     const file = await handle.getFile();
     const text = await file.text();
+	window.HtmlPreviewAssets?.reset();
     fileHandle = handle;
     fileName   = file.name;
 

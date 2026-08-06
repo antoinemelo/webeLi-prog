@@ -42,6 +42,15 @@ class LongDocumentEditorTests(unittest.TestCase):
         self.assertIn("const offsetY = (first - 1) * lineHeight;", javascript)
         self.assertNotIn("(first - 1) * lineHeight + padTop", javascript)
 
+    def test_html_preview_loads_images_as_one_project(self):
+        html = (ROOT / "labs/html/index.html").read_text(encoding="utf-8")
+        javascript = (ROOT / "assets/js/html.js").read_text(encoding="utf-8")
+        self.assertIn('id="openAssets"', html)
+        self.assertIn("showDirectoryPicker", javascript)
+        self.assertIn('input.multiple = true', javascript)
+        self.assertNotIn("suggestedName: src", javascript)
+        self.assertIn("img { max-width: 100%; height: auto; object-fit: contain; }", javascript)
+
 
 if __name__ == "__main__":
     unittest.main()
