@@ -65,7 +65,10 @@
     lastKey = key;
 
     // Offset vertical pour que les numéros collent aux lignes
-    const offsetY = (first - 1) * lineHeight + padTop;
+    // Le padding du <pre> aligne déjà son texte sur celui du textarea.
+    // Ajouter padTop au transform déplaçait toute la boîte et découvrait une
+    // bande claire au-dessus de la gouttière.
+    const offsetY = (first - 1) * lineHeight;
     gutter.style.transform = `translateY(${-scrollTop + offsetY}px)`;
 
     // Génère uniquement les lignes visibles

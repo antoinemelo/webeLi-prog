@@ -37,6 +37,11 @@ class LongDocumentEditorTests(unittest.TestCase):
         self.assertIn('wrap="off"', html)
         self.assertNotIn("visibleWrapsForLine", javascript)
 
+    def test_sql_gutter_does_not_translate_its_background_by_padding(self):
+        javascript = (ROOT / "assets/js/sql.js").read_text(encoding="utf-8")
+        self.assertIn("const offsetY = (first - 1) * lineHeight;", javascript)
+        self.assertNotIn("(first - 1) * lineHeight + padTop", javascript)
+
 
 if __name__ == "__main__":
     unittest.main()
