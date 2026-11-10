@@ -20,7 +20,7 @@ const translations = {
 		pyDeleteConfirm: "Supprimer définitivement de cet atelier le fichier",
 		pyStorageError: "Sauvegarde du navigateur indisponible ou pleine. Télécharger le projet ZIP pour conserver votre travail.",
 		pyImportError: "Import impossible. Choisir un fichier texte UTF-8.",
-		brandTitle: "INFORMATIC - Programmation",
+		brandTitle: "WebeLi - Informatique",
 		navStats: "Statistiques",
 		navGuide: "Guide utilisateur",
 
@@ -188,7 +188,7 @@ const translations = {
 		pyDeleteConfirm: "Diese Datei aus der Werkstatt löschen:",
 		pyStorageError: "Browserspeicher nicht verfügbar oder voll. Das ZIP-Projekt herunterladen, um die Arbeit zu sichern.",
 		pyImportError: "Import fehlgeschlagen. Eine UTF-8-Textdatei auswählen.",
-		brandTitle: "INFORMATIC - Programmierung",
+		brandTitle: "WebeLi - Informatik",
 		navStats: "Statistiken",
 		navGuide: "Benutzerhandbuch",
 
@@ -356,7 +356,7 @@ const translations = {
 		pyDeleteConfirm: "Delete this file from the workshop:",
 		pyStorageError: "Browser storage unavailable or full. Download the project ZIP to keep your work.",
 		pyImportError: "Import failed. Choose a UTF-8 text file.",
-		brandTitle: "INFORMATIC - Programming",
+		brandTitle: "WebeLi - Computer science",
 		navStats: "Statistics",
 		navGuide: "User guide",
 

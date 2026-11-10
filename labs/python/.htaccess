@@ -1,0 +1,5 @@
+# Shared memory between the Python Worker and the page (files, input, Turtle).
+<IfModule mod_headers.c>
+    Header always set Cross-Origin-Opener-Policy "same-origin"
+    Header always set Cross-Origin-Embedder-Policy "require-corp"
+</IfModule>

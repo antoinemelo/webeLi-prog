@@ -38,6 +38,20 @@ Python restent exécutés dans un Worker interruptible, mais les opérations
 qui demandent les fichiers en direct, une saisie ou Turtle signalent que le
 serveur adapté est nécessaire. Aucun code élève n'est exécuté sur le serveur.
 
+### Publication Apache sous `/tec/`
+
+Pour `https://webe.li/tec/`, les fichiers `labs/python/.htaccess` et
+`assets/aide/.htaccess` fournissent ces en-têtes avec `mod_headers`. Les inclure
+dans les transferts, même si le logiciel de synchronisation masque les fichiers
+commençant par un point. Vérifier les réponses HTTP et `crossOriginIsolated`
+dans l'atelier après publication.
+
+Synchroniser les fichiers du site par FTPS, en sauvegardant les fichiers
+remplacés avant transfert. Les données de `partage/`, les bases SQLite déjà
+présentes, les configurations de l'hébergement et les fichiers absents du
+paquet de publication sont conservés. Les serveurs Python locaux, les tests et
+les métadonnées Git ne sont pas nécessaires sur l'hébergement web.
+
 ## Serveur HTTP de fichiers
 
 ```bash
