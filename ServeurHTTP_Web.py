@@ -120,6 +120,12 @@ class StaticHandler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def end_headers(self):
+        # Shared memory lets the Python Worker read live files and request input
+        # without blocking the page. The glossary iframe needs the same policy.
+        path = urlparse(self.path).path
+        if path.startswith(("/labs/python/", "/assets/aide/")):
+            self.send_header("Cross-Origin-Opener-Policy", "same-origin")
+            self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
         if self.cache_seconds <= 0:
             self.send_header("Cache-Control", "no-store, max-age=0")
         else:

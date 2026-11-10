@@ -107,9 +107,7 @@
 		  tdiv.innerHTML = '';
 		}
 
-		if (window.__BRYTHON__ && "turtle" in __BRYTHON__.modules) {
-		  delete __BRYTHON__.modules["turtle"];
-		}
+		// Le module Turtle est réinitialisé par le runner avant son exécution.
 	  });
 	}
 
@@ -839,12 +837,12 @@
 			}catch(e){ /* cancel */ }
 		  }
 
-		  async function saveToExistingHandle(){
-			if(!fileHandle) throw new Error('no-handle');
-			const writable = await fileHandle.createWritable();
+		  async function saveToExistingHandle(handle = fileHandle){
+			if(!handle) throw new Error('no-handle');
+			const writable = await handle.createWritable();
 			await writable.write(ta.value);
-			window._pyDirty?.markJustSaved();
 			await writable.close();
+			window._pyDirty?.markJustSaved();
 		  }
 
 		  // réutilise ta computeFilename() si elle existe, sinon fallback
@@ -853,16 +851,15 @@
 			catch(_){ return 'script.py'; }
 		  }
 
-		async function saveAsWithFSAccess(){
+		async function saveAsWithFSAccess(suggestedName = fileName || fallbackName()){
 		  const handle = await window.showSaveFilePicker({
-			suggestedName: fileName || fallbackName(),
+			suggestedName,
 			types: [{ description: 'Python', accept: { 'text/x-python': ['.py'] } }],
 		  });
+		  await saveToExistingHandle(handle);
 		  fileHandle = handle;
 		  fileName   = handle.name;
-		  await saveToExistingHandle();
 		  setDocTitle();
-		  window._pyDirty?.markJustSaved();
 		  updateBadge();
 		  document.getElementById('saveLocal')?.classList.remove('disabled');
 		}
@@ -956,40 +953,40 @@
 			else await pickFileFallback();
 		  });
 
-		btnSave?.addEventListener('click', async ()=>{
+		btnSave?.addEventListener('click', async event => {
+		  event.preventDefault();
 		  const expected = computeFilename();   // nom basé sur la 1ère ligne
-		  if (fileName && fileName !== expected){
+		  const renamed = fileName && fileName !== expected;
+		  if (supportsFS && renamed){
 			alert(
 			  "/!\\ Le nom défini par la 1ère ligne a changé.\n" +
 			  "Avant   : " + fileName + "\n" +
 			  "Nouveau : " + expected + "\n\n" +
 			  "Un nouvel enregistrement va être proposé."
 			);
-			fileHandle = null;
-			fileName   = expected;
 		  }
 
 		  try {
 			if (supportsFS) {
-			  if (fileHandle) {
+			  if (fileHandle && !renamed) {
 				await saveToExistingHandle();    // écrase le fichier courant si nom en cohérence
 			  } else {
-				await saveAsWithFSAccess();      // sinon => dialogue Enregistrer sous...
+				await saveAsWithFSAccess(expected); // sinon => dialogue Enregistrer sous...
 			  }
-			}
+			} else saveAsFallback();
 		  } catch(e) {
-			  if(String(e?.message) !== 'cancel'){ console.error(e); alert('Échec de "Enregistrer".'); }
+			  if(e?.name !== 'AbortError' && String(e?.message) !== 'cancel'){ console.error(e); alert('Échec de "Enregistrer".'); }
 		  }
 		});
 
-		  btnSaveAs?.addEventListener('click', async ()=>{
+		  btnSaveAs?.addEventListener('click', async event => {
+			event.preventDefault();
 			const expected = computeFilename();   // nom basé sur la 1ère ligne
-			fileName = expected;
 			try{
-			  if(supportsFS) await saveAsWithFSAccess();
+			  if(supportsFS) await saveAsWithFSAccess(expected);
 			  else saveAsFallback();
 			}catch(e){
-			  if(String(e?.message) !== 'cancel'){ console.error(e); alert('Échec de "Enregistrer sous...".'); }
+			  if(e?.name !== 'AbortError' && String(e?.message) !== 'cancel'){ console.error(e); alert('Échec de "Enregistrer sous...".'); }
 			}
 		  });
 
@@ -1059,50 +1056,6 @@
       document.getElementById('download').addEventListener('click', downloadFile);
     })();
 
-	/* --- Détection robuste des 'while' (ignore chaînes + commentaires) --- */
-	function stripStringsAndComments(src){
-	  src = src.replace(/("""[\s\S]*?""")|('''[\s\S]*?''')/g, ' ');
-	  src = src.replace(/"(?:\\.|[^"\\])*"/g, ' ');
-	  src = src.replace(/'(?:\\.|[^'\\])*'/g, ' ');
-	  src = src.replace(/#[^\n]*/g, ' ');
-	  return src;
-	}
-	function codeHasWhile(code){
-	  const clean = stripStringsAndComments(code);
-	  return /\bwhile\b/.test(clean);
-	}
-
-	/* --- Garde-fou sur le bouton Exécuter --- */
-	/* capture: true => notre listener passe AVANT Brython; on peut annuler proprement */
-	(function(){
-	  const runBtn = document.getElementById('run');
-	  const out = document.getElementById('output');
-	  if (out) out.textContent = '';
-	  if(!runBtn) return;
-
-	  runBtn.addEventListener('click', (e)=>{
-		const code = document.getElementById('code').value || '';
-
-		// Si au moins un 'while' (hors chaînes/commentaires) est détecté => avertir
-		if(codeHasWhile(code)){
-		  const ok = window.confirm(
-			"/!\\ Une boucle WHILE mal conçue peut bloquer la page !\n\n" +
-			"Ont, par exemple, des effets problématiques:\n" +
-			"while True: pass | while r!= 'non merci': r = print(var)\n" +
-			"=> Utilisez des 'break' si besoin ou nécessaire.\n\n" +
-			"Êtes-vous sûr de vouloir exécuter vorte code ?"
-		  );
-		  if(!ok){
-			e.preventDefault();
-			e.stopImmediatePropagation();  // bloque le handler Brython
-			if(out) out.textContent = "Exécution annulée.";
-			return;
-		  }
-		}
-		// sinon on laisse Brython exécuter normalement
-	  }, true);
-	})();
-
 		window.addEventListener('load', () => {
 			console.log(">> Event: window load");
 		  const ua = navigator.userAgent;
@@ -1133,28 +1086,20 @@
 		  }).catch(()=>{});
 		})();
 
-		// Exécution avec F9
-		  document.addEventListener('keydown', function (e) {
-			if (e.key === "F9") {
-			  e.preventDefault(); // évite d'ouvrir les outils navigateur
-			  const runBtn = document.getElementById("run");
-			  if (runBtn) {
-				runBtn.click(); // simule le clic
-			  }
-			}
-		  });
-		document.addEventListener('keydown', async function(e) {
-		  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-			e.preventDefault(); // bloque le "Enregistrer la page" du navigateur
-			try {
-			  // Si un fichier est déjà ouvert, simple "Enregistrer"
-			  const btnSave = document.getElementById('saveLocal');
-			  if (btnSave) btnSave.click();
-			} catch(err) {
-			  console.error("Erreur lors de l'enregistrement:", err);
-			}
-		  }
-		});
+    // Use the same commands as the File menu, including browser fallbacks.
+    window.addEventListener('keydown', event => {
+      if (event.isComposing || event.altKey || event.shiftKey) return;
+      let command;
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+        command = 'saveLocal';
+      } else if (!event.ctrlKey && !event.metaKey) {
+        if (event.key === 'F9') command = 'run';
+        else if (event.key === 'F12') command = 'saveAsLocal';
+      }
+      if (!command) return;
+      event.preventDefault();
+      if (!event.repeat) document.getElementById(command)?.click();
+    }, true);
 		(() => {
 		  const ta       = document.getElementById('code');
 		  const dirtyDot = document.getElementById('dirtyDot');

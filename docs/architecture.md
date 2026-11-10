@@ -39,6 +39,80 @@ Les fichiers de progression et les bases exportees restent sous le controle de
 l'utilisateur. Le dossier `partage/` appartient au serveur local de fichiers et
 n'est pas versionne.
 
+### Fichiers de l'atelier Python
+
+Le menu **Projet**, à droite d’**Effacer**, crée ou importe des fichiers texte UTF-8, télécharge le
+fichier actif ou exporte un ZIP contenant le script et tous les fichiers.
+Les onglets permettent de modifier les données avant ou pendant l'exécution.
+Chaque lecture Python consulte le contenu actuel ; une modification conserve
+le curseur du fichier ouvert. Les écritures du programme restent visibles et
+sont mémorisées même lorsqu'on interrompt ensuite son exécution.
+**Effacer** vide uniquement les résultats et le dessin Turtle ; supprimer un
+fichier passe par une commande distincte avec confirmation. Les données sont
+mémorisées dans `localStorage` sous `py_workspace_files_v1`, pour cette origine
+et ce navigateur. Le lien de partage et les commandes historiques du menu
+**Fichier** portent sur le script seul ; utiliser le ZIP du menu **Projet**
+pour emporter les données aussi. Pour rouvrir un projet, extraire le ZIP,
+ouvrir son `.py` dans l'éditeur et importer les fichiers texte à droite.
+
+`virtual_files.py` gère les modes `r`, `w`, `a`, `x` et leurs variantes `+`,
+les curseurs, les lectures (`read`, `readline`, `readlines`, itération),
+l'écriture (`write`, `writelines`, `print(file=...)`) et la fermeture.
+`execution.py` adapte temporairement `open()` et les entrées/sorties, y compris
+après une erreur ou `sys.exit()`. Le code utilisateur tourne dans le Web Worker
+`worker.js`, avec `worker_runtime.py`. Le moteur est préchargé dès l'ouverture
+de l'atelier, puis réutilisé entre les exécutions pour éviter de recharger et
+de compiler Brython à chaque clic. Chaque programme dispose de nouvelles
+variables globales, de nouveaux fichiers ouverts et de nouvelles références
+Turtle ; les modules Python déjà importés restent en mémoire.
+`assets/js/python-execution.js` pilote le Worker, les sorties et l'arrêt.
+Après 3,5 secondes, **Arrêter** apparaît en
+rouge : un clic ou **Échap** interrompt le programme, sans arrêt automatique.
+Échap fonctionne dès le lancement, même avant l'apparition du bouton. Terminer
+le Worker arrête aussi une boucle qui ne produit aucune sortie, sans bloquer
+la page. Après un arrêt manuel, un nouveau moteur est préparé en arrière-plan ;
+une exécution lancée immédiatement peut attendre sa préparation. Une erreur
+Python ordinaire conserve le moteur disponible. La console conserve au maximum
+les 100 000 derniers caractères.
+
+**Ctrl+S** (ou **⌘+S**) enregistre le script courant ; **F12** ouvre
+**Enregistrer sous**. Ces raccourcis utilisent les mêmes commandes que le menu
+Fichier. Sans prise en charge de l'enregistrement direct par le navigateur,
+ils téléchargent le script. Hors exécution, Échap conserve son rôle habituel,
+notamment la fermeture de la vue Turtle agrandie.
+
+Les échanges synchrones du Worker avec les fichiers, `input()` et Turtle
+utilisent un `SharedArrayBuffer` (réponse limitée à 8 Mo). L'attente se fait
+dans le Worker ; le navigateur peut continuer à traiter les clics et la saisie.
+`runner.py` ne lance plus le code utilisateur : il ne réalise que les appels
+Turtle demandés par le Worker, pour conserver le rendu SVG existant. Les
+coordonnées et les objets Turtle courants sont renvoyés au programme.
+`assets/js/python-files.js` relie ces fichiers aux onglets, aux imports/exports
+et au stockage. Les exemples et fichiers du support conservés dans
+`activities.json` servent aux tests de compatibilité ; ils ne sont pas chargés
+ni affichés dans l’interface.
+
+Ce système pédagogique manipule des noms de fichiers sans dossiers, en texte
+UTF-8 uniquement, sans accès au disque ni écriture serveur. Les positions de
+`seek()` / `tell()` comptent les caractères et acceptent les déplacements
+relatifs du support ; ce comportement diffère des positions opaques des
+fichiers texte CPython. Avec le contenu `1ere ligne\n2e ligne\nfin\n`, la
+longueur est 24 caractères et le mot `ligne` commence à la position 5 : les
+exemples intégrés corrigent les décalages du support. Les comportements sont
+couverts par `tests/test_python_files.py` et les validations du projet.
+
+### Affichage Turtle
+
+`assets/js/python-turtle.js` adapte le SVG produit par Brython à son panneau.
+La vue initiale englobe les positions finales du dessin, même au-delà du
+canevas natif de 500 × 500, sans modifier les coordonnées ni l'animation.
+Les boutons **+**, **−** et **Tout voir** règlent le zoom ; glisser déplace la
+vue. **Agrandir** ouvre une vue occupant la fenêtre, refermable avec **Réduire**
+ou **Échap**. Le panneau reste utilisable sur mobile et le panneau Résultat
+peut défiler lorsque des fichiers sont également ouverts. Cette adaptation
+porte sur l'affichage ; les fonctions Turtle non implémentées par la version
+de Brython embarquée, telles que `screensize()` et `setup()`, restent inchangées.
+
 ## Bibliotheques embarquees
 
 Les bibliotheques lourdes sont conservees dans `assets/js/dist` et

@@ -130,12 +130,12 @@
               </a>
             </li>
             <li>
-              <a id="saveLocal" class="dropdown-item d-flex align-items-center gap-2 disabled" href="#">
+              <a id="saveLocal" class="dropdown-item d-flex align-items-center gap-2 disabled" href="#" aria-keyshortcuts="Control+s Meta+s">
                 <i class="bi bi-save"></i> <span data-i18n="saveFile"></span>
               </a>
             </li>
             <li>
-              <a id="saveAsLocal" class="dropdown-item d-flex align-items-center gap-2" href="#">
+              <a id="saveAsLocal" class="dropdown-item d-flex align-items-center gap-2" href="#" aria-keyshortcuts="F12">
                 <i class="bi bi-save2"></i> <span data-i18n="saveAsFile"></span>
               </a>
             </li>
@@ -177,7 +177,7 @@
           <span class="d-none d-sm-inline" data-i18n="reset"></span>
         </button>
 
-        <button id="run" class="btn btn-sm btn-primary" aria-label="Exécuter">
+        <button id="run" disabled class="btn btn-sm btn-primary" aria-label="Exécuter">
           <i class="bi bi-play-fill me-sm-1"></i>
           <span class="d-none d-sm-inline" data-i18n="run"></span>
         </button>
@@ -203,17 +203,46 @@
         <button id="clear" class="btn btn-sm btn-outline-light">
           <i class="bi bi-eraser me-1"></i><span data-i18n="clear"></span>
         </button>
+        <div class="btn-group" id="pythonProjectMenu">
+          <button id="projectMenu" class="btn btn-sm btn-project dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-folder2-open me-1"></i><span data-i18n="pyProject"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+            <li><button id="newTextFile" class="dropdown-item" data-i18n="pyNewFile"></button></li>
+            <li><button id="importTextFiles" class="dropdown-item" data-i18n="pyImportFiles"></button></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><button id="exportTextFile" class="dropdown-item" data-i18n="pyExportFile"></button></li>
+            <li><button id="exportPythonProject" class="dropdown-item" data-i18n="pyExportProject"></button></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><button id="deleteTextFile" class="dropdown-item" data-i18n="pyDeleteFile"></button></li>
+          </ul>
+        </div>
+        <button id="stopPython" class="btn btn-sm btn-danger" type="button" aria-keyshortcuts="Escape" hidden>
+          <i class="bi bi-stop-fill me-1"></i><span data-i18n="pyStop"></span>
+        </button>
 		<button id="btnHelp" class="btn btn-sm btn-outline-light"
 				type="button" data-bs-toggle="offcanvas" data-bs-target="#sidePanel" aria-controls="sidePanel">
 			<i class="bi bi-stickies me-1"></i><span data-i18n="help"></span>
 		</button>
       </div>
 
+      <input id="textFileInput" type="file" accept=".txt,.csv,.json,.md,.py,text/plain" multiple hidden>
+      <p id="filesStatus" class="small px-3 mb-0" role="status"></p>
       <!-- Onglets fichiers -->
-      <ul class="nav nav-tabs d-none" id="fileTabs"></ul>
-      <div class="tab-content flex-grow-1" id="fileTabContent"></div>
+      <ul class="nav nav-tabs d-none" id="fileTabs" role="tablist" aria-label="Fichiers texte"></ul>
+      <div class="tab-content d-none" id="fileTabContent"></div>
 
-      <div id="turtlediv"></div>
+      <section id="turtlePanel" class="turtle-panel" aria-labelledby="turtleTitle" hidden>
+        <div class="toolbar turtle-toolbar">
+          <strong id="turtleTitle">Turtle</strong>
+          <div class="spacer"></div>
+          <button id="zoomOutTurtle" class="btn btn-sm btn-outline-light" type="button" aria-label="Zoom −">−</button>
+          <button id="zoomInTurtle" class="btn btn-sm btn-outline-light" type="button" aria-label="Zoom +">+</button>
+          <button id="fitTurtle" class="btn btn-sm btn-outline-light" type="button" data-i18n="pyTurtleFit"></button>
+          <button id="expandTurtle" class="btn btn-sm btn-outline-light" type="button"><i class="bi bi-arrows-fullscreen me-1"></i><span data-i18n="pyTurtleExpand"></span></button>
+        </div>
+        <div id="turtlediv"></div>
+      </section>
       <pre id="output"></pre>
 		<div class="hint">
 		  <span id="cursorPos"></span> <span data-i18n="hintPy"></span>
@@ -221,6 +250,7 @@
     </section>
 	</div>
 </main>
+<dialog id="turtleDialog" aria-labelledby="turtleTitle"></dialog>
 
 	<!-- Offcanvas (volet droit) -->
 	<div class="offcanvas offcanvas-top bg-secondary text-light" tabindex="-1" id="menuMobile">
@@ -287,7 +317,7 @@
 			</li>
 			<li><strong>Gestion des fichiers virtuels</strong>
 				<ul>
-					<li>L’appel à <code>open("f.txt", "r/w")</code> crée un onglet (3 max.); expl. avec
+					<li>Créer ou importer un fichier texte via le menu <strong>Projet</strong>, ou le créer avec <code>open("f.txt", "w")</code>. Exemple :
 					<pre  class="small"><code>
 with open("fichier.txt","w") as f:
     f.write("Hello world")
@@ -295,7 +325,10 @@ with open("fichier.txt") as f:
     print(f.read())
 					</code></pre>
 					</li>
-					<li>Le contenu du fichier est éditable directement dans cet onglet</li>
+					<li>Lecture : <code>read()</code>, <code>read(n)</code>, <code>readline()</code>, <code>readlines()</code>, boucles et <code>with</code>.</li>
+					<li>Écriture : modes <code>w</code>, <code>a</code>, <code>r+</code>, <code>write()</code>, <code>writelines()</code>, <code>print(..., file=fd)</code>.</li>
+					<li>Le contenu du fichier est éditable directement dans cet onglet, mémorisé dans ce navigateur et exportable en texte ou en ZIP avec le script.</li>
+					<li><code>seek()</code> et <code>tell()</code> comptent les caractères pour reproduire le support p. 58–63, y compris les déplacements relatifs. En Python sur ordinateur, les déplacements relatifs non nuls nécessitent un fichier binaire.</li>
 					<li>Les modifications faites par le code Python et celles faites à la main restent synchronisées</li>
 				</ul>
 			</li>
@@ -310,15 +343,16 @@ for _ in range(4):
 turtle.done()</code></pre>
 				</li>
 				<li>Chaque exécution efface et recrée un nouveau canevas</li>
+				<li>Le dessin s’ajuste à l’espace disponible, même au-delà du canevas initial. Zoom +/−, déplacement par glisser et vue agrandie permettent d’explorer les grands dessins.</li>
 			  </ul>
 			</li>
 			<li><strong>Partage rapide</strong> : génération d’un lien (URL encodée en Base64)</li>
-			<li><strong>Protection anti-boucle infinie</strong> : avertissement si un <code>while</code> risque de bloquer</li>
+			<li><strong>Exécution interruptible</strong> : l’interface reste accessible ; le bouton rouge Arrêter apparaît après 3,5 secondes et interrompt le programme à la demande</li>
 			<li><strong>Exécution locale</strong> : le code Python est interprété par
 				<code>Brython</code> dans l’onglet, sans exécution sur le serveur</li>
 			<li><strong>Résultats console</strong> avec mise en évidence des erreurs et surlignage de la ligne fautive</li>
 			<li><strong>Interface mobile-friendly</strong> avec redimensionnement dynamique</li>
-			<li><strong>Raccourcis pratiques</strong>: <kbd>F9</kbd> = exécuter le code</li>
+			<li><strong>Raccourcis pratiques</strong> : <kbd>F9</kbd> = exécuter ; <kbd>Échap</kbd> = arrêter le script ; <kbd>Ctrl</kbd>+<kbd>S</kbd> (ou <kbd>⌘</kbd>+<kbd>S</kbd>) = enregistrer ; <kbd>F12</kbd> = enregistrer sous</li>
 			<li><strong>Tkinter</strong>: n'est en revanche pas supporté...</li>
 		  </ul>
 		</div>
@@ -332,230 +366,15 @@ turtle.done()</code></pre>
 	<!-- Logic -->
 	<script src="../../assets/js/python.js"></script>
 
-	<!-- Brython: exécution -->
-	<script type="text/python">
-	from browser import document, window, html
-	import sys, traceback
-	from io import StringIO
-
-	def run_code(ev):
-		buffer = StringIO()
-		old_stdout = sys.stdout
-		sys.stdout = buffer
-
-		# input() redirigé vers prompt()
-		try:
-			import builtins as _bi
-		except Exception:
-			_bi = __builtins__
-		_bi.input = lambda msg="": window.prompt(msg, "")
-
-		code = document["code"].value
-
-		try:
-			try:
-				window.highlight_error_line(0)
-			except Exception:
-				pass
-
-			# Exécuter le code utilisateur (sans compile(), plus compatible Brython)
-			g = {"__name__": "__main__"}
-
-			if "import turtle" in code:
-				document["turtlediv"].clear()
-				if "turtle" in sys.modules:
-					del sys.modules["turtle"]
-				import turtle
-				turtle.set_defaults(
-					turtle_canvas_wrapper=document['turtlediv']
-				)
-
-			exec(code, g)
-			result = buffer.getvalue() or ""
-
-		except SyntaxError as e:
-			# Erreurs de syntaxe
-			lineno = getattr(e, "lineno", None)
-			header = "Erreur de syntaxe"
-			if lineno:
-				header += f" :: Probablement à la ligne {lineno}"
-
-			msg_only = "".join(traceback.format_exception_only(e.__class__, e))
-			# --- Nettoyage générique : supprime "NomException:" ---
-			msg_only = msg_only.replace(f"{e.__class__.__name__}:", "").strip()
-
-			result = header + "\n\n" + msg_only
-
-			try:
-				if lineno:
-					window.highlight_error_line(int(lineno))
-			except Exception:
-				pass
-
-
-		except Exception as e:
-			# Erreurs à l’exécution
-			etype, exc, tb = sys.exc_info()
-			tb_list = traceback.extract_tb(tb) if tb else []
-			lineno = tb_list[-1].lineno if tb_list else None
-
-			header = "Erreur :: Probablement"
-			if lineno:
-				header += f" à la ligne {lineno}"
-
-			# Nettoyage du message (supprime "NomException:")
-			msg_only = "".join(traceback.format_exception_only(etype, exc))
-			msg_only = msg_only.replace(f"{etype.__name__}:", "").strip()
-
-			full_tb = "".join(traceback.format_exception(etype, exc, tb))
-			result = header + "\n\n" + msg_only + "\n\n" + full_tb
-
-			try:
-				if lineno:
-					window.highlight_error_line(int(lineno))
-			except Exception:
-				pass
-
-		finally:
-			# Restauration stdout
-			sys.stdout = old_stdout
-
-		document["output"].text = result
-
-	document["run"].bind("click", run_code)
-
-	# Stockage des fichiers ouverts (nom → textarea)
-	open_files = {}
-	MAX_FILES = 2  # max fichiers texte (hors onglet code)
-
-	def ensure_file_tabbar():
-		"""Affiche ou cache la barre d’onglets"""
-		tabbar = document["fileTabs"]
-		if open_files:
-			tabbar.classList.remove("d-none")
-		else:
-			tabbar.classList.add("d-none")
-
-	class VirtualFile:
-		def __init__(self, name, mode):
-			self.name = name
-			self.mode = mode
-			self.closed = False
-
-			if name not in open_files:
-				if len(open_files) >= MAX_FILES:
-					raise RuntimeError(f"Erreur : maximum {MAX_FILES} fichiers texte ouverts.")
-				self._create_tab(name)
-
-			self.textarea = open_files[name]
-			if "r" in mode:
-				self.content = self.textarea.value
-			else:
-				self.content = ""
-
-		def _create_tab(self, name):
-			safe_id = name.replace(".", "-")
-			tabbar = document["fileTabs"]
-			content = document["fileTabContent"]
-
-			# --- Onglet
-			li = html.LI(Class="nav-item position-relative")
-			link = html.A(name, Class="nav-link active", **{
-				"data-bs-toggle": "tab",
-				"href": f"#pane-{safe_id}"
-			})
-			close_btn = html.BUTTON(Class="btn-close", **{
-				"aria-label": "Fermer",
-				"style": "position:absolute; right:1px; top:1px; transform:scale(0.5);"
-			})
-			li <= link
-			li <= close_btn
-
-			# Désactiver les autres onglets
-			for a in tabbar.select("a.nav-link"):
-				a.classList.remove("active")
-
-			tabbar <= li
-
-			# --- Contenu
-			pane = html.DIV(
-				html.TEXTAREA(id=f"file-{safe_id}", Class="form-control", style={"height": "200px"}),
-				Class="tab-pane fade show active",
-				Id=f"pane-{safe_id}"
-			)
-			# Désactiver les autres panneaux
-			for p in content.select(".tab-pane"):
-				p.classList.remove("show", "active")
-
-			content <= pane
-
-			open_files[name] = pane.select_one("textarea")
-
-			# --- Fermeture de l’onglet
-			def close_tab(ev):
-				if name in open_files:
-					del open_files[name]
-				li.remove()
-				pane.remove()
-				ensure_file_tabbar()
-
-			close_btn.bind("click", close_tab)
-			ensure_file_tabbar()
-
-		def write(self, data):
-			if self.closed:
-				raise ValueError("I/O operation on closed file")
-			self.content += str(data)
-			self.textarea.value = self.content
-
-		def read(self):
-			if self.closed:
-				raise ValueError("I/O operation on closed file")
-			return self.textarea.value
-
-		def close(self):
-			self.textarea.value = self.content
-			self.closed = True
-
-		def __enter__(self): 
-			return self
-		def __exit__(self, *args):
-			self.close()
-			return False
-
-	# Remplace la fonction open()
-	def open_virtual(filename, mode="r"):
-		return VirtualFile(filename, mode)
-
-	__builtins__.open = open_virtual
-
-	def close_all_files():
-		global open_files
-		for name, ta in list(open_files.items()):
-			if ta and ta.closest(".tab-pane"):
-				ta.closest(".tab-pane").remove()
-			# supprime aussi l’onglet de la barre
-			tabbar = document["fileTabs"]
-			li = tabbar.select(f'a[href="#pane-{name.replace(".", "-")}"]')
-			if li:
-				li[0].parent.remove()
-		open_files.clear()
-		ensure_file_tabbar()
-
-	# On connecte le bouton Effacer
-	def clear_all(ev):
-		document["output"].text = ""
-		document["turtlediv"].clear()
-		if "turtle" in sys.modules:
-			del sys.modules["turtle"]
-		close_all_files()
-
-	document["clear"].bind("click", clear_all)
-	</script>
+	<!-- Brython: fichiers texte locaux et exécution -->
+	<script type="text/python" src="runner.py"></script>
 
 	<!-- Bootstrap JS (modal) -->
 	<script src="../../assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
 	<script src="../../assets/js/dico.js"></script>
+	<script src="../../assets/js/python-files.js"></script>
+	<script src="../../assets/js/python-turtle.js"></script>
+	<script src="../../assets/js/python-execution.js"></script>
 	<script src="../../assets/js/theme.js"></script>
 	<script>
 		Theme.init({ canWrite:false });  // applique + suit, sans changer localStorage
