@@ -194,4 +194,38 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   });
+
+  window.addEventListener("message", event => {
+    if (!event.data || event.data.action !== "insertGlossaryCode") return;
+
+    const helpFrame = Array.from(document.querySelectorAll("#helpFrame, #helpFrameMobile"))
+      .find(frame => frame.contentWindow === event.source);
+    if (!helpFrame) return;
+
+    const textarea = document.querySelector("textarea.codearea");
+    const code = typeof event.data.code === "string" ? event.data.code : "";
+    if (!textarea || !code) return;
+
+    const start = Number.isInteger(textarea.selectionStart)
+      ? textarea.selectionStart
+      : textarea.value.length;
+    const end = Number.isInteger(textarea.selectionEnd)
+      ? textarea.selectionEnd
+      : start;
+
+    textarea.setRangeText(code, start, end, "end");
+    textarea.dispatchEvent(new Event("input", {bubbles:true}));
+
+    const panel = helpFrame.closest(".offcanvas");
+    const offcanvas = panel && window.bootstrap
+      ? bootstrap.Offcanvas.getOrCreateInstance(panel)
+      : null;
+
+    if (offcanvas) {
+      panel.addEventListener("hidden.bs.offcanvas", () => textarea.focus(), {once:true});
+      offcanvas.hide();
+    } else {
+      textarea.focus();
+    }
+  });
 });

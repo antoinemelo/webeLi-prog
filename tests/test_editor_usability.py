@@ -51,6 +51,35 @@ class LongDocumentEditorTests(unittest.TestCase):
         self.assertNotIn("suggestedName: src", javascript)
         self.assertIn("img { max-width: 100%; height: auto; object-fit: contain; }", javascript)
 
+    def test_glossary_code_examples_are_copyable(self):
+        glossary = (ROOT / "assets/aide/index.html").read_text(encoding="utf-8")
+        self.assertIn('class="copy-example example-action"', glossary)
+        self.assertIn('class="bi bi-copy"', glossary)
+        self.assertIn("navigator.clipboard.writeText", glossary)
+        self.assertIn('querySelector("code")', glossary)
+
+    def test_glossary_examples_can_be_inserted_in_each_editor(self):
+        glossary = (ROOT / "assets/aide/index.html").read_text(encoding="utf-8")
+        common = (ROOT / "assets/js/app.js").read_text(encoding="utf-8")
+
+        self.assertIn('class="insert-example example-action"', glossary)
+        self.assertIn('class="bi bi-arrow-bar-left"', glossary)
+        self.assertIn('action: "insertGlossaryCode"', glossary)
+        self.assertIn('event.data.action !== "insertGlossaryCode"', common)
+        self.assertIn('querySelector("textarea.codearea")', common)
+        self.assertIn("textarea.setRangeText", common)
+
+        for workshop in ("html", "markdown", "python", "sql"):
+            page = (ROOT / "labs" / workshop / "index.html").read_text(encoding="utf-8")
+            self.assertIn("../../assets/js/app.js", page)
+
+    def test_stats_use_the_canonical_site_and_report_load_failures(self):
+        stats = (ROOT / "stats.html").read_text(encoding="utf-8")
+        self.assertIn('const STATS_SITE = "informatic.li"', stats)
+        self.assertIn('id="statsStatus"', stats)
+        self.assertIn("if (!res.ok)", stats)
+        self.assertIn("Aucune statistique n’est disponible", stats)
+
 
 if __name__ == "__main__":
     unittest.main()

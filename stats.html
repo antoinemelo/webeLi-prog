@@ -25,7 +25,7 @@
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2" href="./">
         <i class="bi bi-grid"></i>
-        <span>INFORMATIC - Statistiques</span>
+        <span>WebeLi - Statistiques</span>
       </a>
       <span class="brand-mini">
         <a class="btn btn-outline-light" href="./" title="Accueil">
@@ -52,6 +52,11 @@
       </div>
       <br>
 
+      <div id="statsStatus" class="alert alert-secondary" role="status">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+        Chargement des statistiques…
+      </div>
+
       <div class="row g-4">
 		<!-- Par période (année/mois/semaine) -->
 		<div class="col-12 col-lg-6">
@@ -60,9 +65,9 @@
 			  <div class="d-flex justify-content-between align-items-center mb-3">
 				<h2 class="h5 mb-0">Visites</h2>
 				<div class="btn-group" role="group">
-				  <button id="btnYear" class="btn btn-sm btn-outline-primary active">Année</button>
-				  <button id="btnMonth" class="btn btn-sm btn-outline-primary">Mois</button>
-				  <button id="btnWeek" class="btn btn-sm btn-outline-primary">Semaine</button>
+				  <button id="btnYear" type="button" class="btn btn-sm btn-outline-primary active" aria-pressed="true">Année</button>
+				  <button id="btnMonth" type="button" class="btn btn-sm btn-outline-primary" aria-pressed="false">Mois</button>
+				  <button id="btnWeek" type="button" class="btn btn-sm btn-outline-primary" aria-pressed="false">Semaine</button>
 				</div>
 			  </div>
 			  <canvas id="byPeriod" height="360"></canvas>
@@ -116,6 +121,8 @@
   </div>
 
   <script>
+    const STATS_SITE = "informatic.li";
+
     // année dynamique
     document.getElementById('y').textContent = new Date().getFullYear();
 
@@ -123,7 +130,7 @@
     (() => {
       const PRODUCT = "stats";
       const PATH    = location.pathname;
-      const SITE    = location.hostname;
+      const SITE    = STATS_SITE;
       const KEY = `trk:${SITE}:${PRODUCT}:${PATH}`;
       const last = +sessionStorage.getItem(KEY) || 0;
       if (Date.now() - last < 90*60*1000) return;
@@ -139,111 +146,120 @@
 
     // -------- Graphiques --------
     async function loadStats(){
-      const site = 'informatic.li';
-      const res  = await fetch(`https://parapente.world/lab/api/stats.php?site=${site}`);
-      const data = await res.json();
+      const status = document.getElementById("statsStatus");
 
-      // tri
-      const yearRows = [...data.year].sort((a,b)=>Number(a.year)-Number(b.year));
-      const monthRows = [...data.month].sort((a,b)=>a.month.localeCompare(b.month));
-		const weekRows = [...data.week].sort((a,b)=>a.week.localeCompare(b.week));
+      try {
+        if (typeof Chart === "undefined") {
+          throw new Error("La bibliothèque de graphiques n’a pas pu être chargée.");
+        }
 
-      // graphique dynamique année/mois
-      let chart;
-function render(mode){
-  let rows, labels;
-  if(mode==="year"){
-    rows = yearRows;
-    labels = rows.map(r => r.year);
-  } else if(mode==="month"){
-    rows = monthRows;
-    labels = rows.map(r => r.month);
-  } else if(mode==="week"){
-    rows = weekRows;
-    labels = rows.map(r => r.week);
-  }
-  const counts = rows.map(r => Number(r.count));
+        const url = new URL("https://parapente.world/lab/api/stats.php");
+        url.searchParams.set("site", STATS_SITE);
+        const res = await fetch(url, {headers: {"Accept": "application/json"}});
+        if (!res.ok) throw new Error(`Le serveur de statistiques a répondu ${res.status}.`);
 
-  if(chart) chart.destroy();
-  chart = new Chart(document.getElementById('byPeriod'), {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: "Visites",
-        data: counts,
-        borderColor: "#0d6efd",
-        backgroundColor: "rgba(13,110,253,0.2)",
-        fill: true,
-        tension: 0.3,
-        pointRadius: 3,
-        pointHoverRadius: 5
-      }]
-    },
-    options: {
-      responsive:true,
-      interaction:{ mode:'index', intersect:false },
-      plugins:{ legend:{ display:false }},
-      scales:{
-        y:{ beginAtZero:true, ticks:{ precision:0 }},
-        x:{ ticks:{ autoSkip:true, maxRotation:0 }}
+        const data = await res.json();
+        const rows = key => Array.isArray(data[key]) ? data[key] : [];
+
+        if (!["year", "month", "week", "hour", "product"].some(key => rows(key).length)) {
+          throw new Error("Aucune statistique n’est disponible pour ce site.");
+        }
+
+        // tri
+        const yearRows = [...rows("year")].sort((a,b)=>Number(a.year)-Number(b.year));
+        const monthRows = [...rows("month")].sort((a,b)=>String(a.month).localeCompare(String(b.month)));
+        const weekRows = [...rows("week")].sort((a,b)=>String(a.week).localeCompare(String(b.week)));
+
+        // graphique dynamique année/mois/semaine
+        let periodChart;
+        const periodButtons = {
+          year: document.getElementById("btnYear"),
+          month: document.getElementById("btnMonth"),
+          week: document.getElementById("btnWeek")
+        };
+
+        function renderPeriod(mode){
+          const periodRows = {year: yearRows, month: monthRows, week: weekRows}[mode];
+          const labelKey = {year: "year", month: "month", week: "week"}[mode];
+
+          Object.entries(periodButtons).forEach(([name, button]) => {
+            const isActive = name === mode;
+            button.classList.toggle("active", isActive);
+            button.setAttribute("aria-pressed", String(isActive));
+          });
+
+          if (periodChart) periodChart.destroy();
+          periodChart = new Chart(document.getElementById("byPeriod"), {
+            type: "line",
+            data: {
+              labels: periodRows.map(row => row[labelKey]),
+              datasets: [{
+                label: "Visites",
+                data: periodRows.map(row => Number(row.count)),
+                borderColor: "#0d6efd",
+                backgroundColor: "rgba(13,110,253,0.2)",
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3,
+                pointHoverRadius: 5
+              }]
+            },
+            options: {
+              responsive:true,
+              interaction:{mode:"index", intersect:false},
+              plugins:{legend:{display:false}},
+              scales:{
+                y:{beginAtZero:true, ticks:{precision:0}},
+                x:{ticks:{autoSkip:true, maxRotation:0}}
+              }
+            }
+          });
+        }
+
+        Object.entries(periodButtons).forEach(([mode, button]) => {
+          button.addEventListener("click", () => renderPeriod(mode));
+        });
+        renderPeriod("year");
+
+        // Produits (camembert)
+        new Chart(document.getElementById("byProduct"), {
+          type: "pie",
+          data: {
+            labels: rows("product").map(row => row.product),
+            datasets: [{data: rows("product").map(row => Number(row.count))}]
+          },
+          options: {responsive:true, plugins:{legend:{display:true}}}
+        });
+
+        // Heures (histogramme)
+        const hoursAll = Array.from({length:24}, (_, hour) => hour);
+        const hourMap = Object.fromEntries(rows("hour").map(row => [Number(row.hour), Number(row.count)]));
+
+        new Chart(document.getElementById("byHour"), {
+          type: "bar",
+          data: {
+            labels: hoursAll.map(hour => `${hour}h`),
+            datasets: [{data: hoursAll.map(hour => hourMap[hour] ?? 0)}]
+          },
+          options: {
+            responsive:true,
+            plugins:{legend:{display:false}},
+            scales:{y:{beginAtZero:true, ticks:{precision:0}}}
+          }
+        });
+
+        status.hidden = true;
+      } catch (error) {
+        console.error("Impossible de charger les statistiques", error);
+        status.className = "alert alert-danger";
+        status.setAttribute("role", "alert");
+        status.textContent = `Impossible de charger les statistiques. ${error.message || "Veuillez réessayer plus tard."}`;
       }
     }
-  });
-}
 
-	// événements boutons
-	document.getElementById("btnYear").addEventListener("click", ()=>{
-	  document.getElementById("btnYear").classList.add("active");
-	  document.getElementById("btnMonth").classList.remove("active");
-	  document.getElementById("btnWeek").classList.remove("active");
-	  render("year");
-	});
-
-	document.getElementById("btnMonth").addEventListener("click", ()=>{
-	  document.getElementById("btnMonth").classList.add("active");
-	  document.getElementById("btnYear").classList.remove("active");
-	  document.getElementById("btnWeek").classList.remove("active");
-	  render("month");
-	});
-
-	document.getElementById("btnWeek").addEventListener("click", ()=>{
-	  document.getElementById("btnWeek").classList.add("active");
-	  document.getElementById("btnYear").classList.remove("active");
-	  document.getElementById("btnMonth").classList.remove("active");
-	  render("week");
-	});
-
-      // affichage par défaut
-      render("year");
-
-      // Produits (camembert)
-      const products = data.product.map(r => r.product);
-      const pcounts  = data.product.map(r => r.count);
-
-      new Chart(document.getElementById('byProduct'), {
-        type: 'pie',
-        data: { labels: products, datasets: [{ data: pcounts }] },
-        options: { responsive:true, plugins: { legend: { display:true } } }
-      });
-
-      // Heures (histogramme)
-      const hoursAll = Array.from({length:24}, (_,h)=>h);
-      const hmap = Object.fromEntries(data.hour.map(r=>[Number(r.hour), Number(r.count)]));
-      const hcounts = hoursAll.map(h => hmap[h] ?? 0);
-
-      new Chart(document.getElementById('byHour'), {
-        type: 'bar',
-        data: { labels: hoursAll.map(h=>`${h}h`), datasets: [{ data: hcounts }] },
-        options: {
-          responsive:true,
-          plugins: { legend: { display:false } },
-          scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }
-        }
-      });
-    }
-
-    loadStats();
+    window.addEventListener("DOMContentLoaded", () => {
+      loadStats();
+    });
   </script>
 
   <script src="./assets/js/theme.js"></script>

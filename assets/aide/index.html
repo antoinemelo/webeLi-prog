@@ -14,7 +14,36 @@
     .accordion-button { display:flex; justify-content:space-between; align-items:center; }
     .term-label { font-weight:600; display:flex; align-items:center; gap:.4rem; }
     .term-context { color:#6c757d; font-size:.9rem; display:flex; align-items:center; gap:.3rem; }
-    pre { background:#f1f3f5; padding:.5rem; border-radius:.25rem; }
+    .example-wrap { position:relative; }
+    .example-wrap pre { background:#f1f3f5; padding:.5rem 4.25rem .5rem .5rem; border-radius:.25rem; }
+    .example-actions {
+      position:absolute;
+      top:.2rem;
+      right:.25rem;
+      z-index:1;
+      display:flex;
+      gap:0;
+    }
+    .example-action {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:1.8rem;
+      height:1.8rem;
+      padding:0;
+      line-height:1;
+      color:#495057;
+      background:transparent;
+      border:1px solid transparent;
+      border-radius:.25rem;
+    }
+    .example-action i { display:block; line-height:1; }
+    .example-action:hover, .example-action:focus-visible {
+      color:#0d6efd;
+      background:rgba(255, 255, 255, .55);
+      border-color:currentColor;
+    }
+    .example-action.is-success { color:#198754; }
     .btn-check:checked + .btn { background:#0d6efd; color:#fff; }
     code { white-space: pre-wrap; }
   </style>
@@ -272,12 +301,93 @@ function renderTerm(row, context = "") {
       <div id="${collapseId}" class="accordion-collapse collapse">
         <div class="accordion-body">
           <p>${renderSafeHtml(nlToBrExceptQuoted(row.explication))}</p>
-          ${row.exemple ? `<pre><code>${escapeHtml(normalizeCodeTextExceptQuoted(row.exemple))}</code></pre>` : ""}
+          ${row.exemple ? `
+            <div class="example-wrap">
+              <div class="example-actions">
+                <button class="insert-example example-action" type="button"
+                        title="Insérer dans l’éditeur" aria-label="Insérer dans l’éditeur">
+                  <i class="bi bi-arrow-bar-left" aria-hidden="true"></i>
+                </button>
+                <button class="copy-example example-action" type="button"
+                        title="Copier le code" aria-label="Copier le code">
+                  <i class="bi bi-copy" aria-hidden="true"></i>
+                </button>
+              </div>
+              <pre><code>${escapeHtml(normalizeCodeTextExceptQuoted(row.exemple))}</code></pre>
+            </div>` : ""}
         </div>
       </div>
     </div>
   `;
 }
+
+async function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+
+  const copied = document.execCommand("copy");
+  textarea.remove();
+  if (!copied) throw new Error("Copie non prise en charge");
+}
+
+document.getElementById("accordionResults").addEventListener("click", async event => {
+  const insertButton = event.target.closest(".insert-example");
+  if (insertButton) {
+    const code = insertButton.closest(".example-wrap")?.querySelector("code");
+    if (!code) return;
+
+    const icon = insertButton.querySelector("i");
+    window.parent.postMessage({
+      action: "insertGlossaryCode",
+      code: code.textContent
+    }, window.location.origin);
+
+    insertButton.classList.add("is-success");
+    insertButton.title = "Inséré dans l’éditeur !";
+    insertButton.setAttribute("aria-label", "Inséré dans l’éditeur");
+    icon.className = "bi bi-check-lg";
+    return;
+  }
+
+  const button = event.target.closest(".copy-example");
+  if (!button) return;
+
+  const code = button.closest(".example-wrap")?.querySelector("code");
+  if (!code) return;
+
+  const icon = button.querySelector("i");
+  const initialTitle = button.title;
+
+  try {
+    await copyText(code.textContent);
+    button.classList.add("is-success");
+    button.title = "Code copié !";
+    button.setAttribute("aria-label", "Code copié");
+    icon.className = "bi bi-check-lg";
+  } catch (error) {
+    console.error("Impossible de copier le code", error);
+    button.title = "Impossible de copier le code";
+    button.setAttribute("aria-label", "Impossible de copier le code");
+    icon.className = "bi bi-x-lg";
+  }
+
+  window.setTimeout(() => {
+    button.classList.remove("is-success");
+    button.title = initialTitle;
+    button.setAttribute("aria-label", initialTitle);
+    icon.className = "bi bi-copy";
+  }, 1600);
+});
 
 // Gestion recherche + tri
 const searchBox = document.getElementById("search");
