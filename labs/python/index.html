@@ -13,9 +13,9 @@
 	<!-- Bootstrap & Icons -->
 	<link rel="stylesheet" href="../../assets/css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css">
 	<link rel="stylesheet" href="../../assets/css/dist/bootstrap@5.3.8/bootstrap_min.css">
-	<link rel="stylesheet" href="../../assets/css/app.css">
+	<link rel="stylesheet" href="../../assets/css/app.css?v=20261111-projects">
 
-	<script src="../../assets/js/app.js"></script>
+	<script src="../../assets/js/app.js?v=20261111-projects"></script>
 	<script src="../../assets/js/dist/jszip@3.10.1/jszip_min.js"></script>
 		<script src="../../assets/js/dist/brython@3.13.2/brython_min.js"></script>
 		<script src="../../assets/js/dist/brython@3.13.2/brython_stdlib.js"></script>
@@ -97,9 +97,10 @@
       <span data-i18n="pyEditorTitle"></span>
       <span id="dirtyDot" class="ms-2" style="display:none;color:#ff4507;">●</span>
     </span>
-    <span id="fileBadge" class="badge rounded-pill text-bg-info ms-2 d-none">
-      <span id="fileBadgeName">—</span>
-    </span>
+    <div class="python-script-controls">
+      <div id="scriptBadges" role="tablist" aria-label="Scripts Python"></div>
+      <button id="addPythonScript" class="python-script-add" type="button" aria-label="Nouveau script" title="Nouveau script">+</button>
+    </div>
     <div class="d-flex gap-2">
       <button class="btn btn-sm border-0 btn-outline-info" data-bs-toggle="modal" data-bs-target="#featuresModal">
         <i class="bi bi-info-circle me-1"></i>
@@ -182,7 +183,7 @@
           <span class="d-none d-sm-inline" data-i18n="run"></span>
         </button>
       </div>
-      <div class="editor-wrap">
+      <div id="pythonEditorPanel" class="editor-wrap" role="tabpanel">
         <div id="gutter" class="gutter"><div>1</div></div>
         <div class="codecell">
           <pre id="highlighting"></pre>
@@ -215,6 +216,11 @@
             <li><button id="exportPythonProject" class="dropdown-item" data-i18n="pyExportProject"></button></li>
             <li><hr class="dropdown-divider"></li>
             <li><button id="deleteTextFile" class="dropdown-item" data-i18n="pyDeleteFile"></button></li>
+            <li id="closedTextFiles" hidden>
+              <hr class="dropdown-divider">
+              <h6 class="dropdown-header" data-i18n="pyClosedFiles"></h6>
+              <ul id="closedTextFileList" class="list-unstyled mb-0"></ul>
+            </li>
           </ul>
         </div>
         <button id="stopPython" class="btn btn-sm btn-danger" type="button" aria-keyshortcuts="Escape" hidden>
@@ -229,7 +235,10 @@
       <input id="textFileInput" type="file" accept=".txt,.csv,.json,.md,.py,text/plain" multiple hidden>
       <p id="filesStatus" class="small px-3 mb-0" role="status"></p>
       <!-- Onglets fichiers -->
-      <ul class="nav nav-tabs d-none" id="fileTabs" role="tablist" aria-label="Fichiers texte"></ul>
+      <div id="pythonFileTabs" class="python-file-tabs d-none">
+        <ul class="nav nav-tabs" id="fileTabs" role="tablist" aria-label="Fichiers texte"></ul>
+        <button id="addTextFileTab" class="python-file-add" type="button" aria-label="Nouveau fichier texte…" title="Nouveau fichier texte…">+</button>
+      </div>
       <div class="tab-content d-none" id="fileTabContent"></div>
 
       <section id="turtlePanel" class="turtle-panel" aria-labelledby="turtleTitle" hidden>
@@ -364,17 +373,19 @@ turtle.done()</code></pre>
   </div>
 
 	<!-- Logic -->
-	<script src="../../assets/js/python.js"></script>
+	<script src="../../assets/js/workshop-project.js?v=20261111-projects"></script>
+	<script src="../../assets/js/python.js?v=20261111-scripts"></script>
 
 	<!-- Brython: fichiers texte locaux et exécution -->
 	<script type="text/python" src="runner.py"></script>
 
 	<!-- Bootstrap JS (modal) -->
 	<script src="../../assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
-	<script src="../../assets/js/dico.js"></script>
-	<script src="../../assets/js/python-files.js"></script>
+	<script src="../../assets/js/dico.js?v=20261111-projects"></script>
+	<script src="../../assets/js/python-scripts.js?v=20261111-projects"></script>
+	<script src="../../assets/js/python-files.js?v=20261111-projects"></script>
 	<script src="../../assets/js/python-turtle.js"></script>
-	<script src="../../assets/js/python-execution.js"></script>
+	<script src="../../assets/js/python-execution.js?v=20261111-scripts"></script>
 	<script src="../../assets/js/theme.js"></script>
 	<script>
 		Theme.init({ canWrite:false });  // applique + suit, sans changer localStorage
@@ -383,7 +394,7 @@ turtle.done()</code></pre>
 			if (params.has("light")) {
 				document.body.classList.add("l-mode");
 				// Cache la topbar et le hint
-				document.querySelector("nav.navbar")?.remove();
+				document.querySelector("nav.navbar")?.classList.add("d-none");
 				document.querySelector(".hint")?.remove();
 				document.querySelector("main.workbench")?.classList.add("no-topbar");
 
@@ -509,21 +520,24 @@ turtle.done()</code></pre>
 			ta.classList.remove('dragover');
 		  });
 
-		  ta.addEventListener('drop', e => {
+		  ta.addEventListener('drop', async e => {
 			e.preventDefault();
 			ta.classList.remove('dragover');
 
 			const file = e.dataTransfer.files[0];
-			if (!file) return;
-
-			const reader = new FileReader();
-			reader.onload = () => {
-			  ta.value = reader.result;
-			  ta.dispatchEvent(new Event('input'));   // pour renuméroter et re-surligner
-			  if (window.syncHighlight) window.syncHighlight();
-			  try { localStorage.setItem('py_editor_code_v1', ta.value); } catch(_) {}
-			};
-			reader.readAsText(file);
+			const workspace = window.pythonScripts;
+			if (!file || !workspace.beginFileOperation()) return;
+			try {
+			  const text = await file.text();
+			  const current = workspace.current();
+			  if (current.code !== current.savedCode && current.code !== text &&
+			      !window.confirm('Remplacer les modifications non enregistrées du script actif ?')) return;
+			  workspace.loaded(text, file.name);
+			} catch (error) {
+			  window.alert(error.message);
+			} finally {
+			  workspace.endFileOperation();
+			}
 		  });
   
 		  // init + mise à jour

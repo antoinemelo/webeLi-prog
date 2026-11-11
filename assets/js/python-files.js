@@ -2,11 +2,16 @@
 (() => {
   'use strict';
   const storageKey = 'py_workspace_files_v1';
+  const closedStorageKey = 'py_workspace_closed_files_v1';
   const files = new Map();
   const tabs = new Map();
   const tabbar = document.getElementById('fileTabs');
+  const tabrow = document.getElementById('pythonFileTabs');
   const panes = document.getElementById('fileTabContent');
   const status = document.getElementById('filesStatus');
+  const addButton = document.getElementById('addTextFileTab');
+  const closedMenu = document.getElementById('closedTextFiles');
+  const closedList = document.getElementById('closedTextFileList');
   let selected = null;
   let nextId = 0;
   let saveTimer;
@@ -20,6 +25,7 @@
     clearTimeout(saveTimer);
     try {
       localStorage.setItem(storageKey, JSON.stringify(Object.fromEntries(files)));
+      localStorage.setItem(closedStorageKey, JSON.stringify([...files.keys()].filter(name => !tabs.has(name))));
       status.textContent = '';
     } catch (_) {
       status.textContent = message('pyStorageError');
@@ -27,35 +33,85 @@
   }
 
   function select(name) {
-    selected = name;
+    selected = tabs.has(name) ? name : (tabs.keys().next().value ?? null);
     for (const [key, tab] of tabs) {
-      const active = key === name;
+      const active = key === selected;
       tab.button.classList.toggle('active', active);
       tab.button.setAttribute('aria-selected', String(active));
       tab.button.tabIndex = active ? 0 : -1;
       tab.pane.hidden = !active;
       tab.pane.classList.toggle('active', active);
     }
-    const empty = files.size === 0;
-    tabbar.classList.toggle('d-none', empty);
+    const empty = tabs.size === 0;
+    tabrow.classList.toggle('d-none', empty);
     panes.classList.toggle('d-none', empty);
     document.getElementById('exportTextFile').disabled = empty;
     document.getElementById('deleteTextFile').disabled = empty;
   }
 
-  function update(name, text) {
+  function refreshLabels() {
+    addButton.title = message('pyNewFile');
+    addButton.setAttribute('aria-label', message('pyNewFile'));
+    for (const [name, tab] of tabs) {
+      const label = `${message('pyCloseFile')} ${name}`;
+      tab.close.title = label;
+      tab.close.setAttribute('aria-label', label);
+    }
+  }
+
+  function refreshClosedFiles() {
+    closedList.replaceChildren();
+    for (const name of files.keys()) {
+      if (tabs.has(name)) continue;
+      const item = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'dropdown-item';
+      button.textContent = name;
+      button.title = name;
+      button.addEventListener('click', () => openFile(name));
+      item.append(button);
+      closedList.append(item);
+    }
+    closedMenu.hidden = !closedList.children.length;
+  }
+
+  function closeFile(name) {
+    const tab = tabs.get(name);
+    if (!tab) return;
+    const names = [...tabs.keys()];
+    const index = names.indexOf(name);
+    const next = selected === name ? (names[index + 1] ?? names[index - 1] ?? null) : selected;
+    tab.item.remove();
+    tab.pane.remove();
+    tabs.delete(name);
+    select(next);
+    refreshClosedFiles();
+    save();
+    (tabs.get(selected)?.button ?? addButton).focus();
+  }
+
+  function openFile(name) {
+    update(name, files.get(name), true);
+    select(name);
+    save();
+    tabs.get(name).textarea.focus();
+  }
+
+  function update(name, text, open = !files.has(name)) {
     files.set(name, text);
     let tab = tabs.get(name);
-    if (!tab) {
+    if (!tab && open) {
       const id = `python-text-${++nextId}`;
       const item = document.createElement('li');
-      item.className = 'nav-item';
+      item.className = 'nav-item python-file-tab';
       item.setAttribute('role', 'presentation');
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'nav-link';
       button.id = `${id}-tab`;
       button.textContent = name;
+      button.title = name;
       button.setAttribute('role', 'tab');
       button.setAttribute('aria-controls', id);
       button.addEventListener('click', () => select(name));
@@ -70,7 +126,12 @@
         select(names[index]);
         tabs.get(names[index]).button.focus();
       });
-      item.append(button);
+      const close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'python-file-close';
+      close.textContent = '×';
+      close.addEventListener('click', () => closeFile(name));
+      item.append(button, close);
       tabbar.append(item);
       const pane = document.createElement('div');
       pane.id = id;
@@ -88,10 +149,12 @@
       });
       pane.append(textarea);
       panes.append(pane);
-      tab = {item, button, pane, textarea};
+      tab = {item, button, close, pane, textarea};
       tabs.set(name, tab);
+      refreshLabels();
+      refreshClosedFiles();
     }
-    if (tab.textarea.value !== text) {
+    if (tab && tab.textarea.value !== text) {
       const {selectionStart, selectionEnd, scrollTop, scrollLeft} = tab.textarea;
       const editing = document.activeElement === tab.textarea;
       tab.textarea.value = text;
@@ -111,7 +174,7 @@
   }
 
   function put(name, text) {
-    update(name, text.replace(/\r\n?/g, '\n'));
+    update(name, text.replace(/\r\n?/g, '\n'), true);
     select(name);
     save();
   }
@@ -135,30 +198,40 @@
     save
   };
   try {
+    let closed = [];
+    try {
+      const savedClosed = JSON.parse(localStorage.getItem(closedStorageKey) || '[]');
+      if (Array.isArray(savedClosed)) closed = savedClosed;
+    } catch (_) { /* File contents can still be restored if tab preferences are invalid. */ }
     const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
     if (saved && typeof saved === 'object' && !Array.isArray(saved)) {
       for (const [name, text] of Object.entries(saved)) {
-        if (validName(name) && typeof text === 'string') update(name, text);
+        if (validName(name) && typeof text === 'string') update(name, text, !closed.includes(name));
       }
     }
   } catch (_) {
     status.textContent = message('pyStorageError');
   }
   select(selected);
+  refreshClosedFiles();
+  refreshLabels();
+  new MutationObserver(refreshLabels).observe(document.documentElement, {attributes: true, attributeFilter: ['lang']});
   window.addEventListener('pagehide', save);
 
-  document.getElementById('newTextFile').addEventListener('click', () => {
+  function newFile() {
     const answer = window.prompt(message('pyNamePrompt'), 'essai.txt');
     if (answer === null) return;
     const name = answer.trim();
     if (!validName(name)) return window.alert(message('pyInvalidName'));
     if (files.has(name)) {
-      select(name);
+      openFile(name);
       return;
     }
     put(name, '');
     tabs.get(name).textarea.focus();
-  });
+  }
+  document.getElementById('newTextFile').addEventListener('click', newFile);
+  addButton.addEventListener('click', newFile);
 
   const picker = document.getElementById('textFileInput');
   document.getElementById('importTextFiles').addEventListener('click', () => picker.click());
@@ -182,24 +255,17 @@
   });
   document.getElementById('exportPythonProject').addEventListener('click', async () => {
     try {
-      const zip = new JSZip();
-      let scriptName = 'programme.py';
-      for (let i = 1; files.has(scriptName); i++) scriptName = `programme-${i}.py`;
-      zip.file(scriptName, document.getElementById('code').value);
-      for (const [name, text] of files) zip.file(name, text);
-      download(await zip.generateAsync({type: 'blob'}), 'atelier-python.zip');
+      const scripts = window.pythonScripts.snapshot();
+      const data = [...files].map(([name, text]) => ({name, data: text}));
+      await WorkshopProject.download({scripts, files: data, extension: 'py', filename: 'atelier-python.zip'});
     } catch (error) {
       window.alert(error.message);
     }
   });
   document.getElementById('deleteTextFile').addEventListener('click', () => {
     if (selected === null || !window.confirm(`${message('pyDeleteConfirm')} ${selected} ?`)) return;
-    const tab = tabs.get(selected);
-    tab.item.remove();
-    tab.pane.remove();
-    files.delete(selected);
-    tabs.delete(selected);
-    select(files.keys().next().value ?? null);
-    save();
+    const name = selected;
+    files.delete(name);
+    closeFile(name);
   });
 })();

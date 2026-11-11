@@ -25,18 +25,61 @@ navigateur des ateliers.
 
 ### Exécution Python interruptible
 
-Le serveur fourni ajoute `Cross-Origin-Opener-Policy: same-origin` et
+Les serveurs fournis ajoutent `Cross-Origin-Opener-Policy: same-origin` et
 `Cross-Origin-Embedder-Policy: require-corp` pour `/labs/python/` et
 `/assets/aide/` (le lexique intégré). Ces en-têtes permettent le partage de
-mémoire entre le Worker Python et l'interface : édition des fichiers en
-direct, `input()` et dessin Turtle. Les autres ateliers gardent leur politique.
+mémoire entre le Worker Python et l'interface **seulement en contexte sécurisé** :
+HTTPS, ou l'exception accordée à `localhost` / `127.0.0.1`. Une adresse privée
+comme `http://192.168.1.1:8000` n'a pas cette exception. Les autres ateliers
+gardent leur politique.
 
-Sur un autre serveur, fournir ces mêmes en-têtes et utiliser HTTPS ou
-`http://127.0.0.1`. Pour un atelier intégré dans une iframe, la page parente
-doit également permettre l'isolation. Sans cette isolation, les calculs
-Python restent exécutés dans un Worker interruptible, mais les opérations
-qui demandent les fichiers en direct, une saisie ou Turtle signalent que le
-serveur adapté est nécessaire. Aucun code élève n'est exécuté sur le serveur.
+#### Réseau de l'école en HTTP
+
+Lancer sur le serveur central, dans le dossier du site :
+
+```bash
+python ServeurHTTP_Complet.py
+```
+
+Ce lanceur écoute sur `0.0.0.0:8000` par défaut. Les élèves utilisent par exemple
+`http://192.168.1.1:8000/`. Le fichier **`python_bridge.py` doit accompagner le
+lanceur**. `ServeurHTTP_Web.py --host 0.0.0.0` prend également en charge le relais.
+Il ne faut lancer aucun serveur sur les postes élèves et aucun certificat
+n'est requis pour ce mode HTTP.
+
+Quand la mémoire partagée n'est pas disponible, l'atelier utilise automatiquement
+le relais HTTP : `open()`, `read()`, `write()`, les modifications des fichiers
+pendant l'exécution, `input()` et Turtle restent disponibles. **Arrêter** et
+**Échap** continuent d'interrompre le Worker. Les fichiers du projet restent
+propres au navigateur de l'élève ; ce dispositif ne donne pas accès aux fichiers
+du disque du serveur. Les réponses transitent temporairement par sa mémoire,
+sans écriture sur disque. Les allers-retours réseau peuvent ralentir les
+programmes faisant beaucoup de lectures ou d'appels Turtle.
+
+Pour mettre à jour une installation existante, copier ensemble :
+
+- `ServeurHTTP_Complet.py` et `python_bridge.py` à la racine du site ;
+- `labs/python/index.html` et `labs/python/worker.js` ;
+- `assets/js/python-execution.js` et `assets/js/dico.js` ;
+- `assets/js/python-files.js` et `assets/css/app.css` pour les boutons **+** et
+  **×** des onglets, avec réouverture des fichiers fermés dans le menu Projet ;
+- `assets/js/python-scripts.js`, `assets/js/python.js` et `assets/js/app.js`
+  pour les trois scripts et leurs commandes de sauvegarde séparées ;
+- `ServeurHTTP_Web.py` si ce lanceur est aussi utilisé.
+
+Redémarrer ensuite le serveur central et actualiser les pages des élèves
+(`Ctrl+F5` si une ancienne version reste en cache). Le mode optionnel `--php`
+utilise un autre serveur et **ne fournit pas ce relais** ; pour cet atelier en
+HTTP, utiliser le lancement ci-dessus sans `--php`.
+
+#### Hébergement statique en HTTPS
+
+Sur Apache, IIS ou un autre serveur sans le relais Python, fournir les deux
+en-têtes ci-dessus et utiliser HTTPS avec un certificat reconnu par les postes.
+Pour un atelier intégré dans une iframe, la page parente doit également permettre
+l'isolation. Sur un hébergement statique sans isolation ni relais, les calculs
+simples restent possibles ; les appels aux fichiers, à `input()` et à Turtle
+affichent une erreur de configuration. Aucun code élève n'est exécuté sur le serveur.
 
 ### Publication Apache sous `/tec/`
 
@@ -100,9 +143,35 @@ et le serveur local démarré :
 node tools/check_python_browser.cjs
 ```
 
+Pour reproduire le réseau HTTP sans l'exception de sécurité de `localhost`,
+avec `ServeurHTTP_Complet.py` lancé sur le port 8000 :
+
+```bash
+PYTHON_LAB_HTTP_LAN=1 node tools/check_python_browser.cjs
+```
+
+La régression des scripts multiples utilise les mêmes variables et le même serveur :
+
+```bash
+PYTHON_LAB_HTTP_LAN=1 node tools/check_python_scripts_browser.cjs
+```
+
+Elle vérifie la limite de trois scripts, le verrouillage pendant une exécution,
+les sauvegardes séparées (y compris les annulations et erreurs), l'annulation des
+modifications par script, le partage du seul code actif, les fichiers communs,
+la restauration après rechargement et la présentation sur ordinateur et mobile.
+
+Ce mode utilise `http://atelier.test:8000`, résolu vers le serveur de test par
+Chromium uniquement, et vérifie que `isSecureContext` et `crossOriginIsolated`
+sont faux. Il exerce aussi deux navigateurs élèves distincts. Aucun changement
+du DNS de l'école ou du fichier `hosts` n'est nécessaire.
+
 Le test vérifie notamment une boucle infinie sans arrêt automatique, le bouton
 rouge différé, l'édition des fichiers pendant une boucle, la conservation des
 écritures après interruption, la console bornée, `input()` et Turtle. Les
+tests de `input()` couvrent une réponse vide, les accents, plusieurs saisies,
+l'annulation et une nouvelle exécution après annulation. En HTTP, une saisie
+attend également 26 secondes pour vérifier le renouvellement de l'attente réseau. Les
 variables `PLAYWRIGHT_MODULE`, `CHROMIUM_EXECUTABLE` et `PYTHON_LAB_URL`
 permettent de préciser le module, le navigateur et l'adresse de test.
 
@@ -169,3 +238,43 @@ sans la bibliothèque de coloration. Le contrôle général des ateliers passe
 également sans erreur JavaScript ni réponse HTTP en échec.
 Le [rapport du correctif](markdown-correction-2026-11-11.json) conserve les résultats,
 les empreintes des fichiers publiés et la référence de sauvegarde.
+
+## Projets et scripts multiples (version de travail)
+
+Pour transférer cette évolution avec le dossier `dev`, inclure :
+
+- `labs/html/index.html`, `labs/markdown/index.html`, `labs/python/index.html` et `labs/sql/index.html` ;
+- `assets/js/workshop-project.js`, `assets/js/workshop-documents.js` et `assets/js/html-css-files.js` ;
+- `assets/js/html.js`, `assets/js/markdown.js`, `assets/js/sql.js`, `assets/js/python-scripts.js` et `assets/js/python-files.js` ;
+- `assets/js/app.js`, `assets/js/dico.js` et `assets/css/app.css`.
+
+Les pages portent la référence de cache `20261111-projects`. Actualiser après le
+transfert (Ctrl+F5 si nécessaire). Aucun certificat HTTPS n'est requis : l'ouverture
+utilise un sélecteur de fichiers classique en HTTP réseau, et les exports utilisent
+les téléchargements du navigateur. Les données restent propres au navigateur et
+à l'adresse du site ; une sauvegarde locale n'écrit pas sur le serveur de l'école.
+
+Les CSS HTML deviennent communs à tous les documents ouverts. La migration
+conserve les anciens contenus, y compris les variantes portant le même nom.
+SQL accepte trois scripts, avec une base commune conservée quand on change ou
+réinitialise un script. Les ZIP Projet incluent tous les scripts ouverts, ainsi
+que les CSS HTML, les fichiers de données Python ou la base SQLite selon l'atelier.
+Markdown possède maintenant aussi le menu Projet.
+
+Contrôles navigateur contre le serveur local sur le port 8000 :
+
+```bash
+node tools/check_workshop_documents_browser.cjs
+node tools/check_projects_browser.cjs
+```
+
+Ils acceptent `PLAYWRIGHT_MODULE` et `CHROMIUM_EXECUTABLE`.
+`WORKSHOP_BASE_URL=https://webe.li/tec/` permet aussi de lancer
+`check_projects_browser.cjs` sur le site publié, dans des profils de test séparés. Chromium utilise
+`http://atelier.test:8000` redirigé vers `127.0.0.1` pour reproduire un contexte
+HTTP non sécurisé. Les contrôles couvrent trois documents, les sauvegardes séparées,
+les annulations et erreurs, l'historique d'annulation, le rechargement, les CSS
+communs, la migration des anciennes sessions, les imports/exports ZIP, les images,
+les contenus des quatre archives et la réouverture de la base SQLite exportée.
+Les sélecteurs natifs sont simulés dans un profil séparé ; les imports et
+les téléchargements HTTP utilisent les véritables contrôles du navigateur.

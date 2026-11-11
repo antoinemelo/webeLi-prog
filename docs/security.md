@@ -30,6 +30,14 @@ les services tiers.
 
 ## Serveurs locaux
 
+Sur le réseau HTTP de l'école, le relais Python transmet temporairement en mémoire
+les réponses aux lectures de fichiers, à `input()` et aux appels Turtle. Il
+n'exécute pas le code élève et n'écrit pas ces données sur disque. Chaque
+exécution utilise un jeton aléatoire distinct ; les requêtes JSON vérifient
+l'origine, les réponses ne sont pas mises en cache et la mémoire est bornée.
+Les jetons et les contenus ne figurent pas dans les URL ou les journaux d'accès.
+Comme le reste du site en HTTP, ces échanges ne sont pas chiffrés sur le réseau.
+
 Le serveur HTTP de fichiers exige une authentification et limite la taille des
 requêtes. Les fichiers caches et la base de metadonnees ne sont pas servis. Les
 chemins sont resolus physiquement pour empecher une sortie via un lien

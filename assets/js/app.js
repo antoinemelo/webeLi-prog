@@ -86,9 +86,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const isMac = navigator.platform.toUpperCase().includes("MAC");
 
   document.querySelectorAll("textarea.codearea").forEach(textarea => {
-    const history = [textarea.value];
+    let history = [textarea.value];
     let index = 0;
     let isApplying = false;
+
+    // Editors with several documents can keep undo/redo scoped to each one.
+    textarea.editorHistory = {
+      capture: () => ({entries: history.slice(), index}),
+      restore(state) {
+        history = state?.entries?.length ? state.entries.slice() : [textarea.value];
+        index = state ? Math.max(0, Math.min(state.index, history.length - 1)) : 0;
+      }
+    };
 
     function snapshot() {
       if (isApplying) return;

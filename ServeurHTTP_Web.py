@@ -11,6 +11,7 @@ import sys
 import time
 import socket
 import threading
+from python_bridge import BRIDGE_PATH, PythonBridge, PythonBridgeHandler
 
 
 # =========================
@@ -75,7 +76,7 @@ def dec_connections():
 # =========================
 # HANDLER
 # =========================
-class StaticHandler(SimpleHTTPRequestHandler):
+class StaticHandler(PythonBridgeHandler, SimpleHTTPRequestHandler):
     server_version = "StaticSchoolHTTP/1.2"
     cache_seconds = CACHE_SECONDS
 
@@ -126,7 +127,7 @@ class StaticHandler(SimpleHTTPRequestHandler):
         if path.startswith(("/labs/python/", "/assets/aide/")):
             self.send_header("Cross-Origin-Opener-Policy", "same-origin")
             self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
-        if self.cache_seconds <= 0:
+        if path.startswith(BRIDGE_PATH) or self.cache_seconds <= 0:
             self.send_header("Cache-Control", "no-store, max-age=0")
         else:
             self.send_header("Cache-Control", f"public, max-age={self.cache_seconds}")
@@ -164,6 +165,7 @@ def main(argv=None):
 
     StaticHandler.cache_seconds = max(0, args.cache_secondes)
     httpd = ThreadingHTTPServer((args.host, args.port), StaticHandler)
+    httpd.python_bridge = PythonBridge()
 
     print("\n========= Serveur WEB ============")
     print(f"Racine  : {ROOT_DIR}")

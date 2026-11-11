@@ -7,6 +7,9 @@ let lastOutput = 0;
 let initializing = false;
 let ready = false;
 let running = false;
+let relay = null;
+let requestId = 0;
+let bridgeError = '';
 const decoder = new TextDecoder();
 const MAX_OUTPUT = 100000;
 
@@ -23,11 +26,27 @@ self.workshopOutput = text => {
   flushOutput();
 };
 self.workshopRequest = (kind, json) => {
-  if (!control) {
-    return JSON.stringify({error: {type: 'RuntimeError', message:
-      'Les fichiers en direct, input() et Turtle nécessitent le serveur local fourni (python3 ServeurHTTP_Web.py).'}});
-  }
   flushOutput(true);
+  if (!control) {
+    if (!relay) return JSON.stringify({error: {type: 'RuntimeError', message: bridgeError}});
+    const id = ++requestId;
+    self.postMessage({type: 'request', id, kind, payload: JSON.parse(json)});
+    try {
+      // Only this terminable Worker waits. The UI stays responsive over HTTP LAN.
+      while (true) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', relay.url + 'wait', false);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({token: relay.token, id}));
+        if (xhr.status !== 200) throw new Error(bridgeError);
+        const result = JSON.parse(xhr.responseText);
+        if (result.response) return JSON.stringify(result.response);
+        if (!result.pending) throw new Error(bridgeError);
+      }
+    } catch (_) {
+      return JSON.stringify({error: {type: 'RuntimeError', message: bridgeError}});
+    }
+  }
   Atomics.store(control, 0, 0);
   self.postMessage({type: 'request', kind, payload: JSON.parse(json)});
   Atomics.wait(control, 0, 0);
@@ -78,6 +97,9 @@ self.onmessage = event => {
     initialize(event.data.shared);
   } else if (event.data.type === 'run' && ready && !running) {
     running = true;
+    relay = event.data.relay || null;
+    requestId = 0;
+    bridgeError = event.data.bridgeError;
     output = '';
     lastOutput = performance.now() - 100;
     try {

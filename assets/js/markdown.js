@@ -43,10 +43,6 @@
 
     // ---------- Helpers ----------
     const $ = sel => document.querySelector(sel);
-    const LS_CODE   = 'md_editor_code_v1';
-    const LS_CARET  = 'md_editor_caret_v1';
-    const LS_SCROLL = 'md_editor_scroll_v1';
-    const LS_FIRST  = 'md_editor_first_open_v1';
     const SPLIT_KEY = 'md_split_left_percent_v1';
 
     function mkformatDateYYYYMMDD(d){
@@ -376,13 +372,7 @@
       function getLineStartIndex(text, pos){ return text.lastIndexOf('\n', pos - 1) + 1; }
       function getLineEndIndex(text, pos){ const idx = text.indexOf('\n', pos); return idx === -1 ? text.length : idx; }
 
-      function persist(){
-        try {
-          localStorage.setItem(LS_CODE, ta.value);
-          localStorage.setItem(LS_CARET, JSON.stringify({s: ta.selectionStart, e: ta.selectionEnd}));
-          localStorage.setItem(LS_SCROLL, ta.scrollTop.toString());
-        } catch(_) {}
-      }
+      function persist(){ window.workshopDocuments?.save(); }
 
 		function initialTemplate() {
 return `#### Prénom / Thème-ObjetTPxx
@@ -393,65 +383,12 @@ return `#### Prénom / Thème-ObjetTPxx
 [Bienvenue]::`;
 }
 
-		  function restore() {
-			  // 1) Priorité au lien partagé
-			  const linked = readCodeFromURL?.();
-			  if (linked !== null) {
-				ta.value = linked;
-				ta.setSelectionRange(ta.value.length, ta.value.length);
-				ta.scrollTop = 0;
-				ta.dispatchEvent(new Event('input'));
-				syncHighlight();
-				// On persiste pour les rafraîchissements suivants
-				try {
-				  localStorage.setItem(LS_CODE, ta.value);
-				  localStorage.setItem(LS_FIRST, '1');
-				} catch(_) {}
-				return;
-			  }
-
-			const saved = localStorage.getItem(LS_CODE);
-			if (saved !== null) {
-			  ta.value = saved;
-			  const c = localStorage.getItem(LS_CARET);
-			  if (c) {
-				try {
-				  const {s, e} = JSON.parse(c);
-				  ta.setSelectionRange(s, e);
-				} catch(_) {}
-			  }
-			  const st = localStorage.getItem(LS_SCROLL);
-			  if (st) ta.scrollTop = parseInt(st, 10) || 0;
-			} else {
-			  if (!localStorage.getItem(LS_FIRST)) {
-				ta.value = initialTemplate();
-				localStorage.setItem(LS_FIRST, '1');
-			  } else {
-				ta.value = initialTemplate();
-			  }
-			  ta.setSelectionRange(ta.value.length, ta.value.length);
-			}
-			ta.dispatchEvent(new Event('input')); // renumérotation
-			syncHighlight();
-		  }
-
-
-      function resetEditor(){
-        const ok = window.confirm('Réinitialiser l’éditeur ? (Le contenu local sera effacé)');
-        if (!ok) return;
-        try {
-          localStorage.removeItem(LS_CODE);
-          localStorage.removeItem(LS_CARET);
-          localStorage.removeItem(LS_SCROLL);
-          localStorage.removeItem(LS_FIRST);
-        } catch(_) {}
-        ta.value = initialTemplate();
-        ta.setSelectionRange(ta.value.length, ta.value.length);
-        ta.scrollTop = 0;
-        ta.dispatchEvent(new Event('input'));
-        try { localStorage.setItem(LS_FIRST,'1'); } catch(_) {}
-        ta.focus();
-        syncHighlight(); renderPreview();
+      function restore() {
+        createWorkshopDocuments({prefix: 'md_editor', title: 'Markdown', extension: 'md', projectName: 'markdown',
+          template: initialTemplate(), linked: readCodeFromURL(), filename: () => computeFilename('md'),
+          saveAsId: 'saveAs', mime: 'text/markdown;charset=utf-8', accept: '.md,.markdown,.txt',
+          types: [{description: 'Markdown', accept: {'text/markdown': ['.md', '.markdown'], 'text/plain': ['.txt']}}],
+          show: () => renderPreview()});
       }
 
       function download(filename, mime, content){
@@ -468,7 +405,7 @@ return `#### Prénom / Thème-ObjetTPxx
       function computeFilename(ext){
         const firstLine = (ta.value.split('\n')[0] || '').trim();
         // attend: "# Prénom / ObjetTPxx"
-        const m = firstLine.match(/^#\s*([^/]+?)\s*\/\s*(.+?)\s*$/);
+        const m = firstLine.match(/^#{1,6}\s*([^/]+?)\s*\/\s*(.+?)\s*$/);
         const today = mkformatDateYYYYMMDD(new Date());
         if (m){
           const namePart = m[1].trim().replace(/[^\p{L}\p{N}\-_. ]/gu,'').replace(/\s+/g,'');
@@ -563,7 +500,7 @@ return `#### Prénom / Thème-ObjetTPxx
 		updateAC();
 	  });
 		ta.addEventListener('scroll', ()=>{
-			try { localStorage.setItem(LS_SCROLL, ta.scrollTop.toString()); } catch(_){}
+			persist();
 			const hi = document.getElementById('highlighting');
 			hi.scrollTop  = ta.scrollTop;
 			hi.scrollLeft = ta.scrollLeft;
@@ -637,7 +574,7 @@ return `#### Prénom / Thème-ObjetTPxx
 		});
 
       // Buttons
-      $('#reset').addEventListener('click', resetEditor);
+
 
 		document.getElementById('exportHtml').addEventListener('click', () => {
 		  const md = ta.value;
@@ -881,276 +818,6 @@ return `#### Prénom / Thème-ObjetTPxx
     })();
 
 	(() => {
-	  const btnOpen = document.getElementById('openLocal');   // <a id="openLocal"> dans ton menu Fichier
-	  const codeEl  = document.getElementById('code');         // textarea de l'éditeur
-	  if (!btnOpen || !codeEl) return;
-
-	  const supportsFS = ('showOpenFilePicker' in window);
-
-	  // Charger le contenu dans l'éditeur + rafraîchir l'UI (gutter, preview, localStorage…)
-	  function loadText(text) {
-		codeEl.value = text || '';
-		// Curseur à la fin, remonte le scroll
-		codeEl.setSelectionRange(codeEl.value.length, codeEl.value.length);
-		codeEl.scrollTop = 0;
-		// Déclenche les écouteurs existants (rendu preview, numéros de lignes, persistance…)
-		codeEl.dispatchEvent(new Event('input'));
-	  }
-
-	  async function openWithFS() {
-		try {
-		  const [handle] = await window.showOpenFilePicker({
-			types: [{
-			  description: 'Markdown',
-			  accept: {
-				'text/markdown': ['.md', '.markdown'],
-				'text/plain':    ['.txt']
-			  }
-			}],
-			excludeAcceptAllOption: false,
-			multiple: false
-		  });
-		  const file = await handle.getFile();
-		  const text = await file.text();
-		  loadText(text);
-		} catch (_) {
-		  /* annulé par l’utilisateur */
-		}
-	  }
-
-	  function openWithInput() {
-		const inp = document.createElement('input');
-		inp.type = 'file';
-		inp.accept = '.md,.markdown,.txt,text/markdown,text/plain';
-		inp.addEventListener('change', () => {
-		  const f = inp.files && inp.files[0];
-		  if (!f) return;
-		  const reader = new FileReader();
-		  reader.onload = () => loadText(reader.result || '');
-		  reader.readAsText(f);
-		}, { once: true });
-		inp.click();
-	  }
-
-	  btnOpen.addEventListener('click', (e) => {
-		e.preventDefault();
-		supportsFS ? openWithFS() : openWithInput();
-	  });
-	})();
-
-	(() => {
-	  const codeEl   = document.getElementById('code');
-	  const btnOpen  = document.getElementById('openLocal');
-	  const btnSave  = document.getElementById('saveLocal');
-	  const btnSaveAs= document.getElementById('saveAs');
-	  const supportsFS = ('showOpenFilePicker' in window) && ('showSaveFilePicker' in window);
-
-	  // Poignée du fichier ouvert via File System Access
-	  let currentHandle = null;
-
-	  // Utilitaire UI : active/désactive "Enregistrer"
-	  function updateSaveUI() {
-		const canSave = !!currentHandle;
-		if (!btnSave) return;
-		btnSave.classList.toggle('disabled', !canSave);
-		btnSave.setAttribute('aria-disabled', String(!canSave));
-	  }
-	  updateSaveUI();
-
-	  // Intercepte Ctrl/Cmd+S
-	  window.addEventListener('keydown', (e) => {
-		const isMac = navigator.platform.toUpperCase().includes('MAC');
-		if ((isMac ? e.metaKey : e.ctrlKey) && e.key.toLowerCase() === 's') {
-		  e.preventDefault();
-		  saveOrSaveAs();
-		}
-	  });
-
-	(() => {
-	  const codeEl   = document.getElementById('code');
-	  const dirtyDot = document.getElementById('dirtyDot');
-	  const baseTitle = document.title;
-
-	  let lastSavedValue = codeEl ? codeEl.value : '';
-	  let isDirty = false;
-
-		function updateDirtyUI(){
-		  if (dirtyDot) dirtyDot.style.display = isDirty ? '' : 'none';
-		  document.title = isDirty ? baseTitle + ' ●' : baseTitle;
-		}
-
-	  function recomputeDirty(){
-		const now = codeEl ? codeEl.value : '';
-		isDirty = (now !== lastSavedValue);
-		updateDirtyUI();
-	  }
-	  function setJustLoaded(){
-		lastSavedValue = codeEl ? codeEl.value : '';
-		isDirty = false;
-		updateDirtyUI();
-	  }
-	  function markJustSaved(){
-		lastSavedValue = codeEl ? codeEl.value : '';
-		isDirty = false;
-		updateDirtyUI();
-	  }
-	  function resetDirty(){
-		lastSavedValue = codeEl ? codeEl.value : '';
-		isDirty = false;
-		updateDirtyUI();
-	  }
-
-	  // Alerte si on quitte avec des modifs non enregistrées
-	  window.addEventListener('beforeunload', (e) => {
-		if (!isDirty) return;
-		e.preventDefault();
-		e.returnValue = '';
-	  });
-
-	  // Recalcule sur frappe
-	  if (codeEl) codeEl.addEventListener('input', recomputeDirty);
-
-	  // Expose pour que les autres blocs puissent signaler les événements clés
-	  window._mdDirty = { setJustLoaded, markJustSaved, resetDirty };
-
-	  // Première init
-	  recomputeDirty();
-	})();
-
-	  // Enregistrer : écrit directement dans le fichier ouvert (si possible),
-	  // sinon bascule sur "Enregistrer sous..."
-	  async function saveOrSaveAs() {
-		if (currentHandle && supportsFS) {
-		  try {
-			const writable = await currentHandle.createWritable();
-			await writable.write(codeEl.value);
-			await writable.close();
-			+ window._mdDirty?.markJustSaved();   // Contenu désormais synchronisé avec le disque
-			(window.toast || alert)('Enregistré ✅');
-			return;
-		  } catch (err) {
-			console.warn('Écriture directe impossible, fallback Save As', err);
-			// on retombe sur "Enregistrer sous"
-		  }
-		}
-		await saveAs(); // fallback
-	  }
-
-	  // Enregistrer sous…
-	  async function saveAs() {
-		if (supportsFS) {
-		  try {
-			const suggestedName = (function computeFilename(){
-			  // On réutilise votre logique: H1 "# Prénom / ObjetTPxx", sinon fallback
-			  const firstLine = (codeEl.value.split('\n')[0] || '').trim();
-			  const m = firstLine.match(/^#\s*([^/]+?)\s*\/\s*(.+?)\s*$/);
-			  const d = new Date();
-			  const ymd = d.getFullYear().toString()
-						+ String(d.getMonth()+1).padStart(2,'0')
-						+ String(d.getDate()).padStart(2,'0');
-			  if (m) {
-				const safe = s => s.trim().replace(/[^\p{L}\p{N}\-_. ]/gu,'').replace(/\s+/g,'');
-				return `${safe(m[1])}_${safe(m[2])}_${ymd}.md`;
-			  }
-			  return `TP_${ymd}.md`;
-			})();
-
-			const handle = await window.showSaveFilePicker({
-			  suggestedName,
-			  types: [{
-				description: 'Markdown',
-				accept: { 'text/markdown': ['.md', '.markdown'], 'text/plain': ['.txt'] }
-			  }]
-			});
-			const writable = await handle.createWritable();
-			await writable.write(codeEl.value);
-			await writable.close();
-			+ window._mdDirty?.markJustSaved();
-
-			currentHandle = handle;      // on devient "fichier courant"
-			updateSaveUI();              // active "Enregistrer"
-			(window.toast || alert)('Fichier enregistré ✅');
-			return;
-		  } catch (_) {
-			// annulé par l’utilisateur
-			return;
-		  }
-		}
-
-		// Fallback (navigateurs sans File System Access) : téléchargement
-		// -> on réutilise votre fonction de download si vous préférez
-		const blob = new Blob([codeEl.value], {type:'text/markdown;charset=utf-8'});
-		const a = document.createElement('a');
-		a.href = URL.createObjectURL(blob);
-		a.download = 'document.md';
-		document.body.appendChild(a);
-		a.click();
-		URL.revokeObjectURL(a.href);
-		a.remove();
-		(window.toast || alert)('Fichier téléchargé ✅');
-	  }
-
-	  // Brancher les boutons
-	  btnSave  && btnSave .addEventListener('click', (e)=>{ e.preventDefault(); saveOrSaveAs(); });
-	  btnSaveAs&& btnSaveAs.addEventListener('click', (e)=>{ e.preventDefault(); saveAs(); });
-
-	  // Raccorder votre logique d’ouverture pour mémoriser la poignée
-	  // Si vous utilisez showOpenFilePicker (déjà présent plus haut), stockez le handle :
-	  const originalOpenWithFS = window.openWithFS; // si vous l’avez exposée
-	  async function openAndRemember() {
-		try {
-		  const [handle] = await window.showOpenFilePicker({
-			types: [{
-			  description: 'Markdown',
-			  accept: {'text/markdown': ['.md', '.markdown'], 'text/plain': ['.txt']}
-			}],
-			excludeAcceptAllOption: false, multiple: false
-		  });
-		  const file = await handle.getFile();
-		  const text = await file.text();
-
-		  // charge dans l’éditeur
-		  document.getElementById('code').value = text || '';
-		  document.getElementById('code').dispatchEvent(new Event('input'));
-		  + window._mdDirty?.setJustLoaded();   // ← le fichier chargé est "propre"
-
-		  // mémorise le handle puis active "Enregistrer"
-		  currentHandle = handle;
-		  updateSaveUI();
-		  (window.toast || (()=>{}))(`Ouvert: ${file.name}`);
-		} catch(_) { /* annulé */ }
-	  }
-
-	  // Remplace en douceur l’action du bouton "Ouvrir…"
-	  if (btnOpen) {
-		btnOpen.replaceWith(btnOpen.cloneNode(true)); // enlève les anciens listeners
-		const freshOpen = document.getElementById('openLocal');
-		freshOpen.addEventListener('click', (e)=>{
-		  e.preventDefault();
-		  if (supportsFS) openAndRemember(); else {
-			// fallback input file — pas de handle => Enregistrer reste grisé
-			const inp = document.createElement('input');
-			inp.type = 'file';
-			inp.accept = '.md,.markdown,.txt,text/markdown,text/plain';
-			inp.addEventListener('change', () => {
-			  const f = inp.files?.[0]; if (!f) return;
-			  const r = new FileReader();
-			  r.onload = () => {
-				document.getElementById('code').value = r.result || '';
-				document.getElementById('code').dispatchEvent(new Event('input'));
-				currentHandle = null; // pas de handle -> garder "Enregistrer" grisé
-				updateSaveUI();
-				(window.toast || (()=>{}))(`Ouvert: ${f.name}`);
-			  };
-			  r.readAsText(f);
-			}, { once:true });
-			inp.click();
-		  }
-		});
-	  }
-	})();
-
-	(() => {
 	  const PRODUCT = "markdown";       // adapter: "python" | "html" | "markdown" | "sql"
 	  const PATH    = location.pathname;
 	  const SITE    = location.hostname; // "informatic.li"
@@ -1194,25 +861,6 @@ return `#### Prénom / Thème-ObjetTPxx
 			ta.classList.remove('dragover');
 		  });
 
-		  ta.addEventListener('drop', e => {
-			e.preventDefault();
-			ta.classList.remove('dragover');
-
-			const file = e.dataTransfer.files[0];
-			if (!file) return;
-
-			const reader = new FileReader();
-			reader.onload = () => {
-			  ta.value = reader.result;
-			  ta.dispatchEvent(new Event('input'));   // rafraîchit preview + highlight + gutter
-			  if (window.syncHighlight) window.syncHighlight();
-			  if (typeof renderPreview === "function") renderPreview();
-
-			  try { localStorage.setItem('md_editor_code_v1', ta.value); } catch(_) {}
-			  window._mdDirty?.setJustLoaded();
-			};
-			reader.readAsText(file);
-		  });
   
 		  // init + mise à jour
 		  updateCursorPos();

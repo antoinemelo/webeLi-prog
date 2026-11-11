@@ -23,6 +23,14 @@ Pour rendre le site visible sur le reseau de la classe :
 python3 ServeurHTTP_Web.py --host 0.0.0.0
 ```
 
+Sur le serveur central de l'école, le lanceur `ServeurHTTP_Complet.py` écoute
+déjà sur le réseau par défaut. Les élèves ouvrent par exemple
+`http://192.168.1.1:8000/labs/python/`. Les fichiers Python (`open`, `read`,
+`write`), `input()` et Turtle fonctionnent en HTTP grâce au relais
+`python_bridge.py`, à conserver à côté du lanceur. Aucun serveur ni certificat
+n'est nécessaire sur les postes élèves. Voir le
+[déploiement en réseau](docs/deployment.md#réseau-de-lécole-en-http).
+
 ## Composants
 
 - `index.html` : accueil et orientation vers les ateliers ;

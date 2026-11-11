@@ -1,7 +1,4 @@
     // ========================= Constantes & éléments =========================
-    const LS_CODE   = 'sql_editor_code_v3';
-    const LS_CARET  = 'sql_editor_caret_v3';
-    const LS_SCROLL = 'sql_editor_scroll_v3';
     const LS_DB     = 'sql_editor_db_bin_v3'; // base persistée (Uint8Array -> base64)
 
     const codeEl = document.getElementById('code');
@@ -12,11 +9,10 @@
 
 	const saveDBItem    = document.getElementById('saveDB');
 	const saveDBAsItem  = document.getElementById('saveDBAs');
-	const saveSQLItem   = document.getElementById('saveSQL');
-	const openSQLItem   = document.getElementById('openDB');
+	const openDBItem   = document.getElementById('openDB');
 
 	if (!supportsFS) {
-	  [saveDBItem, saveDBAsItem, saveSQLItem, openSQLItem].filter(Boolean).forEach(el => {
+	  [saveDBItem, saveDBAsItem, openDBItem].filter(Boolean).forEach(el => {
 		el.classList.add('disabled');
 		el.setAttribute('aria-disabled', 'true');
 		el.title = "Non supporté par ce navigateur — utilisez « Exporter .sqlite » / « Télécharger .sql »";
@@ -330,8 +326,17 @@ function syncHighlight(){
       ].join('\n');
     }
     function computeFilename(){ const first=(codeEl.value.split('\n')[0]||'').trim(); const m=first.match(/^\s*--\s*([^/]+?)\s*\/\s*(.+?)\s*$/); if(m){ const name=m[1].replace(/[^\p{L}\p{N}\-_. ]/gu,'').replace(/\s+/g,''); const subj=m[2].replace(/[^\p{L}\p{N}\-_. ]/gu,'').replace(/\s+/g,''); if(name&&subj) return `${name}_${subj}_${sqlformatDateYYYYMMDD(new Date())}.sql`; } return `TP_${sqlformatDateYYYYMMDD(new Date())}.sql`; }
-    function persist(){ try{ localStorage.setItem(LS_CODE, codeEl.value); localStorage.setItem(LS_CARET, JSON.stringify({s: codeEl.selectionStart, e: codeEl.selectionEnd})); localStorage.setItem(LS_SCROLL, codeEl.scrollTop.toString()); }catch(_){} }
-    function restore(){ const saved=localStorage.getItem(LS_CODE); codeEl.value = saved ?? initialTemplate(); try{ const ce=JSON.parse(localStorage.getItem(LS_CARET)||'{}'); if(Number.isInteger(ce.s)&&Number.isInteger(ce.e)) codeEl.setSelectionRange(ce.s, ce.e); }catch(_){} const st=parseInt(localStorage.getItem(LS_SCROLL)||'0',10); if(!Number.isNaN(st)) codeEl.scrollTop=st; syncHighlight(); }
+    function persist(){ window.workshopDocuments?.save(); }
+    function restore(){
+      createWorkshopDocuments({prefix: 'sql_editor', legacyVersion: 'v3', title: 'SQL', extension: 'sql',
+        template: initialTemplate(), filename: computeFilename, openId: 'openSQL', saveId: 'saveSQL',
+        saveAsId: 'saveSQLAs', panelId: 'editorWrap', projectName: 'sql',
+        accept: '.sql,.txt,text/sql,text/plain', mime: 'text/sql;charset=utf-8',
+        types: [{description: 'SQL', accept: {'text/sql': ['.sql'], 'text/plain': ['.txt']}}],
+        show() { SQL_ERROR_LINE = null; },
+        projectFiles: () => [{name: defaultDBFilename(), data: db.export()}]
+      });
+    }
 
     // ========================= Autocomplete =========================
     const ac=document.getElementById('ac'); let dict=[]; let acIndex=-1, charWidth=8, lineHeight=18, padLeft=0, padTop=0;
@@ -372,104 +377,8 @@ function syncHighlight(){
     codeEl.addEventListener('input', ()=>{ persist(); syncHighlight(); buildDict(); updateAC(); });
     codeEl.addEventListener('keyup', (e)=>{ if(!['ArrowUp','ArrowDown','Enter','Tab','Escape'].includes(e.key)) updateAC(); });
 
-    // ========================= Fichiers SQL (ouvrir / enregistrer / télécharger) =========================
-    let sqlFileHandle = null;
-    let sqlFileName   = null;
-
-    function getCurrentSQLFilename(){
-      return (sqlFileName || sqlFileHandle?.name || '').trim();
-    }
-
-    function setSQLFileState(handle, name){
-      sqlFileHandle = handle || null;
-      sqlFileName   = name || handle?.name || null;
-    }
-
-    function sqlSaveTypes(){
-      return [{ description:'Script SQL', accept:{ 'text/sql':['.sql'], 'text/plain':['.sql'] } }];
-    }
-
-    async function ensureSQLWritable(handle){
-      if(!handle || typeof handle.queryPermission !== 'function') return;
-      const opts = { mode:'readwrite' };
-      const q = await handle.queryPermission(opts);
-      if(q === 'granted') return;
-      if(typeof handle.requestPermission === 'function'){
-        const r = await handle.requestPermission(opts);
-        if(r === 'granted') return;
-      }
-      throw new Error('write-permission-denied');
-    }
-
-    async function writeSQLToHandle(handle){
-      await ensureSQLWritable(handle);
-      const writable = await handle.createWritable();
-      await writable.write(codeEl.value);
-      await writable.close();
-    }
-
-    async function fsOpenSQL(){
-      try{
-        const [handle]=await window.showOpenFilePicker({
-          types:[{ description:'Script SQL', accept:{ 'text/sql':['.sql'], 'text/plain':['.sql','.txt'] } }],
-          excludeAcceptAllOption:false,
-          multiple:false
-        });
-        const file=await handle.getFile();
-        const text=await file.text();
-        setSQLFileState(handle, file.name);
-        codeEl.value=text;
-        codeEl.setSelectionRange(text.length, text.length);
-        codeEl.scrollTop=0;
-        codeEl.dispatchEvent(new Event('input'));
-      }catch{}
-    }
-
-    async function fsSaveSQLAs(suggestedName){
-      const handle=await window.showSaveFilePicker({
-        suggestedName: suggestedName || computeFilename(),
-        types: sqlSaveTypes()
-      });
-      await writeSQLToHandle(handle);
-      setSQLFileState(handle, handle.name);
-    }
-
-    async function fsSaveSQL(){
-      try{
-        const expected = computeFilename(); // nom basé sur la 1ère ligne SQL
-        const current  = getCurrentSQLFilename();
-
-        // Si l'en-tête SQL a changé, on ne doit surtout pas écraser l'ancien fichier.
-        // On déclenche directement un « Enregistrer sous… » avec le nouveau nom.
-        if(current && current !== expected){
-          await fsSaveSQLAs(expected);
-          return;
-        }
-
-        if(sqlFileHandle){
-          await writeSQLToHandle(sqlFileHandle);
-        }else{
-          await fsSaveSQLAs(expected);
-        }
-      }catch(err){
-        if(String(err?.name||'')!=='AbortError'){
-          console.error('Échec de l’enregistrement SQL:', err);
-          alert("Échec de l'enregistrement .sql");
-        }
-      }
-    }
-
-    function downloadSQL(){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([codeEl.value], {type:'text/sql;charset=utf-8'})); a.download=computeFilename(); document.body.appendChild(a); a.click(); URL.revokeObjectURL(a.href); a.remove(); }
-    document.getElementById('openSQL').addEventListener('click', ()=> supportsFS ? fsOpenSQL() : (function(){ const inp=document.createElement('input'); inp.type='file'; inp.accept='.sql,text/sql,text/plain'; inp.addEventListener('change', async ()=>{ if(!inp.files||!inp.files[0]) return; const text=await inp.files[0].text(); setSQLFileState(null, inp.files[0].name || null); codeEl.value=text; codeEl.setSelectionRange(text.length,text.length); codeEl.scrollTop=0; codeEl.dispatchEvent(new Event('input')); }, {once:true}); inp.click(); })());
-    document.getElementById('saveSQL').addEventListener('click', ()=> supportsFS ? fsSaveSQL() : downloadSQL());
-    document.getElementById('downloadSQL').addEventListener('click', downloadSQL);
-
-    // Ctrl+S / Cmd+S : sauvegarder le script SQL, pas la page HTML du navigateur.
-    document.addEventListener('keydown', function(e){
-      if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's'){
-        e.preventDefault();
-        document.getElementById('saveSQL')?.click();
-      }
+    document.getElementById('downloadSQL').addEventListener('click', event => {
+      event.preventDefault(); workshopDocuments.download();
     });
 
     // ========================= Base SQLite: seed Th_Ex, import/export, exécution =========================
@@ -520,11 +429,29 @@ INSERT INTO ABSENCES(eleve_id,date,motif) VALUES (2,'2024-09-18','Maladie'),(4,'
 
     function persistDB(){ try{ const bin=db.export(); localStorage.setItem(LS_DB, u8ToB64(bin)); }catch(_){} }
 
-    // Import .sqlite (fallback universel)
-    document.getElementById('importDB').addEventListener('click', ()=>{ const inp=document.createElement('input'); inp.type='file'; inp.accept='.sqlite,.db,application/octet-stream'; inp.addEventListener('change', async ()=>{ if(!inp.files||!inp.files[0]) return; const buf=new Uint8Array(await inp.files[0].arrayBuffer()); try{ db && db.close?.(); }catch(_){ } db=new SQL.Database(buf); dbFileHandle=null; setDBName(inp.files[0].name); try{ db.run('PRAGMA foreign_keys = ON;'); }catch(_){ } persistDB(); outEl.innerHTML = `<div class="text-success">Base importée : <strong>${inp.files[0].name}</strong></div>`; }, {once:true}); inp.click(); });
-
-    // Ouvrir .sqlite (FS Access)
-    document.getElementById('openDB').addEventListener('click', async ()=>{ if(!supportsFS){ alert("Votre navigateur ne permet pas l'ouverture directe. Utilisez ‘Importer .sqlite’. "); return; } try{ const [handle]=await window.showOpenFilePicker({ types:[{ description:'SQLite database', accept:{ 'application/octet-stream':['.sqlite','.db'] } }], excludeAcceptAllOption:false, multiple:false }); const file=await handle.getFile(); const buf=new Uint8Array(await file.arrayBuffer()); try{ db && db.close?.(); }catch(_){ } db=new SQL.Database(buf); dbFileHandle=handle; setDBName(file.name); try{ db.run('PRAGMA foreign_keys = ON;'); }catch(_){ } persistDB(); outEl.innerHTML = `<div class="text-success">Base ouverte : <strong>${file.name}</strong></div>`; }catch{} });
+    function replaceDatabase(bytes, name, handle = null) {
+      const next = new SQL.Database(bytes);
+      try { next.exec('PRAGMA schema_version;'); next.run('PRAGMA foreign_keys = ON;'); }
+      catch (error) { next.close(); throw error; }
+      db?.close(); db = next; dbFileHandle = handle;
+      setDBName(name); persistDB();
+      outEl.textContent = `Base importée : ${name}`;
+    }
+    document.getElementById('importDB').addEventListener('click', event => {
+      event.preventDefault();
+      workshopDocuments.operation(async () => {
+        const [file] = await workshopPickFiles('.sqlite,.db,application/octet-stream');
+        if (file) replaceDatabase(new Uint8Array(await file.arrayBuffer()), file.name);
+      });
+    });
+    document.getElementById('openDB').addEventListener('click', event => {
+      event.preventDefault();
+      workshopDocuments.operation(async () => {
+        const [handle] = await window.showOpenFilePicker({types: [{description: 'SQLite', accept: {'application/octet-stream': ['.sqlite', '.db']}}], multiple: false});
+        const file = await handle.getFile();
+        replaceDatabase(new Uint8Array(await file.arrayBuffer()), file.name, handle);
+      });
+    });
 
     // Enregistrer .sqlite / Enregistrer sous...
     function defaultDBFilename(){
@@ -575,20 +502,21 @@ INSERT INTO ABSENCES(eleve_id,date,motif) VALUES (2,'2024-09-18','Maladie'),(4,'
       }
     }
 
-    document.getElementById('saveDB').addEventListener('click', saveDB);
-    document.getElementById('saveDBAs')?.addEventListener('click', saveDBAs);
+    document.getElementById('saveDB').addEventListener('click', event => { event.preventDefault(); workshopDocuments.operation(saveDB); });
+    document.getElementById('saveDBAs')?.addEventListener('click', event => { event.preventDefault(); workshopDocuments.operation(saveDBAs); });
 
     // Export .sqlite (téléchargement)
     function exportDB(){ const bin=db.export(); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([bin], {type:'application/octet-stream'})); a.download=defaultDBFilename(); document.body.appendChild(a); a.click(); URL.revokeObjectURL(a.href); a.remove(); }
     document.getElementById('exportDB').addEventListener('click', exportDB);
 
     // Bouton Charger base scolaire (remplace la base courante)
-	document.getElementById('seedSchool').addEventListener('click', ()=>{
+	document.getElementById('seedSchool').addEventListener('click', () => workshopDocuments.operation(() => {
 	  if(!confirm('Remplacer la base actuelle par la base scolaire Th_Ex ? (les données non enregistrées seront perdues)'))
 		return;
 
 	  try{ db && db.close?.(); }catch(_){}
 	  db = new SQL.Database();
+      dbFileHandle = null;
 	  loadSchoolDB();
 
 		// Injecter le commentaire dans l’éditeur
@@ -599,7 +527,7 @@ INSERT INTO ABSENCES(eleve_id,date,motif) VALUES (2,'2024-09-18','Maladie'),(4,'
 		codeEl.setSelectionRange(codeEl.value.length, codeEl.value.length);
 		codeEl.scrollTop = 0;
 		codeEl.dispatchEvent(new Event('input')); // met à jour coloration & persistance
-	});
+	}));
 
 	function escapeHtml(str){
 	  return String(str)
@@ -610,7 +538,7 @@ INSERT INTO ABSENCES(eleve_id,date,motif) VALUES (2,'2024-09-18','Maladie'),(4,'
 	}
 
     // Exécuter
-	document.getElementById('run').addEventListener('click', ()=>{
+	document.getElementById('run').addEventListener('click', () => workshopDocuments.operation(() => {
 	  outEl.innerHTML = '';
 	  SQL_ERROR_LINE = null;
 	  syncHighlight();
@@ -660,53 +588,27 @@ INSERT INTO ABSENCES(eleve_id,date,motif) VALUES (2,'2024-09-18','Maladie'),(4,'
 			return;
 		  }
 		}
-		persistDB();
 		if (!anyOutput){
 		  outEl.innerHTML = `<div class="text-info">OK (aucun résultat à afficher).</div>`;
 		}
 	  }catch(e){
 		outEl.innerHTML = `<div class="alert alert-danger">Échec d'exécution : ${cleanSqlMessage(String(e?.message||e))}</div>`;
-	  }
-	});
+      } finally { persistDB(); }
+    }));
 
-	// Reset (éditeur + base vide) + rafraîchissement
-	document.getElementById('reset').addEventListener('click', ()=>{
-	  if(!confirm('Réinitialiser l’éditeur et repartir d’une base vide ?')) return;
-
-	  // Nettoyage éditeur / stockage
-	  localStorage.removeItem(LS_CODE);
-	  localStorage.removeItem(LS_CARET);
-	  localStorage.removeItem(LS_SCROLL);
-	  localStorage.removeItem(LS_DB);
-
-	  // Repose le template et persiste
-	  codeEl.value = initialTemplate();
-	  codeEl.setSelectionRange(codeEl.value.length, codeEl.value.length);
-	  codeEl.scrollTop = 0;
-	  syncHighlight();
-	  persist();
-
-	  // Nouvelle base vide + PRAGMA + badge + persistance
-	  try{ db && db.close?.(); }catch(_){}
-	  db = new SQL.Database();
-	  try{ db.run('PRAGMA foreign_keys = ON;'); }catch(_){}
-	  setDBName(' Simple session (base vide)');
-	  try{
-		const bin = db.export();
-		localStorage.setItem(LS_DB, (function(u8){ let s=''; for(let i=0;i<u8.length;i++) s+=String.fromCharCode(u8[i]); return btoa(s); })(bin));
-	  }catch(_){}
-
-	  // --- Rafraîchissement de la page ---
-	  // on laisse le thread UI finir avant de recharger
-	  requestAnimationFrame(()=> location.reload());
-	});
+    // Resetting a script leaves the shared database intact. Database reset is explicit.
+    document.getElementById('resetDB').addEventListener('click', () => workshopDocuments.operation(() => {
+      if (!confirm(workshopMessage('sqlResetDBConfirm'))) return;
+      replaceDatabase(undefined, 'Session (base vide)');
+    }));
 
     // Drag & Drop (.sql sur éditeur, .sqlite sur résultats)
     function isSQLiteFile(f){ return /\.(sqlite|db)$/i.test(f.name) || f.type==='application/octet-stream'; }
-    function isSQLScript(f){ return /\.(sql|txt)$/i.test(f.name) || /^text\//.test(f.type); }
     function setupDropZone(el, onFiles){ ['dragenter','dragover'].forEach(evt=>el.addEventListener(evt, e=>{ e.preventDefault(); e.stopPropagation(); el.classList.add('drop-target'); })); ['dragleave','drop'].forEach(evt=>el.addEventListener(evt, e=>{ e.preventDefault(); e.stopPropagation(); el.classList.remove('drop-target'); })); el.addEventListener('drop', e=>{ const files=[...(e.dataTransfer?.files||[])]; if(files.length) onFiles(files); }); }
-    setupDropZone(document.getElementById('editorWrap'), async (files)=>{ const f=files.find(isSQLScript); if(!f) return; const text=await f.text(); sqlFileHandle=null; codeEl.value=text; codeEl.setSelectionRange(text.length, text.length); codeEl.scrollTop=0; codeEl.dispatchEvent(new Event('input')); });
-    setupDropZone(outEl, async (files)=>{ const f=files.find(isSQLiteFile); if(!f) return; const buf=new Uint8Array(await f.arrayBuffer()); try{ db && db.close?.(); }catch(_){ } db=new SQL.Database(buf); dbFileHandle=null; setDBName(f.name); try{ db.run('PRAGMA foreign_keys = ON;'); }catch(_){ } persistDB(); outEl.innerHTML = `<div class="text-success">Base importée (drag & drop) : <strong>${f.name}</strong></div>`; });
+    setupDropZone(outEl, files => workshopDocuments.operation(async () => {
+      const file = files.find(isSQLiteFile);
+      if (file) replaceDatabase(new Uint8Array(await file.arrayBuffer()), file.name);
+    }));
 
 	// ========================= Schéma / Introspection =========================
 	function rows(result) {
@@ -871,26 +773,19 @@ INSERT INTO ABSENCES(eleve_id,date,motif) VALUES (2,'2024-09-18','Maladie'),(4,'
 	document.getElementById('showDiagram').addEventListener('click',async e=>{ e.preventDefault(); renderER(); });
 
 function loadDB(dbKey, dbLabel, exampleSQL){
+  return workshopDocuments.operation(async () => {
   if(!confirm(`Remplacer la base actuelle par un snapshot de la base ${dbLabel} ? (les données non enregistrées seront perdues)`))
     return;
 
   outEl.innerHTML = `<div class="text-secondary">>&nbsp;Téléchargement de ${dbLabel} en cours...</div>`;
 
-  (async ()=>{
     try{
       const url = `https://parapente.world/lab/api/dump.php?db=${encodeURIComponent(dbKey)}`;
       const res = await fetch(url, { mode: 'cors' });
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
       const buf = new Uint8Array(await res.arrayBuffer());
 
-      // Fermer l'ancienne base
-      try{ db && db.close?.(); }catch(_){}
-      db = new SQL.Database(buf);
-      try{ db.run('PRAGMA foreign_keys = ON;'); }catch(_){}
-
-      // UI + persistance
-      setDBName(dbLabel);
-      persistDB();
+      replaceDatabase(buf, dbLabel);
 
       // Exemple SQL injecté
       codeEl.value = exampleSQL;
@@ -905,7 +800,7 @@ function loadDB(dbKey, dbLabel, exampleSQL){
     }catch(err){
       outEl.innerHTML = `<div class="text-danger">Échec du chargement : ${err?.message||err}</div>`;
     }
-  })();
+  });
 }
 
 // --- Bind sur les boutons du menu ---
@@ -948,7 +843,7 @@ document.getElementById('loadVisits').addEventListener('click', e=>{
     window.addEventListener('beforeunload', persist);
 
     // Init
-    window.addEventListener('load', async ()=>{ restore(); buildDict(); await initDB(); });
+    window.addEventListener('load', async ()=>{ restore(); buildDict(); await workshopDocuments.operation(initDB); });
 
 	(() => {
 	  const PRODUCT = "sql";       // adapter: "python" | "html" | "markdown" | "sql"

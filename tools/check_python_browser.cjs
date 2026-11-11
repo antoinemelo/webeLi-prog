@@ -4,11 +4,16 @@ const assert = require('node:assert/strict');
 
 (async () => {
   const options = {headless: true};
+  if (process.env.PYTHON_LAB_HTTP_LAN === '1') {
+    options.args = ['--host-resolver-rules=MAP atelier.test 127.0.0.1', '--no-proxy-server'];
+  }
   if (process.env.CHROMIUM_EXECUTABLE) options.executablePath = process.env.CHROMIUM_EXECUTABLE;
   const browser = await chromium.launch(options);
   try {
     const page = await browser.newPage({viewport: {width: 1365, height: 960}, locale: 'fr-CH'});
-    const url = process.env.PYTHON_LAB_URL || 'http://127.0.0.1:8000/labs/python/';
+    const lan = process.env.PYTHON_LAB_HTTP_LAN === '1';
+    const url = process.env.PYTHON_LAB_URL || (lan
+      ? 'http://atelier.test:8000/labs/python/' : 'http://127.0.0.1:8000/labs/python/');
     const origin = new URL(url).origin;
     await page.route('**/*', route => new URL(route.request().url()).origin === origin
       ? route.continue() : route.fulfill({status: 200, body: '{}'}));
@@ -36,19 +41,26 @@ const assert = require('node:assert/strict');
     const dialogs = [];
     page.on('dialog', dialog => {
       dialogs.push(dialog.message());
+      if (dialog.message() === 'Attente réseau') {
+        // Exceed one server long-poll to exercise a pupil thinking before typing.
+        return new Promise(resolve => setTimeout(resolve, 26000)).then(() => dialog.accept('réponse différée'));
+      }
+      if (dialog.type() === 'prompt' && promptAnswer === null) return dialog.dismiss();
       return dialog.accept(dialog.type() === 'prompt' ? promptAnswer : undefined);
     });
     await page.goto(url, {waitUntil: 'domcontentloaded'});
     const ready = (timeout = 20000) => page.waitForFunction(() => !document.getElementById('run').disabled, null, {timeout});
     await ready(60000); // Loading both interpreters can be slower on a busy test machine.
-    assert(await page.evaluate(() => crossOriginIsolated), 'Use the supplied server to enable live files and input.');
+    assert.equal(await page.evaluate(() => crossOriginIsolated), !lan);
+    if (lan) assert.equal(await page.evaluate(() => isSecureContext), false,
+      'The LAN regression must run without localhost or HTTPS privileges.');
     const start = async code => {
       await page.locator('#code').fill(code);
       await page.locator('#run').click();
     };
-    const run = async code => {
+    const run = async (code, timeout) => {
       await start(code);
-      await ready();
+      await ready(timeout);
       return page.locator('#output').innerText();
     };
     const stop = async () => {
@@ -76,8 +88,15 @@ const assert = require('node:assert/strict');
     assert.equal(new URL(page.url()).hash, '', 'Saving must not navigate to an anchor.');
     console.log('OK: Ctrl+S saves the current script; F12 chooses a new handle; cancellation preserves it.');
 
+    assert(await page.locator('#addTextFileTab').isHidden(), 'Plus stays hidden until a first file is opened.');
+    promptAnswer = null;
     await page.locator('#projectMenu').click();
     await page.locator('#newTextFile').click();
+    assert(await page.locator('#addTextFileTab').isHidden(), 'Cancelling New keeps plus hidden.');
+    promptAnswer = 'essai.txt';
+    await page.locator('#projectMenu').click();
+    await page.locator('#newTextFile').click();
+    assert(await page.locator('#addTextFileTab').isVisible(), 'Creating the first file reveals plus.');
     const text = page.locator('textarea[aria-label="essai.txt"]');
     await text.click();
     await text.pressSequentially('Première ligne\nDeuxième ligne\n');
@@ -172,6 +191,18 @@ const assert = require('node:assert/strict');
     assert.equal(await page.locator('textarea[aria-label="conserve.txt"]').inputValue(), 'conservé après arrêt');
     promptAnswer = 'Alice';
     assert.equal(await run('print(input("Prénom"))'), 'Alice\n');
+    promptAnswer = '';
+    assert.equal(await run('print(repr(input("Vide")))'), "''\n");
+    promptAnswer = 'Élève 🐢';
+    assert.equal(await run('a = input("Premier")\nb = input("Second")\nprint(a, b)'), 'Élève 🐢 Élève 🐢\n');
+    promptAnswer = null;
+    assert((await run('input("Annuler")')).includes('EOFError'));
+    promptAnswer = 'Alice';
+    assert.equal(await run('print(input("Reprise"))'), 'Alice\n');
+    if (lan) {
+      assert.equal(await run('print(input("Attente réseau"))', 40000), 'réponse différée\n');
+      console.log('OK: input stays usable after the HTTP wait is renewed.');
+    }
     assert.equal(await run('import sys\nprint("avant")\nsys.exit("Abandon")'), 'avant\nAbandon\n');
     const error = await run('print("avant")\nopen("absent.txt")');
     assert(error.includes('avant\nErreur :: à la ligne 2') && error.includes('FileNotFoundError'), error);
@@ -224,8 +255,101 @@ const assert = require('node:assert/strict');
       assert.equal(Buffer.concat(chunks).toString('utf8'), savedCode);
     }
     await fallback.close();
+    if (lan) {
+      const pupil = await browser.newPage();
+      pupil.on('pageerror', error => errors.push(error.message));
+      await pupil.route('**/*', route => new URL(route.request().url()).origin === origin
+        ? route.continue() : route.fulfill({status: 200, body: '{}'}));
+      await pupil.goto(url, {waitUntil: 'domcontentloaded'});
+      await pupil.waitForFunction(() => !document.getElementById('run').disabled);
+      await pupil.locator('#code').fill('with open("conserve.txt", "w") as f:\n    f.write("autre élève")\nwhile True:\n    pass');
+      await pupil.locator('#run').click();
+      await pupil.waitForFunction(() => document.querySelector('textarea[aria-label="conserve.txt"]')?.value === 'autre élève');
+      assert.equal(await run('print(open("conserve.txt").read())'), 'conservé après arrêt\n');
+      await pupil.keyboard.press('Escape');
+      await pupil.waitForFunction(() => !document.getElementById('run').disabled);
+      await pupil.close();
+      console.log('OK: HTTP LAN without a secure context; two pupils retain separate files.');
+    }
     assert.deepEqual(errors, []);
     console.log('OK: Ctrl+S and F12 download the script when direct saving is unavailable.');
+
+    await page.setViewportSize({width: 1365, height: 960});
+    const addFile = page.locator('#addTextFileTab');
+    const closeFile = name => page.getByRole('button', {name: `Fermer l’onglet ${name}`, exact: true}).click();
+    promptAnswer = 'notes.txt';
+    await addFile.click();
+    await page.getByRole('textbox', {name: 'notes.txt', exact: true}).fill('Été conservé');
+    promptAnswer = 'autre.txt';
+    await addFile.click();
+    await page.getByRole('textbox', {name: 'autre.txt', exact: true}).fill('Autre contenu');
+    await closeFile('notes.txt');
+    assert.equal(await page.getByRole('tab', {name: 'autre.txt', exact: true}).getAttribute('aria-selected'), 'true',
+      'Closing an inactive tab preserves the selected tab.');
+    await closeFile('autre.txt');
+    while (await page.locator('#fileTabs .python-file-close').count()) {
+      await page.locator('#fileTabs .python-file-close').last().click();
+    }
+    assert(await addFile.isHidden(), 'Closing the last file hides plus.');
+    assert(await page.locator('#fileTabContent').isHidden());
+    assert(await page.locator('#exportTextFile').isDisabled());
+    assert.equal(await run('with open("notes.txt", "a") as f:\n    f.write(" + Python")\nprint(open("notes.txt").read())'),
+      'Été conservé + Python\n');
+    assert.equal(await page.locator('#fileTabs [role="tab"]').count(), 0, 'Writing to a closed file keeps its tab closed.');
+    await page.reload({waitUntil: 'domcontentloaded'});
+    await ready();
+    assert.equal(await page.locator('#fileTabs [role="tab"]').count(), 0, 'Closed tabs stay closed after reload.');
+    assert(await addFile.isHidden(), 'Plus also stays hidden after reload when all tabs are closed.');
+    assert.equal(await run('print(open("notes.txt").read())'), 'Été conservé + Python\n');
+
+    await page.locator('#projectMenu').click();
+    const zipDownload = page.waitForEvent('download');
+    await page.locator('#exportPythonProject').click();
+    const zipChunks = [];
+    for await (const chunk of await (await zipDownload).createReadStream()) zipChunks.push(chunk);
+    const archivedNotes = await page.evaluate(async base64 => {
+      const zip = await JSZip.loadAsync(base64, {base64: true});
+      return zip.file('notes.txt').async('string');
+    }, Buffer.concat(zipChunks).toString('base64'));
+    assert.equal(archivedNotes, 'Été conservé + Python', 'Closed files remain in exported projects.');
+
+    await page.locator('#projectMenu').click();
+    await page.locator('#closedTextFileList').getByRole('button', {name: 'notes.txt', exact: true}).click();
+    assert.equal(await page.getByRole('textbox', {name: 'notes.txt', exact: true}).inputValue(), 'Été conservé + Python');
+    promptAnswer = 'notes.txt';
+    await addFile.click();
+    assert.equal(await page.getByRole('tab', {name: 'notes.txt', exact: true}).count(), 1, 'Plus never duplicates an existing file.');
+    promptAnswer = 'autre.txt';
+    await addFile.click();
+    assert.equal(await page.getByRole('textbox', {name: 'autre.txt', exact: true}).inputValue(), 'Autre contenu');
+    await closeFile('autre.txt');
+    assert.equal(await page.getByRole('tab', {name: 'notes.txt', exact: true}).getAttribute('aria-selected'), 'true');
+    await page.locator('#projectMenu').click();
+    await page.locator('#deleteTextFile').click();
+    assert((await run('open("notes.txt")')).includes('FileNotFoundError'), 'Deleting remains distinct from closing.');
+    assert.equal(await page.locator('#closedTextFileList').getByRole('button', {name: 'notes.txt', exact: true}).count(), 0);
+
+    promptAnswer = 'donnees.txt';
+    assert(await addFile.isHidden(), 'Deleting the last open file hides plus.');
+    await page.locator('#projectMenu').click();
+    await page.locator('#newTextFile').click();
+    assert(await addFile.isVisible(), 'New reveals plus again.');
+    await page.getByRole('textbox', {name: 'donnees.txt', exact: true}).fill('Première ligne\nDeuxième ligne\n');
+    promptAnswer = 'resultats.txt';
+    await addFile.click();
+    await page.getByRole('textbox', {name: 'resultats.txt', exact: true}).fill('Résultats du programme');
+    await page.screenshot({path: '/tmp/tec-python-tabs-desktop.png', fullPage: true});
+    await page.setViewportSize({width: 390, height: 844});
+    await addFile.scrollIntoViewIfNeeded();
+    await page.screenshot({path: '/tmp/tec-python-tabs-mobile.png', fullPage: true});
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    assert(await addFile.isVisible());
+    await closeFile('resultats.txt');
+    promptAnswer = null;
+    await addFile.click();
+    assert.equal(await page.locator('#fileTabs [role="tab"]').count(), 1, 'Cancelling plus does not create a file.');
+    assert.deepEqual(errors, []);
+    console.log('OK: plus, tab closing/reopening, retained contents and ZIP, reload, deletion and mobile controls.');
   } finally {
     await browser.close();
   }

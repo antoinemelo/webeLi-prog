@@ -495,13 +495,35 @@ body[data-app="python"] pre#output{
   margin:0; padding:1rem; height: calc(100% - 44px); overflow:auto;
 }
 body[data-app="python"] .right pre#output{ flex:1 1 10rem; min-height:8rem; height:auto; }
+body[data-app="python"] .python-script-controls{ display:flex; align-items:center; gap:.35rem; min-width:0; max-width:100%; margin-left:.5rem; }
+body[data-app="python"] #scriptBadges{ display:flex; align-items:center; gap:.35rem; min-width:0; overflow-x:auto; }
+body[data-app="python"] .python-script-badge{ display:inline-flex; align-items:center; gap:.2rem; min-width:0; }
+body[data-app="python"] .python-script-name, body[data-app="python"] .python-script-close{ padding:0; border:0; background:transparent; color:inherit; font:inherit; }
+body[data-app="python"] .python-script-name{ max-width:14rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+body[data-app="python"] .python-script-close{ width:1.1rem; flex-shrink:0; font-size:1rem; }
+body[data-app="python"] .python-script-add{ width:1.6rem; height:1.6rem; padding:0; flex-shrink:0; border:1px solid var(--border); border-radius:50%; background:transparent; color:var(--text-main); line-height:1; font-size:1.2rem; }
+body[data-app="python"] .python-script-controls button:disabled{ cursor:default; opacity:.65; }
+body[data-app="python"] .python-script-controls button:focus-visible{ outline:2px solid currentColor; outline-offset:2px; }
+@media (max-width:575px){
+  body[data-app="python"] .python-script-name{ max-width:6rem; }
+  body[data-app="python"] .python-script-controls{ order:1; flex-basis:100%; justify-content:center; margin:.25rem 0 0; }
+}
 body[data-app="python"] #projectMenu span{ display:inline !important; }
 body[data-app="python"] #projectMenu{ --bs-btn-color:var(--project-accent); --bs-btn-border-color:var(--project-accent); --bs-btn-hover-bg:var(--project-hover); --bs-btn-hover-color:#fff; --bs-btn-hover-border-color:var(--project-hover); --bs-btn-active-bg:var(--project-hover); --bs-btn-active-color:#fff; --bs-btn-active-border-color:var(--project-hover); }
 body[data-app="python"] #stopPython span{ display:inline !important; }
 body[data-app="python"] .right > .toolbar{ flex-shrink:0; flex-wrap:wrap; }
-body[data-app="python"] #fileTabs{ flex-wrap:nowrap; overflow-x:auto; flex-shrink:0; }
-body[data-app="python"] #fileTabs .nav-link{ white-space:nowrap; color:var(--text-main); }
+body[data-app="python"] .python-file-tabs{ display:flex; align-items:center; flex-shrink:0; min-width:0; border-bottom:1px solid var(--border); }
+body[data-app="python"] #fileTabs{ flex-wrap:nowrap; overflow-x:auto; min-width:0; border-bottom:0; }
+body[data-app="python"] #fileTabs .python-file-tab{ position:relative; flex-shrink:0; }
+body[data-app="python"] #fileTabs .nav-link{ white-space:nowrap; color:var(--text-main); padding-right:2.2rem; max-width:18rem; overflow:hidden; text-overflow:ellipsis; }
 body[data-app="python"] #fileTabs .nav-link.active{ background:var(--surface-3); border-color:var(--border); }
+body[data-app="python"] .python-file-close, body[data-app="python"] .python-file-add{ border:0; border-radius:.25rem; background:transparent; color:var(--text-main); line-height:1; }
+body[data-app="python"] .python-file-close{ position:absolute; right:.25rem; top:50%; transform:translateY(-50%); width:1.75rem; height:1.75rem; font-size:1.25rem; }
+body[data-app="python"] .python-file-add{ flex-shrink:0; width:2rem; height:2rem; margin:.2rem; font-size:1.5rem; }
+body[data-app="python"] .python-file-close:hover, body[data-app="python"] .python-file-add:hover{ background:var(--surface-2); }
+body[data-app="python"] .python-file-close:focus-visible, body[data-app="python"] .python-file-add:focus-visible{ outline:2px solid var(--project-accent); outline-offset:-2px; }
+body[data-app="python"] #closedTextFileList{ max-height:14rem; overflow-y:auto; }
+body[data-app="python"] #closedTextFileList .dropdown-item{ max-width:20rem; overflow:hidden; text-overflow:ellipsis; }
 body[data-app="python"] #fileTabContent{ flex:0 1 13rem; min-height:6rem; overflow:hidden; border-bottom:1px solid var(--border); }
 body[data-app="python"] #fileTabContent .tab-pane.active{ display:flex; min-height:0; }
 body[data-app="python"] .python-text-file{ display:block; box-sizing:border-box; flex:1; min-height:0; width:100%; height:100%; padding:.75rem; color:var(--text-main); caret-color:var(--text-main); background:var(--surface-3); border:0; font-family:var(--font-mono, monospace); resize:none; overflow:auto; }
@@ -601,3 +623,51 @@ body[data-app="typing"] .toolbar {
 body[data-app="typing"] .pane.right .toolbar {
   background: var(--surface-2);
 }
+
+/* Shared HTML and Markdown document names. */
+.document-controls{ display:flex; align-items:center; gap:.35rem; min-width:0; max-width:100%; margin-left:.5rem; }
+#documentBadges{ display:flex; align-items:center; gap:.35rem; min-width:0; overflow-x:auto; }
+.document-badge{ display:inline-flex; align-items:center; gap:.2rem; min-width:0; }
+.document-name, .document-close{ padding:0; border:0; background:transparent; color:inherit; font:inherit; }
+.document-name{ max-width:14rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.document-close{ width:1.1rem; flex-shrink:0; font-size:1rem; }
+.document-add{ width:1.6rem; height:1.6rem; padding:0; flex-shrink:0; border:1px solid var(--border); border-radius:50%; background:transparent; color:var(--text-main); line-height:1; font-size:1.2rem; }
+.document-controls button:disabled{ cursor:default; opacity:.65; }
+.document-controls button:focus-visible{ outline:2px solid currentColor; outline-offset:2px; }
+@media (max-width:575px){
+  .document-name{ max-width:6rem; }
+  .document-controls{ order:1; flex-basis:100%; justify-content:center; margin:.25rem 0 0; }
+}
+
+/* CSS project files use the same controls as Python data files. */
+body[data-app="html"] #projectMenu span{ display:inline !important; }
+body[data-app="html"] #projectMenu{ --bs-btn-color:var(--project-accent); --bs-btn-border-color:var(--project-accent); --bs-btn-hover-bg:var(--project-hover); --bs-btn-hover-color:#fff; --bs-btn-hover-border-color:var(--project-hover); --bs-btn-active-bg:var(--project-hover); --bs-btn-active-color:#fff; --bs-btn-active-border-color:var(--project-hover); }
+body[data-app="html"] .right > .toolbar{ flex-shrink:0; flex-wrap:wrap; }
+body[data-app="html"] .css-file-tabs{ display:flex; align-items:center; flex-shrink:0; min-width:0; border-bottom:1px solid var(--border); }
+body[data-app="html"] #fileTabsCss{ flex-wrap:nowrap; overflow-x:auto; min-width:0; border-bottom:0; }
+body[data-app="html"] #fileTabsCss .css-file-tab{ position:relative; flex-shrink:0; }
+body[data-app="html"] #fileTabsCss .nav-link{ white-space:nowrap; color:var(--text-main); padding-right:2.2rem; max-width:18rem; overflow:hidden; text-overflow:ellipsis; }
+body[data-app="html"] #fileTabsCss .nav-link.active{ background:var(--surface-3); border-color:var(--border); }
+body[data-app="html"] .css-file-close, body[data-app="html"] .css-file-add{ border:0; border-radius:.25rem; background:transparent; color:var(--text-main); line-height:1; }
+body[data-app="html"] .css-file-close{ position:absolute; right:.25rem; top:50%; transform:translateY(-50%); width:1.75rem; height:1.75rem; font-size:1.25rem; }
+body[data-app="html"] .css-file-add{ flex-shrink:0; width:2rem; height:2rem; margin:.2rem; font-size:1.5rem; }
+body[data-app="html"] .css-file-close:hover, body[data-app="html"] .css-file-add:hover{ background:var(--surface-2); }
+body[data-app="html"] .css-file-close:focus-visible, body[data-app="html"] .css-file-add:focus-visible{ outline:2px solid var(--project-accent); outline-offset:-2px; }
+body[data-app="html"] #closedCssFileList{ max-height:14rem; overflow-y:auto; }
+body[data-app="html"] #closedCssFileList .dropdown-item{ max-width:20rem; overflow:hidden; text-overflow:ellipsis; }
+body[data-app="html"] #fileTabContentCss{ flex:0 1 13rem; min-height:6rem; overflow:hidden; border-bottom:1px solid var(--border); }
+body[data-app="html"] #fileTabContentCss .tab-pane.active{ display:flex; min-height:0; }
+body[data-app="html"] .css-text-file{ display:block; box-sizing:border-box; flex:1; min-height:0; width:100%; height:100%; padding:.75rem; color:var(--text-main); caret-color:var(--text-main); background:var(--surface-3); border:0; font-family:var(--font-mono, monospace); resize:none; overflow:auto; }
+body[data-app="html"] .right, body[data-app="html"] #fileTabsCss, body[data-app="html"] .css-text-file{ scrollbar-width:none; }
+body[data-app="html"] .right::-webkit-scrollbar, body[data-app="html"] #fileTabsCss::-webkit-scrollbar, body[data-app="html"] .css-text-file::-webkit-scrollbar{ width:0; height:0; }
+body[data-app="html"] .css-text-file:focus{ outline:2px solid var(--border); outline-offset:-2px; }
+body[data-app="html"] .preview-wrap{ display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden; }
+body[data-app="html"] #preview{ flex:1; min-height:8rem; width:100%; border:0; background:white; }
+body[data-app="html"] #fileTabContentCss .tab-pane.active{ height:100%; }
+body[data-app="html"] #fileTabsCss [hidden]{ display:none; }
+@media(max-width:768px){ body[data-app="html"] .preview-wrap{ min-height:30rem; } }
+
+/* Shared project controls for Markdown and SQL. */
+body:is([data-app="markdown"], [data-app="sql"]) #projectMenu span{ display:inline !important; }
+body:is([data-app="markdown"], [data-app="sql"]) #projectMenu{ --bs-btn-color:var(--project-accent); --bs-btn-border-color:var(--project-accent); --bs-btn-hover-bg:var(--project-hover); --bs-btn-hover-color:#fff; --bs-btn-hover-border-color:var(--project-hover); --bs-btn-active-bg:var(--project-hover); --bs-btn-active-color:#fff; --bs-btn-active-border-color:var(--project-hover); }
+body:is([data-app="markdown"], [data-app="sql"]) .right > .toolbar{ flex-shrink:0; flex-wrap:wrap; }

@@ -10,13 +10,13 @@
   <link rel="icon" href="../../assets/images/grid.ico" sizes="any">
   <meta name="theme-color" content="#0b1220">
 
-	<script src="../../assets/js/app.js"></script>
+	<script src="../../assets/js/app.js?v=20261111-projects"></script>
 	<script src="../../assets/js/dist/jszip@3.10.1/jszip_min.js"></script>
 
 	<!-- Bootstrap & Icons -->
 	<link rel="stylesheet" href="../../assets/css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css">
 	<link rel="stylesheet" href="../../assets/css/dist/bootstrap@5.3.8/bootstrap_min.css">
-	<link rel="stylesheet" href="../../assets/css/app.css">
+	<link rel="stylesheet" href="../../assets/css/app.css?v=20261111-projects">
 	<style>
 		#fileTabContentCss,
 		#fileTabContentCss .tab-pane,
@@ -85,9 +85,10 @@
         <span data-i18n="htmlCssTitle"></span>
         <span id="dirtyDot" class="ms-2" style="display:none;color:#ff4507;">●</span>
       </span>
-      <span id="fileBadge" class="badge rounded-pill text-bg-info ms-2 d-none">
-        <span id="fileBadgeName">—</span>
-      </span>
+      <div class="document-controls">
+        <div id="documentBadges" role="tablist" aria-label="Documents"></div>
+        <button id="addDocument" class="document-add" type="button" aria-label="Nouveau document">+</button>
+      </div>
       <div class="d-flex gap-2">
         <button class="btn btn-sm border-0 btn-outline-info" data-bs-toggle="modal" data-bs-target="#featuresModal">
           <i class="bi bi-info-circle me-1"></i>
@@ -173,7 +174,7 @@
             <span class="d-none d-sm-inline" data-i18n="preview"></span>
           </button>
         </div>
-        <div class="editor-wrap">
+        <div class="editor-wrap" id="documentEditorPanel" role="tabpanel">
           <div id="gutter" class="gutter"><div>1</div></div>
           <!-- Code cell: overlay + textarea -->
           <div class="codecell">
@@ -194,16 +195,38 @@
           <button id="clear" class="btn btn-sm btn-outline-light">
             <i class="bi bi-eraser me-1"></i><span data-i18n="clear"></span>
           </button>
+          <div class="btn-group">
+            <button id="projectMenu" class="btn btn-sm btn-project dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-folder2-open me-1"></i><span data-i18n="pyProject"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+              <li><button id="newCssFile" class="dropdown-item" data-i18n="cssNewFile"></button></li>
+              <li><button id="importCssFiles" class="dropdown-item" data-i18n="cssImportFiles"></button></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><button id="exportCssFile" class="dropdown-item" data-i18n="pyExportFile"></button></li>
+              <li><button id="exportHtmlProject" class="dropdown-item" data-i18n="pyExportProject"></button></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><button id="deleteCssFile" class="dropdown-item" data-i18n="pyDeleteFile"></button></li>
+              <li id="closedCssFiles" hidden>
+                <hr class="dropdown-divider">
+                <h6 class="dropdown-header" data-i18n="pyClosedFiles"></h6>
+                <ul id="closedCssFileList" class="list-unstyled mb-0"></ul>
+              </li>
+            </ul>
+          </div>
 		<button id="btnHelp" class="btn btn-sm btn-outline-light"
 				type="button" data-bs-toggle="offcanvas" data-bs-target="#sidePanel" aria-controls="sidePanel">
 			<i class="bi bi-stickies me-1"></i><span data-i18n="help"></span>
 		</button>
         </div>
         <div class="preview-wrap">
-          <!-- Onglets CSS (seulement si <link rel="stylesheet"> détecté) -->
-          <ul class="nav nav-tabs d-none" id="fileTabsCss"></ul>
-          <div class="tab-content flex-grow-1" id="fileTabContentCss"></div>
-          <!-- sandbox vide = pas de JS exécuté -->
+          <p id="filesStatus" class="small px-3 mb-0" role="status"></p>
+          <div id="cssFileTabs" class="css-file-tabs d-none">
+            <ul class="nav nav-tabs" id="fileTabsCss" role="tablist" aria-label="CSS"></ul>
+            <button id="addCssFile" class="css-file-add" type="button" aria-label="Nouveau fichier CSS">+</button>
+          </div>
+          <div class="tab-content d-none" id="fileTabContentCss"></div>
+          <!-- Le résultat reste isolé dans son iframe. -->
           <iframe id="preview" sandbox="allow-scripts"></iframe>
         </div>
 		<div class="hint">
@@ -267,18 +290,19 @@
 				</ul>
 			  </li>
 			  <li><strong>Gestion des paires</strong> : parenthèses, guillemets et chevrons <code>&lt; &gt;</code> fermés automatiquement</li>
+			  <li><strong>Trois documents au maximum</strong> : cliquez sur leur nom en haut pour changer de document. Le document actif est vert ; le bouton + crée un document et disparaît à trois. Fichier, Partager et Réinitialiser concernent le document actif. Projet télécharge tous les documents ouverts et les CSS communs.</li>
 			  <li><strong>Sauvegarde locale</strong> : code, position du curseur et défilement mémorisés.</li>
 			  <li><strong>Chargement et enregistrement</strong>
 				<ul>
-				  <li>Ouvrir un fichier local (<code>.html</code>, <code>.css</code>)</li>
+				  <li>Ouvrir un fichier HTML ou un projet ZIP contenant le HTML et ses CSS</li>
 				  <li>Enregistrer ou télécharger avec nom auto-généré (<code>Prénom_Thème-ObjetTPxx_YYYYMMDD.html</code>)</li>
 				</ul>
 			  </li>
 				<li><strong>Gestion des fichiers CSS virtuels</strong>
 					<ul>
-						<li>Un <code>&lt;link rel="stylesheet" href="abc.css"&gt;</code> dans le code crée automatiquement un onglet <em>abc.css</em> dans la zone Aperçu</li>
-						<li>Le contenu de cet onglet CSS peut être modifié directement.</li>
-						<li>Lors de l’aperçu, le code CSS est injecté dans la page en lieu et place du fichier externe (virtualisation du fichier)</li>
+						<li>Créer ou importer les CSS avec le menu <strong>Projet</strong>. La balise <code>&lt;link&gt;</code> correspondante est ajoutée si nécessaire.</li>
+						<li>Les documents HTML partagent les CSS affichés à droite ; changer de document conserve les onglets ouverts. Le bouton + apparaît après la création ou l’import d’un fichier.</li>
+						<li>La croix × ferme l’onglet sans supprimer le CSS : il reste appliqué et inclus dans le ZIP. <strong>Projet → Fichiers fermés</strong> permet de le rouvrir.</li>
 					</ul>
 				</li>
 			  <li><strong>Partage rapide</strong> : génération d’un lien (URL encodée en Base64)</li>
@@ -286,7 +310,7 @@
 				<ul>
 				  <li>Rendu de la page dans une iframe sécurisée (sandbox)</li>
 				  <li>Images locales chargées en une fois depuis le dossier du projet et adaptées à la largeur de l’aperçu</li>
-				  <li>Si seul du CSS est saisi, il est automatiquement appliqué à un modèle HTML de test</li>
+				  <li>Les CSS liés à la page sont appliqués lors du clic sur Aperçu, même si leurs onglets sont fermés.</li>
 				</ul>
 			  </li>
 			  <li><strong>Raccourcis pratiques</strong> : <kbd>F9</kbd> = afficher l’aperçu</li>
@@ -300,11 +324,14 @@
   </div>
   
 	<!-- Logic -->
-	<script src="../../assets/js/html.js"></script>
+	<script src="../../assets/js/workshop-project.js?v=20261111-projects"></script>
+	<script src="../../assets/js/workshop-documents.js?v=20261111-projects"></script>
+	<script src="../../assets/js/html-css-files.js?v=20261111-projects"></script>
+	<script src="../../assets/js/html.js?v=20261111-projects"></script>
 
 	<!-- Bootstrap JS (modal) -->
 	<script src="../../assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
-	<script src="../../assets/js/dico.js"></script>
+	<script src="../../assets/js/dico.js?v=20261111-projects"></script>
 	<script src="../../assets/js/theme.js"></script>
 	<script>
 		Theme.init({ canWrite:false });  // applique + suit, sans changer localStorage
@@ -313,7 +340,7 @@
 			const params = new URLSearchParams(window.location.search);
 			if (params.has("light")) {
 				document.body.classList.add("l-mode");
-				document.querySelector("nav.navbar")?.remove();
+				document.querySelector("nav.navbar")?.classList.add("d-none");
 				document.querySelector(".hint")?.remove();
 				document.querySelector("main.workbench")?.classList.add("no-topbar");
 
@@ -442,26 +469,6 @@
 			ta.classList.remove('dragover');
 		  });
 
-		  ta.addEventListener('drop', e => {
-			e.preventDefault();
-			ta.classList.remove('dragover');
-
-			const file = e.dataTransfer.files[0];
-			if (!file) return;
-
-			const reader = new FileReader();
-			reader.onload = () => {
-			  ta.value = reader.result;
-			  ta.dispatchEvent(new Event('input'));   // met à jour numéro + highlight
-			  if (window.syncHighlight) window.syncHighlight();
-			  try { localStorage.setItem('html_editor_code_v1', ta.value); } catch(_) {}
-
-			  // Met à jour le "dirty state" et le badge
-			  window._htmlDirty?.setJustLoaded();
-			  window.EditorFS?.clear();
-			};
-			reader.readAsText(file);
-		  });
   
 		  // init + mise à jour
 		  updateCursorPos();

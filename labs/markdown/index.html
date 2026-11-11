@@ -13,9 +13,9 @@
 	<!-- Bootstrap & Icons -->
 	<link rel="stylesheet" href="../../assets/css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css">
 	<link rel="stylesheet" href="../../assets/css/dist/bootstrap@5.3.8/bootstrap_min.css">
-	<link rel="stylesheet" href="../../assets/css/app.css">
+	<link rel="stylesheet" href="../../assets/css/app.css?v=20261111-projects">
 
-	<script src="../../assets/js/app.js"></script>
+	<script src="../../assets/js/app.js?v=20261111-projects"></script>
 	<script src="../../assets/js/dist/html2pdf@0.10.1/html2pdf-bundle_min.js"></script>
 	<!-- Markdown + code highlight -->
 	<script src="../../assets/js/dist/marked@16.2.1/marked_umd.js"></script>
@@ -173,6 +173,10 @@
         <span data-i18n="mdEditorTitle"></span>
         <span id="dirtyDot" class="ms-2" style="display:none;color:#ff4507;">●</span>
       </span>
+      <div class="document-controls">
+        <div id="documentBadges" role="tablist" aria-label="Documents"></div>
+        <button id="addDocument" class="document-add" type="button" aria-label="Nouveau document">+</button>
+      </div>
       <div class="d-flex gap-2">
         <button class="btn btn-sm border-0 btn-outline-info" data-bs-toggle="modal" data-bs-target="#featuresModal">
           <i class="bi bi-info-circle me-1"></i>
@@ -266,7 +270,7 @@
           </button>
         </div>
 
-        <div class="editor-wrap">
+        <div class="editor-wrap" id="documentEditorPanel" role="tabpanel">
           <div id="gutter" class="gutter"><div>1</div></div>
           <div class="codecell">
             <pre id="highlighting" aria-hidden="true"></pre>
@@ -283,6 +287,16 @@
       <section class="pane right d-flex flex-column">
         <div class="toolbar">
           <div class="fw-semibold" data-i18n="preview"></div>
+          <div class="spacer"></div>
+          <div class="btn-group">
+            <button id="projectMenu" class="btn btn-sm btn-project dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-folder2-open me-1"></i><span data-i18n="pyProject"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+              <li><button id="exportProject" class="dropdown-item" data-i18n="pyExportProject"></button></li>
+            </ul>
+          </div>
+
         </div>
         <div id="preview" class="preview"></div>
 		<div class="hint">
@@ -342,6 +356,7 @@
 			  </li>
 			  <li><strong>Snippets avec autocomplétion</strong> : titres, tableaux, citations, blocs de code, etc.</li>
 			  <li><strong>Aperçu en direct</strong> via <code>marked.js</code> + coloration syntaxique (<code>highlight.js</code>).</li>
+			  <li><strong>Trois documents au maximum</strong> : cliquez sur leur nom en haut pour changer de document. Le document actif est vert ; le bouton + crée un document et disparaît à trois. Fichier, Partager et Réinitialiser concernent le document actif.</li>
 			  <li><strong>Sauvegarde locale</strong> : texte, position du curseur et défilement mémorisés.</li>
 			  <li><strong>Documents longs</strong> : défilement interne visible; clic sur un numéro pour atteindre la ligne, double-clic pour la sélectionner.</li>
 			  <li><strong>Export et impression</strong> :
@@ -363,11 +378,14 @@
   </div>
 
 	<!-- Logic -->
-	<script src="../../assets/js/markdown.js?v=20261111-highlight"></script>
+	<script src="../../assets/js/dist/jszip@3.10.1/jszip_min.js"></script>
+	<script src="../../assets/js/workshop-project.js?v=20261111-projects"></script>
+	<script src="../../assets/js/workshop-documents.js?v=20261111-projects"></script>
+	<script src="../../assets/js/markdown.js?v=20261111-projects"></script>
 
 	<!-- Bootstrap JS -->
 	<script src="../../assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
-	<script src="../../assets/js/dico.js"></script>
+	<script src="../../assets/js/dico.js?v=20261111-projects"></script>
 	<script src="../../assets/js/theme.js"></script>
 	<script>
 	  Theme.init({ canWrite:false });  // applique + suit, sans changer localStorage
