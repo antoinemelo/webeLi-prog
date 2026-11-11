@@ -1,0 +1,319 @@
+{
+  "status": "published_and_verified",
+  "base_url": "https://webe.li/tec/",
+  "source_commit": "ccf0f813f25b5e2ee9395e2c2007d9ab9e68866c",
+  "branch": "agent/harden-and-document",
+  "published_at": "2026-11-11T20:28:54.456108+00:00",
+  "verified_at": "2026-11-11T20:31:23.716878+00:00",
+  "backup_directory": ".publication-backups/projects-20261111T202226Z",
+  "published_files": [
+    {
+      "path": "assets/js/workshop-project.js",
+      "sha256_before": null,
+      "sha256_after": "7f0e312c539ad5d8fcda3e364d05e6036ffa92c4d138dcb564b957a68b49f023",
+      "verified": true
+    },
+    {
+      "path": "assets/js/workshop-documents.js",
+      "sha256_before": null,
+      "sha256_after": "84af9a1e8936c5a9daa3bcb7983e222180d6e907d471f27ce4915656e04626fa",
+      "verified": true
+    },
+    {
+      "path": "assets/js/html-css-files.js",
+      "sha256_before": null,
+      "sha256_after": "ea45a46d6a419e0617c44d785698fb08cf978f0b7c727d953f77b1430294064f",
+      "verified": true
+    },
+    {
+      "path": "assets/js/python-scripts.js",
+      "sha256_before": null,
+      "sha256_after": "d4282c2f1e5d5e507aef191b8398b69278496c00b22bad8b7660ac563331ce3b",
+      "verified": true
+    },
+    {
+      "path": "assets/css/app.css",
+      "sha256_before": "43723661b8b1abfe3247ddc9836a2412322d2aa6a485c22ce6d7eac4cc7eb5ad",
+      "sha256_after": "b316bf0fcb49ecafee15faabbbef4769f83b3c6e8166ff38f2650dbfd4fa68f7",
+      "verified": true
+    },
+    {
+      "path": "assets/js/app.js",
+      "sha256_before": "ee2e3c5ba2a40be13a162c4965f748be1b4c5f52605b1c6082de62bea1bdde8a",
+      "sha256_after": "07feb21bd377be1e094a1c1ea59109e57fa6f7045edd5d3a3b8fec2df9c7eb5c",
+      "verified": true
+    },
+    {
+      "path": "assets/js/dico.js",
+      "sha256_before": "0da3a0cd1dd137099376ec1a5f5c98775a06b99d7415b5795d401d7bf911151b",
+      "sha256_after": "b3a9481d028d8ee4bfc64bf468b0cf2bcc4658d638ec73e7e1a458739732d7d7",
+      "verified": true
+    },
+    {
+      "path": "assets/js/html.js",
+      "sha256_before": "ded85c29ac25fec4351d62045836c8bc96593da5f240e9ece3ba666f91c8c1f6",
+      "sha256_after": "7de1cfb6e3414a237f36e532ac836b06a5d9211319884836d4610dc2ee9f81b3",
+      "verified": true
+    },
+    {
+      "path": "assets/js/markdown.js",
+      "sha256_before": "2892d66865a5313f9704b2a53a7f65acddbe0aaecbea3b0f24ff8c5b90cc6cc2",
+      "sha256_after": "9312d9d1d17612aeffdc44fd623241b80c0de5deedebea23f5b4408648bc8bcb",
+      "verified": true
+    },
+    {
+      "path": "assets/js/python-execution.js",
+      "sha256_before": "559e6cd88ceb130dbfd958f2bb7910c463d51e2757e9f10ef659fd05fa2f6c63",
+      "sha256_after": "5293e7ef088f0d5132f18d6bbe09ff8d42a3c3fccfbb1266a4c32943cf87c1c1",
+      "verified": true
+    },
+    {
+      "path": "assets/js/python-files.js",
+      "sha256_before": "1c178f0a017f5ee401f62fa76da54f8c143885ec6d60d2ffdc24aaf384fe13c8",
+      "sha256_after": "26e7e03b16505351d05aafa6410ac3749c6c0d3c6db082fa24c5261582dbfbfa",
+      "verified": true
+    },
+    {
+      "path": "assets/js/python.js",
+      "sha256_before": "a64d6582fc5bcdffe4cda8a52fbac0608182336ecd3354389db213b9e0020466",
+      "sha256_after": "c5a6379900582dcc5b187ce18cf9835177cf979a5bd15fc9d576fc8dbc973411",
+      "verified": true
+    },
+    {
+      "path": "assets/js/sql.js",
+      "sha256_before": "c20db4bc0e29adc68877caef67e685f893460eafcac37ad240bb17c46694e3fb",
+      "sha256_after": "63f655daf34669be78e3353c7610636de7d83944fb5c1628599d2346e8902f8c",
+      "verified": true
+    },
+    {
+      "path": "labs/python/worker.js",
+      "sha256_before": "734d5c62fdab602d3ec74d4025e82567ebea91b73362bce432c3f80e2d06f18f",
+      "sha256_after": "d0621c3b52933dade0b79e8d9482b9eca4960c32e4d843b31edd5e5f0761ad42",
+      "verified": true
+    },
+    {
+      "path": "labs/html/index.html",
+      "sha256_before": "486cb3a9e46da1183249231c71484032d6c66ae067ab4954526e4524078103f1",
+      "sha256_after": "abb3c21a50660e92b0d5c60c05b82f342306d533c1c4910e8b5871c895ced969",
+      "verified": true
+    },
+    {
+      "path": "labs/markdown/index.html",
+      "sha256_before": "720afa7379bc01e085c28cc2d72d20b90e4614cea254dfb6264cfce6257c099d",
+      "sha256_after": "bc739795d40c4c6af51cd1e8308a344f24f302d5ff8f5c66041121b0275abab2",
+      "verified": true
+    },
+    {
+      "path": "labs/python/index.html",
+      "sha256_before": "0b0179b6aa4a4ec6e458723ca4216688863496a51bbd4351953386272fdc5ee8",
+      "sha256_after": "598ccd696835549f0e6d72a5b0d76f706e241bbc66570dfeac69e2c78181e357",
+      "verified": true
+    },
+    {
+      "path": "labs/sql/index.html",
+      "sha256_before": "caa3c3d04946af174dda8f8d9311cb67da2845757db400cf095d9b5108ec74e4",
+      "sha256_after": "c5f0db49badd1fc1e93a0cb66fd8bb9a6cbc6a41b546ea6976f0528068ab25b8",
+      "verified": true
+    }
+  ],
+  "http_verification": {
+    "checked_at": "2026-11-11T20:30:15.119966+00:00",
+    "base_url": "https://webe.li/tec/",
+    "files": [
+      {
+        "path": "assets/js/workshop-project.js",
+        "status": 200,
+        "sha256": "7f0e312c539ad5d8fcda3e364d05e6036ffa92c4d138dcb564b957a68b49f023",
+        "verified": true
+      },
+      {
+        "path": "assets/js/workshop-documents.js",
+        "status": 200,
+        "sha256": "84af9a1e8936c5a9daa3bcb7983e222180d6e907d471f27ce4915656e04626fa",
+        "verified": true
+      },
+      {
+        "path": "assets/js/html-css-files.js",
+        "status": 200,
+        "sha256": "ea45a46d6a419e0617c44d785698fb08cf978f0b7c727d953f77b1430294064f",
+        "verified": true
+      },
+      {
+        "path": "assets/js/python-scripts.js",
+        "status": 200,
+        "sha256": "d4282c2f1e5d5e507aef191b8398b69278496c00b22bad8b7660ac563331ce3b",
+        "verified": true
+      },
+      {
+        "path": "assets/css/app.css",
+        "status": 200,
+        "sha256": "b316bf0fcb49ecafee15faabbbef4769f83b3c6e8166ff38f2650dbfd4fa68f7",
+        "verified": true
+      },
+      {
+        "path": "assets/js/app.js",
+        "status": 200,
+        "sha256": "07feb21bd377be1e094a1c1ea59109e57fa6f7045edd5d3a3b8fec2df9c7eb5c",
+        "verified": true
+      },
+      {
+        "path": "assets/js/dico.js",
+        "status": 200,
+        "sha256": "b3a9481d028d8ee4bfc64bf468b0cf2bcc4658d638ec73e7e1a458739732d7d7",
+        "verified": true
+      },
+      {
+        "path": "assets/js/html.js",
+        "status": 200,
+        "sha256": "7de1cfb6e3414a237f36e532ac836b06a5d9211319884836d4610dc2ee9f81b3",
+        "verified": true
+      },
+      {
+        "path": "assets/js/markdown.js",
+        "status": 200,
+        "sha256": "9312d9d1d17612aeffdc44fd623241b80c0de5deedebea23f5b4408648bc8bcb",
+        "verified": true
+      },
+      {
+        "path": "assets/js/python-execution.js",
+        "status": 200,
+        "sha256": "5293e7ef088f0d5132f18d6bbe09ff8d42a3c3fccfbb1266a4c32943cf87c1c1",
+        "verified": true
+      },
+      {
+        "path": "assets/js/python-files.js",
+        "status": 200,
+        "sha256": "26e7e03b16505351d05aafa6410ac3749c6c0d3c6db082fa24c5261582dbfbfa",
+        "verified": true
+      },
+      {
+        "path": "assets/js/python.js",
+        "status": 200,
+        "sha256": "c5a6379900582dcc5b187ce18cf9835177cf979a5bd15fc9d576fc8dbc973411",
+        "verified": true
+      },
+      {
+        "path": "assets/js/sql.js",
+        "status": 200,
+        "sha256": "63f655daf34669be78e3353c7610636de7d83944fb5c1628599d2346e8902f8c",
+        "verified": true
+      },
+      {
+        "path": "labs/python/worker.js",
+        "status": 200,
+        "sha256": "d0621c3b52933dade0b79e8d9482b9eca4960c32e4d843b31edd5e5f0761ad42",
+        "verified": true
+      },
+      {
+        "path": "labs/html/index.html",
+        "status": 200,
+        "sha256": "abb3c21a50660e92b0d5c60c05b82f342306d533c1c4910e8b5871c895ced969",
+        "verified": true
+      },
+      {
+        "path": "labs/markdown/index.html",
+        "status": 200,
+        "sha256": "bc739795d40c4c6af51cd1e8308a344f24f302d5ff8f5c66041121b0275abab2",
+        "verified": true
+      },
+      {
+        "path": "labs/python/index.html",
+        "status": 200,
+        "sha256": "598ccd696835549f0e6d72a5b0d76f706e241bbc66570dfeac69e2c78181e357",
+        "verified": true
+      },
+      {
+        "path": "labs/sql/index.html",
+        "status": 200,
+        "sha256": "c5f0db49badd1fc1e93a0cb66fd8bb9a6cbc6a41b546ea6976f0528068ab25b8",
+        "verified": true
+      }
+    ],
+    "isolation_headers": [
+      {
+        "path": "labs/python/",
+        "coop": "same-origin",
+        "coep": "require-corp"
+      },
+      {
+        "path": "assets/aide/",
+        "coop": "same-origin",
+        "coep": "require-corp"
+      }
+    ]
+  },
+  "static_validation": {
+    "exit_code": 0
+  },
+  "unit_tests": {
+    "passed": 46,
+    "exit_code": 0
+  },
+  "browser_checks": [
+    {
+      "name": "projects",
+      "exit_code": 0,
+      "log": [
+        "OK HTML: shared CSS tabs, old storage migration with conflicting names, reset/reload, three HTML files and all CSS in ZIP.",
+        "OK Markdown: all three documents, duplicate names, unsaved edits, consistent ZIP snapshot.",
+        "OK Python: three scripts, all data files including closed tabs, no collisions with script names.",
+        "OK SQL: migration, three scripts, independent undo/caret, shared database/results, reset/reload/errors, script and SQLite import/export, valid project ZIP."
+      ]
+    },
+    {
+      "name": "python",
+      "exit_code": 0,
+      "log": [
+        "OK: Ctrl+S saves the current script; F12 chooses a new handle; cancellation preserves it.",
+        "OK: warm executions (median 7 ms), fresh globals and recovery after syntax errors.",
+        "OK: Escape interrupts from either editor, before Stop appears and with autocomplete open.",
+        "OK: infinite loop stays off the UI thread; delayed manual stop and restart.",
+        "OK: an already-open Python file sees edits made during execution.",
+        "OK: bounded console, retained writes, input, exceptions, append and readlines.",
+        "OK: Turtle, reload persistence, purple Project menu and red Stop on mobile.",
+        "OK: Ctrl+S and F12 download the script when direct saving is unavailable.",
+        "OK: plus, tab closing/reopening, retained contents and ZIP, reload, deletion and mobile controls."
+      ]
+    },
+    {
+      "name": "markdown",
+      "exit_code": 0,
+      "log": [
+        "OK: Python, JavaScript, SQL, HTML and automatic highlighting; unknown languages remain escaped text.",
+        "OK: code colors follow the light and dark themes.",
+        "OK: reload persistence and HTML export preserve code without executing it.",
+        "OK: plain-code fallback when highlighting is unavailable; no JavaScript errors."
+      ]
+    },
+    {
+      "name": "general",
+      "exit_code": 0,
+      "log": [
+        "OK: Accueil publié",
+        "OK: Exécution HTML",
+        "OK: Exécution JavaScript",
+        "OK: Rendu Markdown et restauration après rechargement",
+        "OK: SQL : exécution, export et réimport de la base",
+        "OK: Ouverture de la dactylographie",
+        "OK: Lexique Python intégré et isolation du navigateur",
+        "OK: Aucune erreur JavaScript ni réponse HTTP en échec"
+      ]
+    }
+  ],
+  "general_browser_checks": {
+    "checked_at": "2026-11-11T20:31:13.457Z",
+    "checks": [
+      "Accueil publié",
+      "Exécution HTML",
+      "Exécution JavaScript",
+      "Rendu Markdown et restauration après rechargement",
+      "SQL : exécution, export et réimport de la base",
+      "Ouverture de la dactylographie",
+      "Lexique Python intégré et isolation du navigateur",
+      "Aucune erreur JavaScript ni réponse HTTP en échec"
+    ],
+    "errors": [],
+    "failed": []
+  },
+  "scope": "Fichiers des ateliers uniquement ; aucune base SQLite, donnée partagée ou configuration d’hébergement remplacée."
+}

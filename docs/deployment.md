@@ -239,7 +239,7 @@ sans la bibliothèque de coloration. Le contrôle général des ateliers passe
 Le [rapport du correctif](markdown-correction-2026-11-11.json) conserve les résultats,
 les empreintes des fichiers publiés et la référence de sauvegarde.
 
-## Projets et scripts multiples (version de travail)
+## Projets et scripts multiples publiés le 11 novembre 2026
 
 Pour transférer cette évolution avec le dossier `dev`, inclure :
 
@@ -278,3 +278,15 @@ communs, la migration des anciennes sessions, les imports/exports ZIP, les image
 les contenus des quatre archives et la réouverture de la base SQLite exportée.
 Les sélecteurs natifs sont simulés dans un profil séparé ; les imports et
 les téléchargements HTTP utilisent les véritables contrôles du navigateur.
+
+La publication a été effectuée depuis le commit `ccf0f81` sur la branche
+`agent/harden-and-document`. Les 18 fichiers ont été transférés par FTPS après
+sauvegarde des anciennes versions, puis relus et comparés par empreinte SHA-256.
+La vérification HTTPS confirme les 18 fichiers et les en-têtes d'isolation de
+Python et de son lexique. Les tests en ligne des projets HTML, Markdown, Python
+et SQL, les ZIP complets, les entrées/sorties Python et Turtle, la coloration
+Markdown et le contrôle général du site passent. Les bases SQLite existantes
+et les données de partage n'ont pas été remplacées.
+
+Le [rapport de publication](projects-publication-2026-11-11.json) conserve les
+empreintes, la référence de sauvegarde et les résultats de validation.
