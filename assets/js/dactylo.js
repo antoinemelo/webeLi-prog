@@ -408,7 +408,7 @@ async function onExerciseCardClick(ex) {
 
   // Charger texte
   if (!currentExercise.text) {
-    const res = await fetch("/assets/js/exercices/" + currentExercise.file);
+    const res = await fetch("../../assets/js/exercices/" + currentExercise.file);
     currentExercise.text = await res.text();
   }
 

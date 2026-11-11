@@ -1,0 +1,86 @@
+{
+  "status": "resolved_and_published",
+  "verified_at": "2026-11-11T04:00:20.861661+00:00",
+  "url": "https://webe.li/tec/labs/markdown/",
+  "issue": "CommonJS highlight.js provoquait require is not defined ; Marked 16 ignorait l’ancienne option highlight.",
+  "fix": "Distribution navigateur 11.11.1, renderer.code, synchronisation des palettes claire et sombre, référence de cache du script actualisée.",
+  "official_sources": [
+    "https://raw.githubusercontent.com/highlightjs/cdn-release/11.11.1/build/highlight.min.js",
+    "https://raw.githubusercontent.com/highlightjs/cdn-release/11.11.1/build/styles/github.min.css",
+    "https://raw.githubusercontent.com/highlightjs/highlight.js/11.11.1/LICENSE"
+  ],
+  "backup_directory": ".publication-backups/markdown-20261111T035900Z",
+  "published_files": [
+    {
+      "path": "assets/js/dist/highlight@11.11.1/LICENSE",
+      "sha256_before": null,
+      "sha256_after": "6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490",
+      "verified": true
+    },
+    {
+      "path": "assets/js/dist/highlight@11.11.1/highlight_min.js",
+      "sha256_before": null,
+      "sha256_after": "c4a399dd6f488bc97a3546e3476747b3e714c99c57b9473154c6fb8d259b9381",
+      "verified": true
+    },
+    {
+      "path": "assets/css/dist/highlight@11.11.1/github_min.css",
+      "sha256_before": null,
+      "sha256_after": "3a9a5def8b9c311e5ae43abde85c63133185eed4f0d9f67fea4b00a8308cf066",
+      "verified": true
+    },
+    {
+      "path": "assets/js/markdown.js",
+      "sha256_before": "13451107b3b9215f79caa037ea93d795ccd25903d80ab8f0f52b2c08112e173e",
+      "sha256_after": "2892d66865a5313f9704b2a53a7f65acddbe0aaecbea3b0f24ff8c5b90cc6cc2",
+      "verified": true
+    },
+    {
+      "path": "labs/markdown/index.html",
+      "sha256_before": "5b0981d2f22a7a969f4f70fb01a8e630d5e0d6150b65b4269fea322dd13255f2",
+      "sha256_after": "720afa7379bc01e085c28cc2d72d20b90e4614cea254dfb6264cfce6257c099d",
+      "verified": true
+    }
+  ],
+  "static_validation": {
+    "exit_code": 0
+  },
+  "unit_tests": {
+    "passed": 38,
+    "exit_code": 0
+  },
+  "markdown_browser_local": {
+    "exit_code": 0,
+    "log": [
+      "OK: Python, JavaScript, SQL, HTML and automatic highlighting; unknown languages remain escaped text.",
+      "OK: code colors follow the light and dark themes.",
+      "OK: reload persistence and HTML export preserve code without executing it.",
+      "OK: plain-code fallback when highlighting is unavailable; no JavaScript errors."
+    ]
+  },
+  "markdown_browser_production": {
+    "exit_code": 0,
+    "log": [
+      "OK: Python, JavaScript, SQL, HTML and automatic highlighting; unknown languages remain escaped text.",
+      "OK: code colors follow the light and dark themes.",
+      "OK: reload persistence and HTML export preserve code without executing it.",
+      "OK: plain-code fallback when highlighting is unavailable; no JavaScript errors."
+    ]
+  },
+  "general_browser_production": {
+    "exit_code": 0,
+    "checked_at": "2026-11-11T03:59:36.641Z",
+    "checks": [
+      "Accueil publié",
+      "Exécution HTML",
+      "Exécution JavaScript",
+      "Rendu Markdown et restauration après rechargement",
+      "SQL : exécution, export et réimport de la base",
+      "Ouverture de la dactylographie",
+      "Lexique Python intégré et isolation du navigateur",
+      "Aucune erreur JavaScript ni réponse HTTP en échec"
+    ],
+    "errors": [],
+    "failed": []
+  }
+}

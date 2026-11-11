@@ -86,9 +86,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const isMac = navigator.platform.toUpperCase().includes("MAC");
 
   document.querySelectorAll("textarea.codearea").forEach(textarea => {
-    const history = [textarea.value];
+    let history = [textarea.value];
     let index = 0;
     let isApplying = false;
+
+    // Editors with several documents can keep undo/redo scoped to each one.
+    textarea.editorHistory = {
+      capture: () => ({entries: history.slice(), index}),
+      restore(state) {
+        history = state?.entries?.length ? state.entries.slice() : [textarea.value];
+        index = state ? Math.max(0, Math.min(state.index, history.length - 1)) : 0;
+      }
+    };
 
     function snapshot() {
       if (isApplying) return;
@@ -165,6 +174,67 @@ document.addEventListener("DOMContentLoaded", () => {
           toolbar.insertBefore(btnRedo, toolbar.firstChild);
         }
       }
+    }
+
+    // Navigation précise dans les documents longs : un clic sur un numéro
+    // place le caret au début de la ligne, un double-clic sélectionne la ligne.
+    const gutter = textarea.closest(".editor-wrap")?.querySelector(".gutter");
+    if (gutter) {
+      gutter.title = "Cliquer pour atteindre la ligne; double-cliquer pour la sélectionner";
+      gutter.setAttribute("aria-label", "Numéros de ligne cliquables");
+      gutter.addEventListener("mousedown", event => {
+        if (event.button !== 0) return;
+        const marker = event.target.closest("[data-line]");
+        if (!marker || !gutter.contains(marker)) return;
+
+        const requestedLine = Number.parseInt(marker.dataset.line || "", 10);
+        if (!Number.isInteger(requestedLine) || requestedLine < 1) return;
+
+        event.preventDefault();
+        const lines = textarea.value.split("\n");
+        const line = Math.min(requestedLine, lines.length);
+        let start = 0;
+        for (let index = 1; index < line; index++) start += lines[index - 1].length + 1;
+        const end = start + lines[line - 1].replace(/\r$/, "").length;
+
+        textarea.focus({preventScroll: true});
+        textarea.setSelectionRange(start, event.detail >= 2 ? end : start);
+        textarea.dispatchEvent(new Event("select", {bubbles: true}));
+      });
+    }
+  });
+
+  window.addEventListener("message", event => {
+    if (!event.data || event.data.action !== "insertGlossaryCode") return;
+
+    const helpFrame = Array.from(document.querySelectorAll("#helpFrame, #helpFrameMobile"))
+      .find(frame => frame.contentWindow === event.source);
+    if (!helpFrame) return;
+
+    const textarea = document.querySelector("textarea.codearea");
+    const code = typeof event.data.code === "string" ? event.data.code : "";
+    if (!textarea || !code) return;
+
+    const start = Number.isInteger(textarea.selectionStart)
+      ? textarea.selectionStart
+      : textarea.value.length;
+    const end = Number.isInteger(textarea.selectionEnd)
+      ? textarea.selectionEnd
+      : start;
+
+    textarea.setRangeText(code, start, end, "end");
+    textarea.dispatchEvent(new Event("input", {bubbles:true}));
+
+    const panel = helpFrame.closest(".offcanvas");
+    const offcanvas = panel && window.bootstrap
+      ? bootstrap.Offcanvas.getOrCreateInstance(panel)
+      : null;
+
+    if (offcanvas) {
+      panel.addEventListener("hidden.bs.offcanvas", () => textarea.focus(), {once:true});
+      offcanvas.hide();
+    } else {
+      textarea.focus();
     }
   });
 });

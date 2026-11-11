@@ -1,0 +1,5 @@
+# The glossary is embedded in the isolated Python workshop.
+<IfModule mod_headers.c>
+    Header always set Cross-Origin-Opener-Policy "same-origin"
+    Header always set Cross-Origin-Embedder-Policy "require-corp"
+</IfModule>

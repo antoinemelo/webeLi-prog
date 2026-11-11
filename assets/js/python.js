@@ -1,8 +1,3 @@
-    // ---- Persistence keys ----
-    const LS_CODE   = 'py_editor_code_v1';
-    const LS_CARET  = 'py_editor_caret_v1';
-    const LS_SCROLL = 'py_editor_scroll_v1';
-    const LS_FIRST  = 'py_editor_first_open_done_v1';
 
 	  // Line numbers (wrap-aware + "…")
 	  (function(){
@@ -20,44 +15,14 @@
 		  document.getElementById("saveAsLocal")?.classList.add("d-none");
 		}
 
-		// Mesure "mono" pour estimer la largeur d'un caractère
-		function measureMonoCharWidth(el){
-		  const cs = getComputedStyle(el);
-		  const canvas = document.createElement('canvas');
-		  const ctx = canvas.getContext('2d');
-		  ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-		  const w = ctx.measureText('M').width || 8;
-		  return { charWidth: w, padL: parseFloat(cs.paddingLeft)||0, padR: parseFloat(cs.paddingRight)||0 };
-		}
-
-		function visibleWrapsForLine(line, cols){
-		  // tabs ~ 4 espaces pour l'estimation
-		  const expanded = line.replace(/\t/g, '    ');
-		  return Math.max(1, Math.ceil(expanded.length / Math.max(1, cols)));
-		}
-
 		function updateGutter(){
 		  if(!codeEl || !gutter) return;
 
-		  // Colonnes visibles utiles (largeur intérieure / largeur d'un caractère)
-		  const { charWidth, padL, padR } = measureMonoCharWidth(codeEl);
-		  const inner = Math.max(1, codeEl.clientWidth - padL - padR);
-		  const cols  = Math.max(1, Math.floor(inner / Math.max(1, charWidth)));
-
 		  const lines = codeEl.value.split(/\r?\n/);
 		  let html = '';
-		  let n = 1;
-
-		  for (let i=0; i<lines.length; i++){
-			const wraps = visibleWrapsForLine(lines[i], cols);
-
-			// Première rangée visuelle : numéro
-			html += `<div>${n}</div>`;
-			// Rangées suivantes : marqueur de continuation
-			for (let k=1; k<wraps; k++){
-			  html += `<div class="cont"></div>`;
-			}
-			n++;
+		  for (let index = 0; index < lines.length; index++){
+			const line = index + 1;
+			html += `<div data-line="${line}">${line}</div>`;
 		  }
 
 		  gutter.innerHTML = html;
@@ -79,15 +44,7 @@
 		  }
 		});
 
-		// Recalcule aussi quand la zone change de taille (splitter/plein écran)
-		function sizeTextarea(){
-		  const wrap = document.querySelector('.editor-wrap');
-		  const h = wrap.getBoundingClientRect().height;
-		  codeEl.style.height = h + 'px';
-		  updateGutter();
-		}
-		window.addEventListener('resize', sizeTextarea);
-		window.addEventListener('load',  sizeTextarea);
+		// La hauteur reste pilotée par CSS; le ResizeObserver gère la largeur.
 		window.addEventListener('load',  updateGutter);
 	  })();
 
@@ -145,9 +102,7 @@
 		  tdiv.innerHTML = '';
 		}
 
-		if (window.__BRYTHON__ && "turtle" in __BRYTHON__.modules) {
-		  delete __BRYTHON__.modules["turtle"];
-		}
+		// Le module Turtle est réinitialisé par le runner avant son exécution.
 	  });
 	}
 
@@ -279,10 +234,6 @@
       if (!ta || !hi) return;
 
       const INDENT = '    '; // 4 espaces
-      const LS_CODE   = 'py_editor_code_v1';
-      const LS_CARET  = 'py_editor_caret_v1';
-      const LS_SCROLL = 'py_editor_scroll_v1';
-      const LS_FIRST  = 'py_editor_first_open_done_v1';
 
       function wrapSelection(open, close) {
         const start = ta.selectionStart, end = ta.selectionEnd;
@@ -387,14 +338,8 @@
         return false;
       }
 
-      // ---- Persistence helpers ----
-      function persist() {
-        try {
-          localStorage.setItem(LS_CODE, ta.value);
-          localStorage.setItem(LS_CARET, JSON.stringify({s: ta.selectionStart, e: ta.selectionEnd}));
-          localStorage.setItem(LS_SCROLL, ta.scrollTop.toString());
-        } catch(_) {}
-      }
+      // The script workspace owns code, cursor and scroll for each name.
+      function persist() { window.pythonScripts?.save(); }
 
 	function initialTemplate(){
 	  return [
@@ -406,70 +351,13 @@
 		window.addEventListener('load', ()=>{ buildDict(); });
 
       function restore() {
-		  console.log("==> restore() lancé");
-		  // 1) Priorité au lien partagé
-		  const linked = readCodeFromURL?.();
-		  if (linked !== null) {
-			console.log("On prend l’URL comme source");
-			ta.value = linked;
-			ta.setSelectionRange(ta.value.length, ta.value.length);
-			ta.scrollTop = 0;
-			ta.dispatchEvent(new Event('input'));
-			syncHighlight();
-			// On persiste pour les rafraîchissements suivants
-			try {
-			  localStorage.setItem(LS_CODE, ta.value);
-			  localStorage.setItem(LS_FIRST, '1');
-			} catch(_) {}
-			return;
-		  }
-
-        const saved = localStorage.getItem(LS_CODE);
-        console.log("LocalStorage récupéré:", saved ? "OUI" : "NON");
-        if (saved !== null) {
-          ta.value = saved;
-          const c = localStorage.getItem(LS_CARET);
-          if (c) {
-            try {
-              const {s, e} = JSON.parse(c);
-              ta.setSelectionRange(s, e);
-            } catch(_) {}
-          }
-          const st = localStorage.getItem(LS_SCROLL);
-          if (st) ta.scrollTop = parseInt(st, 10) || 0;
-        } else {
-          if (!localStorage.getItem(LS_FIRST)) {
-            ta.value = initialTemplate();
-            localStorage.setItem(LS_FIRST, '1');
-          } else {
-            ta.value = initialTemplate();
-          }
-          ta.setSelectionRange(ta.value.length, ta.value.length);
-        }
-        ta.dispatchEvent(new Event('input')); // renumérotation
-        syncHighlight();
+        window.pythonScripts.restore(initialTemplate(), readCodeFromURL());
       }
 
       function resetEditor() {
-        const ok = window.confirm('Réinitialiser l’éditeur ? (Le contenu local sera effacé)');
-        if (!ok) return;
-        try {
-          localStorage.removeItem(LS_CODE);
-          localStorage.removeItem(LS_CARET);
-          localStorage.removeItem(LS_SCROLL);
-          localStorage.removeItem(LS_FIRST);
-        } catch(_) {}
-        // cache le badge et remet le titre (FS)
-        window.EditorFS?.clear();
-        ta.value = initialTemplate();
-        ta.setSelectionRange(ta.value.length, ta.value.length);
-        ta.scrollTop = 0;
-        ta.dispatchEvent(new Event('input'));
-        try { localStorage.setItem(LS_FIRST, '1'); } catch(_) {}
-        ta.focus();
-        syncHighlight();
-
-		document.getElementById('saveLocal')?.classList.add('disabled');
+        if (window.pythonScripts.busy()) return;
+        if (!window.confirm('Réinitialiser le script actif ? Son contenu sera remplacé.')) return;
+        window.pythonScripts.reset();
       }
 
 	function computeFilename() {
@@ -489,49 +377,38 @@
 	  return `TP_${formatDateYYYYMMDD(new Date())}.py`;
 	}
 
-	async function downloadFile() {
-	  const filename = computeFilename();
-	  const text = document.getElementById('code').value;
-
-	  // Détection iOS / Safari
-	  const ua = navigator.userAgent;
-	  const isiPadOS = ua.includes("Macintosh") && "ontouchend" in document;
-	  const isIOS = /iPad|iPhone|iPod/.test(ua) || isiPadOS;
-	  const isSafari = /^((?!chrome|android|CriOS|FxiOS|EdgiOS).)*safari/i.test(ua);
-
-	  window._pyDirty?.markJustSaved();
-
-	  if (isIOS || isSafari) {
-		// 👉 Créer un ZIP contenant le fichier Python
-		const zip = new JSZip();
-		let filename = computeFilename();
-		if (!filename.endsWith(".py")) {
-		  filename += ".py";
-		}
-		zip.file(filename, text);
-
-		const blob = await zip.generateAsync({ type: "blob" });
-
-		const zipName = filename.replace(/\.py$/i, "") + ".zip";
-		const a = document.createElement("a");
-		a.href = URL.createObjectURL(blob);
-		a.download = zipName;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(a.href);
-	  } else {
-		// 👉 Téléchargement standard du .py
-		const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-		const a = document.createElement("a");
-		a.href = URL.createObjectURL(blob);
-		a.download = filename;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(a.href);
-	  }
-	}
+  async function downloadFile(event) {
+    event?.preventDefault();
+    const workspace = window.pythonScripts;
+    if (!workspace.beginFileOperation()) return;
+    const text = ta.value;
+    const filename = computeFilename();
+    try {
+      const ua = navigator.userAgent;
+      const isiPadOS = ua.includes('Macintosh') && 'ontouchend' in document;
+      const isIOS = /iPad|iPhone|iPod/.test(ua) || isiPadOS;
+      const isSafari = /^((?!chrome|android|CriOS|FxiOS|EdgiOS).)*safari/i.test(ua);
+      let blob, downloadName = filename;
+      if (isIOS || isSafari) {
+        const zip = new JSZip();
+        zip.file(filename, text);
+        blob = await zip.generateAsync({type: 'blob'});
+        downloadName = filename.replace(/\.py$/i, '') + '.zip';
+      } else blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = downloadName;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      workspace.saved(text, filename);
+    } catch (error) {
+      window.alert(error.message);
+    } finally {
+      workspace.endFileOperation();
+    }
+  }
 
       // Init + watchers
       window.addEventListener('load', restore);
@@ -800,243 +677,88 @@
 		  if (!['ArrowUp','ArrowDown','Enter','Tab','Escape'].includes(e.key)) updateAC();
 		});
 
-		// ==== Local file open/save for Python (File System Access API + fallback) ====
-		(function(){
-		  const ta = document.getElementById('code');
-		  const btnOpen     = document.getElementById('openLocal');
-		  const btnSave     = document.getElementById('saveLocal');
-		  const btnSaveAs   = document.getElementById('saveAsLocal');
-		  const btnDownload = document.getElementById('download');
+    // File actions always use the active script and its own writable handle.
+    (() => {
+      const supportsFS = ('showOpenFilePicker' in window) && ('showSaveFilePicker' in window);
 
-		  // Badge
-		  const badge     = document.getElementById('fileBadge');
-		  const badgeName = document.getElementById('fileBadgeName');
+      function pickFileFallback() {
+        return new Promise(resolve => {
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.accept = '.py,.txt,.zip,text/x-python,text/plain,application/zip';
+          input.hidden = true;
+          document.body.append(input);
+          const finish = file => { input.remove(); resolve(file); };
+          input.addEventListener('change', () => finish(input.files?.[0] ?? null), {once: true});
+          input.addEventListener('cancel', () => finish(null), {once: true});
+          input.click();
+        });
+      }
 
-		  // État courant
-		  let fileHandle = null;
-		  let fileName   = null;
+      document.getElementById('openLocal').addEventListener('click', async event => {
+        event.preventDefault();
+        const workspace = window.pythonScripts;
+        if (event.currentTarget.getAttribute('aria-disabled') === 'true' || !workspace.beginFileOperation()) return;
+        try {
+          let handle = null, file;
+          if (supportsFS) {
+            [handle] = await window.showOpenFilePicker({
+              types: [{description: 'Scripts Python', accept: {'text/x-python': ['.py'], 'text/plain': ['.py', '.txt']}}],
+              excludeAcceptAllOption: false, multiple: false
+            });
+            if (!handle) return;
+            file = await handle.getFile();
+          } else file = await pickFileFallback();
+          if (!file) return;
+          let name = file.name, text;
+          if (/\.zip$/i.test(name)) {
+            const zip = await JSZip.loadAsync(await file.arrayBuffer());
+            name = Object.keys(zip.files).find(name => !zip.files[name].dir && /\.py$/i.test(name));
+            if (!name) throw new Error('Aucun fichier .py trouvé dans ce fichier ZIP.');
+            text = await zip.files[name].async('string');
+          } else text = await file.text();
+          const current = workspace.current();
+          if (current.code !== current.savedCode && current.code !== text &&
+              !window.confirm('Remplacer les modifications non enregistrées du script actif ?')) return;
+          workspace.loaded(text, name, handle);
+        } catch (error) {
+          if (error?.name !== 'AbortError') window.alert(error.message);
+        } finally {
+          workspace.endFileOperation();
+        }
+      });
 
-		  const supportsFS = ('showOpenFilePicker' in window) && ('showSaveFilePicker' in window);
-
-		  function setDocTitle(){
-			const base = document.title.replace(/\s+\|.*$/, '');
-			document.title = fileName ? `${base} | ${fileName}` : base;
-		  }
-		  function updateBadge(){
-			if (!badge) return;
-			if (fileName && fileName.trim()){
-			  badge.classList.remove('d-none');
-			  if (badgeName) badgeName.textContent = fileName;
-			} else {
-			  badge.classList.add('d-none');
-			}
-		  }
-
-		  // Masquer les boutons qui ne fonctionnent pas sur iPad/iPhone
-		  function adjustButtons(){
-			if (!supportsFS){
-			  btnSave?.parentElement.classList.add('d-none');
-			  btnSaveAs?.parentElement.classList.add('d-none');
-			  // On garde seulement Télécharger (et Partager plus bas)
-			}
-		  }
-		  window.addEventListener('load', adjustButtons);
-		  
-		  // Désactive "Enregistrer" si pas d’écrasement supporté
-		  if (btnSave && !supportsFS){
-			btnSave.disabled = true;
-			btnSave.title = 'Votre navigateur ne permet pas l’enregistrement direct (écrasement). Utilisez “Enregistrer sous…” ou “Télécharger”.';
-		  }
-
-		  async function openWithFSAccess(){
-			try{
-			  const [handle] = await window.showOpenFilePicker({
-				types: [{ description: 'Scripts Python', accept: {
-				  'text/x-python': ['.py'],
-				  'text/plain': ['.py', '.txt']
-				}}],
-				excludeAcceptAllOption: false,
-				multiple: false
-			  });
-			  const file = await handle.getFile();
-			  const text = await file.text();
-			  fileHandle = handle;
-			  fileName   = file.name;
-			  ta.value   = text;
-			  ta.setSelectionRange(text.length, text.length);
-			  ta.scrollTop = 0;
-			  ta.dispatchEvent(new Event('input'));
-			  (window.syncHighlight||(()=>{}))();
-			  setDocTitle();
-			  updateBadge();
-				// 👉 Activer "Enregistrer"
-				const btnSave = document.getElementById('saveLocal');
-				btnSave?.classList.remove('disabled');
-				btnSave?.removeAttribute('aria-disabled');
-				btnSave.title = 'Enregistrer';
-			}catch(e){ /* cancel */ }
-		  }
-
-		  async function saveToExistingHandle(){
-			if(!fileHandle) throw new Error('no-handle');
-			const writable = await fileHandle.createWritable();
-			await writable.write(ta.value);
-			window._pyDirty?.markJustSaved();
-			await writable.close();
-		  }
-
-		  // réutilise ta computeFilename() si elle existe, sinon fallback
-		  function fallbackName(){
-			try { return (typeof computeFilename==='function' && computeFilename()) || 'script.py'; }
-			catch(_){ return 'script.py'; }
-		  }
-
-		async function saveAsWithFSAccess(){
-		  const handle = await window.showSaveFilePicker({
-			suggestedName: fileName || fallbackName(),
-			types: [{ description: 'Python', accept: { 'text/x-python': ['.py'] } }],
-		  });
-		  fileHandle = handle;
-		  fileName   = handle.name;
-		  await saveToExistingHandle();
-		  setDocTitle();
-		  window._pyDirty?.markJustSaved();
-		  updateBadge();
-		  document.getElementById('saveLocal')?.classList.remove('disabled');
-		}
-
-		// Fallback (Firefox / Safari)
-		function pickFileFallback(){
-		  return new Promise((resolve,reject)=>{
-			const inp = document.createElement('input');
-			inp.type = 'file';
-			inp.accept = '.py,.txt,.zip,text/x-python,text/plain,application/zip';
-			inp.addEventListener('change', async ()=>{
-			  if(!inp.files || !inp.files[0]) { reject(new Error('cancel')); return; }
-			  const f = inp.files[0];
-
-			  if (f.name.endsWith(".zip")) {
-				// Cas ZIP → lire avec JSZip
-				const reader = new FileReader();
-				reader.onload = async ()=>{
-				  try {
-					const zip = await JSZip.loadAsync(reader.result);
-					// Cherche le premier fichier .py
-					const pyFile = Object.keys(zip.files).find(name => name.endsWith(".py"));
-					if (pyFile) {
-					  const text = await zip.files[pyFile].async("string");
-					  fileHandle = null;
-					  fileName   = pyFile;
-					  ta.value   = text;
-					  ta.setSelectionRange(text.length, text.length);
-					  ta.scrollTop = 0;
-					  ta.dispatchEvent(new Event('input'));
-					  (window.syncHighlight||(()=>{}))();
-					  setDocTitle();
-					  updateBadge();
-					  btnSave?.classList.remove('disabled');
-					  btnSave?.removeAttribute('aria-disabled');
-					  resolve();
-					} else {
-					  alert("Aucun fichier .py trouvé dans ce fichier ZIP.");
-					  reject(new Error("no-py-in-zip"));
-					}
-				  } catch(err) {
-					alert("Erreur lors de la lecture du ZIP.");
-					reject(err);
-				  }
-				};
-				reader.readAsArrayBuffer(f);
-
-			  } else {
-				// Cas classique .py ou .txt
-				const reader = new FileReader();
-				reader.onload = ()=>{
-				  fileHandle = null;
-				  fileName   = f.name || null;
-				  ta.value   = reader.result || '';
-				  ta.setSelectionRange(ta.value.length, ta.value.length);
-				  ta.scrollTop = 0;
-				  ta.dispatchEvent(new Event('input'));
-				  (window.syncHighlight||(()=>{}))();
-				  setDocTitle();
-				  updateBadge();
-				  btnSave?.classList.remove('disabled');
-				  btnSave?.removeAttribute('aria-disabled');
-				  resolve();
-				};
-				reader.onerror = ()=> reject(reader.error || new Error('read-error'));
-				reader.readAsText(f);
-			  }
-			}, { once:true });
-			inp.click();
-		  });
-		}
-
-			function saveAsFallback(){
-			  btnDownload?.click();
-			  document.getElementById('saveLocal')?.classList.remove('disabled');
-			}
-
-		  // Mini API publique pour Reset (appelée depuis ton resetEditor)
-		  window.EditorFS = {
-			clear(){
-			  fileHandle = null;
-			  fileName   = null;
-			  setDocTitle();
-			  updateBadge();
-			}
-		  };
-
-		  // Wire boutons
-		  btnOpen?.addEventListener('click', async ()=>{
-			if(supportsFS) await openWithFSAccess();
-			else await pickFileFallback();
-		  });
-
-		btnSave?.addEventListener('click', async ()=>{
-		  const expected = computeFilename();   // nom basé sur la 1ère ligne
-		  if (fileName && fileName !== expected){
-			alert(
-			  "/!\\ Le nom défini par la 1ère ligne a changé.\n" +
-			  "Avant   : " + fileName + "\n" +
-			  "Nouveau : " + expected + "\n\n" +
-			  "Un nouvel enregistrement va être proposé."
-			);
-			fileHandle = null;
-			fileName   = expected;
-		  }
-
-		  try {
-			if (supportsFS) {
-			  if (fileHandle) {
-				await saveToExistingHandle();    // écrase le fichier courant si nom en cohérence
-			  } else {
-				await saveAsWithFSAccess();      // sinon => dialogue Enregistrer sous...
-			  }
-			}
-		  } catch(e) {
-			  if(String(e?.message) !== 'cancel'){ console.error(e); alert('Échec de "Enregistrer".'); }
-		  }
-		});
-
-		  btnSaveAs?.addEventListener('click', async ()=>{
-			const expected = computeFilename();   // nom basé sur la 1ère ligne
-			fileName = expected;
-			try{
-			  if(supportsFS) await saveAsWithFSAccess();
-			  else saveAsFallback();
-			}catch(e){
-			  if(String(e?.message) !== 'cancel'){ console.error(e); alert('Échec de "Enregistrer sous...".'); }
-			}
-		  });
-
-		  // état initial
-		  updateBadge();
-		})();
+      async function saveFile(event, saveAs) {
+        event.preventDefault();
+        if (!supportsFS) { await downloadFile(); return; }
+        const workspace = window.pythonScripts;
+        if (!workspace.beginFileOperation()) return;
+        const current = workspace.current();
+        const text = current.code;
+        const expected = computeFilename();
+        const renamed = current.name && current.name !== expected;
+        try {
+          let handle = current.handle;
+          if (saveAs || !handle || renamed) {
+            handle = await window.showSaveFilePicker({suggestedName: expected,
+              types: [{description: 'Python', accept: {'text/x-python': ['.py']}}]});
+          }
+          const writable = await handle.createWritable();
+          await writable.write(text);
+          await writable.close();
+          workspace.saved(text, handle.name, handle);
+        } catch (error) {
+          if (error?.name !== 'AbortError') window.alert('Échec de l’enregistrement : ' + error.message);
+        } finally {
+          workspace.endFileOperation();
+        }
+      }
+      document.getElementById('saveLocal').addEventListener('click', event => saveFile(event, false));
+      document.getElementById('saveAsLocal').addEventListener('click', event => saveFile(event, true));
+    })();
 
 		// Bouton Partager
-		function handleShare(type) {
+		async function handleShare(type) {
 		  const ta = document.getElementById('code');
 		  const url = makeShareURL(ta.value);
 
@@ -1048,15 +770,15 @@
 			if (!cont) return;
 		  }
 
-		  if (type === "link") {
-			navigator.clipboard.writeText(url).then(() => {
-			  alert("Lien copié dans le presse-papiers !");
-			});
-		  } else if (type === "iframe") {
-			const iframeCode = `<iframe src="${url}&light=1" width="100%" height="600" style="border:0;"></iframe>`;
-			navigator.clipboard.writeText(iframeCode).then(() => {
-			  alert("Code iframe copié dans le presse-papiers !");
-			});
+		  const text = type === 'iframe'
+		    ? `<iframe src="${url}&light=1" width="100%" height="600" style="border:0;"></iframe>` : url;
+		  try {
+		    if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+		    await navigator.clipboard.writeText(text);
+		    alert(type === 'iframe' ? 'Code iframe copié dans le presse-papiers !' : 'Lien copié dans le presse-papiers !');
+		  } catch (_) {
+		    // The school HTTP network may not expose the Clipboard API.
+		    window.prompt(type === 'iframe' ? 'Copiez ce code iframe :' : 'Copiez ce lien :', text);
 		  }
 		}
 
@@ -1077,7 +799,8 @@
 
 		// Bouton lien
 		const btnCopyLink = document.getElementById('copyLink');
-		btnCopyLink?.addEventListener('click', () => {
+		btnCopyLink?.addEventListener('click', event => {
+		  event.preventDefault();
 		  handleShare("link");
 		});
 
@@ -1088,7 +811,8 @@
 		
 		// Bouton iframe
 		const btnCopyIframe = document.getElementById('copyIframe');
-		btnCopyIframe?.addEventListener('click', () => {
+		btnCopyIframe?.addEventListener('click', event => {
+		  event.preventDefault();
 		  handleShare("iframe");
 		});
 
@@ -1096,50 +820,6 @@
       document.getElementById('reset').addEventListener('click', resetEditor);
       document.getElementById('download').addEventListener('click', downloadFile);
     })();
-
-	/* --- Détection robuste des 'while' (ignore chaînes + commentaires) --- */
-	function stripStringsAndComments(src){
-	  src = src.replace(/("""[\s\S]*?""")|('''[\s\S]*?''')/g, ' ');
-	  src = src.replace(/"(?:\\.|[^"\\])*"/g, ' ');
-	  src = src.replace(/'(?:\\.|[^'\\])*'/g, ' ');
-	  src = src.replace(/#[^\n]*/g, ' ');
-	  return src;
-	}
-	function codeHasWhile(code){
-	  const clean = stripStringsAndComments(code);
-	  return /\bwhile\b/.test(clean);
-	}
-
-	/* --- Garde-fou sur le bouton Exécuter --- */
-	/* capture: true => notre listener passe AVANT Brython; on peut annuler proprement */
-	(function(){
-	  const runBtn = document.getElementById('run');
-	  const out = document.getElementById('output');
-	  if (out) out.textContent = '';
-	  if(!runBtn) return;
-
-	  runBtn.addEventListener('click', (e)=>{
-		const code = document.getElementById('code').value || '';
-
-		// Si au moins un 'while' (hors chaînes/commentaires) est détecté => avertir
-		if(codeHasWhile(code)){
-		  const ok = window.confirm(
-			"/!\\ Une boucle WHILE mal conçue peut bloquer la page !\n\n" +
-			"Ont, par exemple, des effets problématiques:\n" +
-			"while True: pass | while r!= 'non merci': r = print(var)\n" +
-			"=> Utilisez des 'break' si besoin ou nécessaire.\n\n" +
-			"Êtes-vous sûr de vouloir exécuter vorte code ?"
-		  );
-		  if(!ok){
-			e.preventDefault();
-			e.stopImmediatePropagation();  // bloque le handler Brython
-			if(out) out.textContent = "Exécution annulée.";
-			return;
-		  }
-		}
-		// sinon on laisse Brython exécuter normalement
-	  }, true);
-	})();
 
 		window.addEventListener('load', () => {
 			console.log(">> Event: window load");
@@ -1171,62 +851,17 @@
 		  }).catch(()=>{});
 		})();
 
-		// Exécution avec F9
-		  document.addEventListener('keydown', function (e) {
-			if (e.key === "F9") {
-			  e.preventDefault(); // évite d'ouvrir les outils navigateur
-			  const runBtn = document.getElementById("run");
-			  if (runBtn) {
-				runBtn.click(); // simule le clic
-			  }
-			}
-		  });
-		document.addEventListener('keydown', async function(e) {
-		  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-			e.preventDefault(); // bloque le "Enregistrer la page" du navigateur
-			try {
-			  // Si un fichier est déjà ouvert, simple "Enregistrer"
-			  const btnSave = document.getElementById('saveLocal');
-			  if (btnSave) btnSave.click();
-			} catch(err) {
-			  console.error("Erreur lors de l'enregistrement:", err);
-			}
-		  }
-		});
-		(() => {
-		  const ta       = document.getElementById('code');
-		  const dirtyDot = document.getElementById('dirtyDot');
-		  const baseTitle = document.title;
-
-		  let lastSavedValue = ta ? ta.value : '';
-		  let isDirty = false;
-
-		function updateDirtyUI(){
-		  if (dirtyDot) dirtyDot.style.display = isDirty ? '' : 'none';
-		  document.title = isDirty ? baseTitle + ' ●' : baseTitle;
-		}
-
-		  function recomputeDirty(){
-			const now = ta ? ta.value : '';
-			isDirty = (now !== lastSavedValue);
-			updateDirtyUI();
-		  }
-
-		  function markJustSaved(){
-			lastSavedValue = ta ? ta.value : '';
-			isDirty = false;
-			updateDirtyUI();
-		  }
-
-		  function setJustLoaded(){
-			lastSavedValue = ta ? ta.value : '';
-			isDirty = false;
-			updateDirtyUI();
-		  }
-
-		  // recalcul à chaque frappe
-		  if (ta) ta.addEventListener('input', recomputeDirty);
-
-		  // exposer pour les autres blocs (ex. quand tu fais "Enregistrer")
-		  window._pyDirty = { markJustSaved, setJustLoaded };
-		})();
+    // Use the same commands as the File menu, including browser fallbacks.
+    window.addEventListener('keydown', event => {
+      if (event.isComposing || event.altKey || event.shiftKey) return;
+      let command;
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+        command = 'saveLocal';
+      } else if (!event.ctrlKey && !event.metaKey) {
+        if (event.key === 'F9') command = 'run';
+        else if (event.key === 'F12') command = 'saveAsLocal';
+      }
+      if (!command) return;
+      event.preventDefault();
+      if (!event.repeat) document.getElementById(command)?.click();
+    }, true);

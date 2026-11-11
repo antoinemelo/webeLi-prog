@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Redirection</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+  <script src="./js/dist/sql-js@1.13.0/sql-wasm.js"></script>
   <style>
     body { font-family: system-ui, sans-serif; text-align:center; padding:3rem; }
     h1 { font-weight:400; margin-bottom:1rem; }
@@ -28,7 +28,7 @@
 
     try {
       const SQL = await initSqlJs({
-        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${file}`
+        locateFile: file => `./js/dist/sql-js@1.13.0/${file}`
       });
 
       const response = await fetch('./liens/link.db');

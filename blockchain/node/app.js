@@ -53,7 +53,7 @@ function logoutLocal() {
 
 // ============ DB INIT (sql.js) ============
 (async function initDB(){
-  SQL = await initSqlJs({ locateFile: f => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.wasm" });
+  SQL = await initSqlJs({ locateFile: f => "../../assets/js/dist/sql-js@1.13.0/sql-wasm.wasm" });
   const saved = localStorage.getItem("cg_db");
   db = saved ? new SQL.Database(Uint8Array.from(atob(saved), c=>c.charCodeAt(0))) : new SQL.Database();
   db.run(`

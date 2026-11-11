@@ -8,14 +8,13 @@
   <link rel="icon" href="../../assets/images/grid.svg" type="image/svg+xml">
   <!-- Fallback multi-navigateurs -->
   <link rel="icon" href="../../assets/images/grid.ico" sizes="any">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta name="theme-color" content="#0b1220">
  
- 	<script src="../../assets/js/app.js"></script> 
+	<script src="../../assets/js/app.js?v=20261111-projects"></script>
 	<!-- Bootstrap & Icons -->
 	<link rel="stylesheet" href="../../assets/css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css">
 	<link rel="stylesheet" href="../../assets/css/dist/bootstrap@5.3.8/bootstrap_min.css">
-	<link rel="stylesheet" href="../../assets/css/app.css">
+	<link rel="stylesheet" href="../../assets/css/app.css?v=20261111-projects">
 
 	<style>
 		/* par défaut (thème sombre) */
@@ -62,10 +61,12 @@
       <a href="../../" class="text-decoration-none d-inline-flex align-items-center gap-2">
         <i class="bi bi-database"></i>
       </a> <span data-i18n="sqlTitle"></span>
+      <span id="dirtyDot" class="ms-2" style="display:none;color:#ff4507;">●</span>
     </span>
-    <span id="dbBadge" class="badge badge-db rounded-pill text-bg-info d-none">
-      <i class="bi bi-hdd"></i> <span id="dbName">—</span>
-    </span>
+    <div class="document-controls">
+      <div id="documentBadges" role="tablist" aria-label="Scripts SQL"></div>
+      <button id="addDocument" class="document-add" type="button" aria-label="Nouveau script SQL">+</button>
+    </div>
     <div class="d-flex gap-2">
       <button class="btn btn-sm border-0 btn-outline-info" data-bs-toggle="modal" data-bs-target="#featuresModal">
         <i class="bi bi-info-circle me-1"></i>
@@ -85,13 +86,14 @@
       <div class="toolbar">
         <!-- ========== MENUS REGROUPÉS ========== -->
         <div class="btn-group me-2">
-			<button class="btn btn-sm btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+			<button id="dropdownFiles" class="btn btn-sm btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 			  <i class="bi bi-filetype-sql me-1"></i>
 			  <span class="d-none d-sm-inline">SQL</span>
 			</button>
           <ul class="dropdown-menu dropdown-menu-dark">
             <li><a id="openSQL" class="dropdown-item" href="#"><i class="bi bi-folder2-open me-2"></i><span data-i18n="openFile"></span></a></li>
             <li><a id="saveSQL" class="dropdown-item" href="#"><i class="bi bi-save me-2"></i><span data-i18n="saveFile"></span></a></li>
+            <li><a id="saveSQLAs" class="dropdown-item" href="#"><i class="bi bi-save2 me-2"></i><span data-i18n="saveAsFile"></span></a></li>
             <li><a id="downloadSQL" class="dropdown-item" href="#"><i class="bi bi-download me-2"></i><span data-i18n="downloadFile"></span></a></li>
           </ul>
         </div>
@@ -102,7 +104,7 @@
         <button id="run" class="btn btn-sm btn-primary"><i class="bi bi-play-fill me-1"></i><span class="d-none d-sm-inline" data-i18n="run"></span></button>
       </div>
 
-      <div class="editor-wrap" id="editorWrap">
+      <div class="editor-wrap" id="editorWrap" role="tabpanel">
         <pre id="gutter" class="gutter" aria-hidden="true"></pre>
         <div class="codecell">
           <pre id="highlighting"></pre>
@@ -131,6 +133,7 @@
             <li><a id="saveDB" class="dropdown-item" href="#"><i class="bi bi-save me-2"></i><span data-i18n="saveDb"></span></a></li>
             <li><a id="saveDBAs" class="dropdown-item" href="#"><i class="bi bi-save2 me-2"></i><span data-i18n="saveDbAs"></span></a></li>
             <li><a id="exportDB" class="dropdown-item" href="#"><i class="bi bi-file-earmark-arrow-down me-2"></i><span data-i18n="exportDb"></span></a></li>
+            <li><button id="resetDB" class="dropdown-item" data-i18n="sqlResetDB"></button></li>
             <li class="dropdown-divider"></li>
             <li class="px-3"><span data-i18n="loadLabel"></span></li>
             <li><a id="seedSchool" class="dropdown-item" href="#"><i class="bi bi-mortarboard me-2"></i><span data-i18n="seedSchool"></span></a></li>
@@ -164,11 +167,23 @@
 		  <span class="d-none d-sm-inline" data-i18n="clear"></span>
 		</button>
 
+          <div class="btn-group">
+            <button id="projectMenu" class="btn btn-sm btn-project dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-folder2-open me-1"></i><span data-i18n="pyProject"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+              <li><button id="exportProject" class="dropdown-item" data-i18n="pyExportProject"></button></li>
+            </ul>
+          </div>
+
 		<button id="btnHelp" class="btn btn-sm btn-outline-light"
 				type="button" data-bs-toggle="offcanvas" data-bs-target="#sidePanel" aria-controls="sidePanel">
 			<i class="bi bi-stickies me-1"></i><span data-i18n="help"></span>
 		</button>
       </div>
+      <div class="px-3 py-1"><span id="dbBadge" class="badge badge-db rounded-pill text-bg-info d-none">
+      <i class="bi bi-hdd"></i> <span id="dbName">—</span>
+    </span></div>
       <div id="output" class="result"></div>
 		<div class="hint">
 			<span data-i18n="hintSql"></span>
@@ -229,7 +244,9 @@
 				  <li>Ouvrir / exporter une base <code>.sqlite</code></li>
 				</ul>
 			  </li>
-			  <li><strong>Sauvegarde locale</strong> : code et base de données stockés dans le navigateur.</li>
+			  <li><strong>Trois scripts au maximum</strong> : le nom actif est vert. La base et les résultats restent communs à tous les scripts. Réinitialiser concerne uniquement le script actif.</li>
+              <li><strong>Projet</strong> : télécharger tous les scripts ouverts et la base SQLite dans un ZIP.</li>
+              <li><strong>Sauvegarde locale</strong> : scripts et base de données stockés dans le navigateur.</li>
 			  <li><strong>Affichage des résultats</strong> :
 				<ul>
 				  <li>Résultats des requêtes sous forme de tableau</li>
@@ -253,14 +270,17 @@
   </div>
 
 	<!-- Logic -->
-	<script src="../../assets/js/sql.js"></script>
+	<script src="../../assets/js/dist/jszip@3.10.1/jszip_min.js"></script>
+	<script src="../../assets/js/workshop-project.js?v=20261111-projects"></script>
+	<script src="../../assets/js/workshop-documents.js?v=20261111-projects"></script>
+	<script src="../../assets/js/sql.js?v=20261111-projects"></script>
 	
 	<!-- sql.js (SQLite en WebAssembly) -->
 	<script src="../../assets/js/dist/sql-js@1.13.0/sql-wasm.js"></script>
 	<!-- Bootstrap JS -->
 	<script src="../../assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js" defer></script>
 
-	<script src="../../assets/js/dico.js"></script>
+	<script src="../../assets/js/dico.js?v=20261111-projects"></script>
 	<script src="../../assets/js/theme.js"></script>
 	<script>
 		Theme.init({ canWrite:false });  // applique + suit, sans changer localStorage
@@ -270,7 +290,7 @@
 			if (params.has("light")) {
 				document.body.classList.add("l-mode");
 				// Cache la topbar et le hint
-				document.querySelector("nav.navbar")?.remove();
+				document.querySelector("nav.navbar")?.classList.add("d-none");
 				document.querySelector(".hint")?.remove();
 				document.querySelector("main.workbench")?.classList.add("no-topbar");
 

@@ -1,0 +1,79 @@
+[
+  {
+    "id": "ouverture",
+    "title": "Théorie p. 58–59 · Ouverture et fermeture",
+    "instructions": "Créer fich.txt en mode w et observer le nom, le mode, l’encodage et les droits de lecture. Fermer le fichier, puis essayer de lire un fichier inexistant : le mode r signale une erreur, sans créer le fichier.",
+    "code": "# Théorie / Fichiers-Ouverture\nfd = open(\"fich.txt\", \"w\", encoding=\"utf-8\")\nprint(fd)\nprint(\"Fermé :\", fd.closed)\nprint(\"Nom :\", fd.name)\nprint(\"Mode :\", fd.mode)\nprint(\"Encodage :\", fd.encoding)\nprint(\"Lecture possible :\", fd.readable())\nfd.close()\nprint(\"Fermé :\", fd.closed)\n\ntry:\n    open(\"inexistant.txt\", \"r\")\nexcept IOError as err:\n    print(err.strerror)\n",
+    "files": {}
+  },
+  {
+    "id": "lecture",
+    "title": "Théorie p. 59–60 · read() et readlines()",
+    "instructions": "Lire tout le fichier sous forme de chaîne puis de liste. Après une lecture complète, le curseur est à la fin : seek(0) permet de recommencer. Observer les retours à la ligne avec repr().",
+    "code": "# Théorie / Fichiers-Lecture\nfd = open(\"essai.txt\", \"r\", encoding=\"utf-8\")\nchaine = fd.read()\nprint(repr(chaine))\nprint(\"À la fin :\", repr(fd.read()))\nfd.seek(0)\nliste = fd.readlines()\nprint(liste)\nfd.close()\nprint(\"Fermé :\", fd.closed)\n",
+    "files": {
+      "essai.txt": "1ere ligne\n2e ligne\nfin\n"
+    }
+  },
+  {
+    "id": "paquets",
+    "title": "Théorie p. 60 · read(n)",
+    "instructions": "Lire le texte par paquets de 10 caractères. Le dernier paquet peut être plus court. À la fin, read() renvoie une chaîne vide.",
+    "code": "# Théorie / Fichiers-Paquets\nfd = open(\"essai.txt\", \"r\")\nchaine = \"\"\nwhile True:\n    paquet = fd.read(10)\n    if paquet:\n        print(repr(paquet))\n        chaine += paquet\n    else:\n        break\nfd.close()\nprint(chaine)\n",
+    "files": {
+      "essai.txt": "1ere ligne\n2e ligne\nfin\n"
+    }
+  },
+  {
+    "id": "lignes",
+    "title": "Théorie p. 60–61 · readline(), for et with",
+    "instructions": "Comparer les trois parcours. Une ligne vide contient encore un retour à la ligne ; seule la chaîne vide signale la fin. with ferme automatiquement le fichier.",
+    "code": "# Théorie / Fichiers-Lignes\nfd = open(\"essai.txt\", \"r\")\nwhile True:\n    ligne = fd.readline()\n    if not ligne:\n        break\n    print(ligne.rstrip())\nfd.close()\n\nwith open(\"essai.txt\", \"r\") as fd:\n    for ligne in fd.readlines():\n        print(ligne.rstrip())\n\nwith open(\"essai.txt\", \"r\") as fd:\n    for ligne in fd:\n        print(ligne.rstrip())\nprint(\"Fermé :\", fd.closed)\n",
+    "files": {
+      "essai.txt": "1ere ligne\n2e ligne\nfin\n"
+    }
+  },
+  {
+    "id": "ecriture",
+    "title": "Théorie p. 61–62 · write(), writelines(), print()",
+    "instructions": "Les trois méthodes produisent le même texte. write() et writelines() n’ajoutent pas de retour à la ligne ; print() en ajoute un. Observer les fichiers dans les onglets.",
+    "code": "# Théorie / Fichiers-Ecriture\nliste = [\"1ere ligne\", \"2e ligne\", \"fin\"]\nwith open(\"ecrit.txt\", \"w\") as fd:\n    for ligne in liste:\n        fd.write(ligne + \"\\n\")\n\nwith open(\"lignes.txt\", \"w\") as fd:\n    fd.writelines([ligne + \"\\n\" for ligne in liste])\n\nwith open(\"affichage.txt\", \"w\") as fd:\n    for ligne in liste:\n        print(ligne, file=fd)\n\nwith open(\"ecrit.txt\", \"r\") as fd:\n    print(fd.read())\n",
+    "files": {}
+  },
+  {
+    "id": "curseur",
+    "title": "Théorie p. 62–63 · seek() et tell()",
+    "instructions": "Le curseur compte ici les caractères, comme dans le support. Les déplacements relatifs non nuls sont une adaptation pédagogique : sur ordinateur, Python les réserve aux fichiers binaires. essai.txt contient ici exactement 24 caractères (sans espaces ajoutés).",
+    "code": "# Théorie / Fichiers-Curseur\nfd = open(\"essai.txt\", \"r\")\nprint(fd.tell())\nfd.seek(5)\nprint(fd.read(5))  # ligne\nprint(fd.tell())   # 10\nfd.seek(0, 2)\nprint(fd.tell())   # 24 caractères\nfd.seek(-4, 2)\nprint(fd.read(3))  # fin\nfd.seek(-3, 1)\nprint(fd.read(3))  # fin\nfd.seek(0)\nprint(fd.tell())\nfd.close()\n",
+    "files": {
+      "essai.txt": "1ere ligne\n2e ligne\nfin\n"
+    }
+  },
+  {
+    "id": "tp05-ex1",
+    "title": "Coco_TP05 · ex1 · Modes r, w, a (p. 147)",
+    "instructions": "1. Lire test.txt et afficher son contenu.\n2. Le rouvrir en mode w et écrire « Salut ».\n3. Le relire pour vérifier que le contenu précédent est écrasé.\n4. L’ouvrir en mode a et ajouter « le monde » sans effacer « Salut » (penser à l’espace).",
+    "code": "# Prénom / Coco_TP05ex1-Modes\n# Le fichier test.txt est prêt dans l’onglet à droite.\n# 1. Lire et afficher son contenu.\n\n# 2. Écrire \"Salut\" en mode w.\n\n# 3. Relire pour vérifier le remplacement.\n\n# 4. Ajouter \" le monde\" en mode a.\n\n",
+    "files": {
+      "test.txt": "Bonjour le monde"
+    }
+  },
+  {
+    "id": "tp05-ex2",
+    "title": "Coco_TP05 · ex2 · Lecture et écriture r+ (p. 147)",
+    "instructions": "1. Modifier les lignes de donnees.txt dans son onglet, comme dans un éditeur de texte.\n2. L’ouvrir en mode r+, lire la première ligne et l’afficher.\n3. Ajouter « FIN DU DOCUMENT » à la fin du fichier (seek(0, 2)).\n4. Fermer avec fd.close(). En r+, écrire remplace les caractères à la position courante.",
+    "code": "# Prénom / Coco_TP05ex2-LectureEcriture\n# Préparer donnees.txt dans l’onglet à droite.\n# 1. Ouvrir en r+ et afficher la première ligne.\n\n# 2. Aller à la fin du fichier et ajouter \"FIN DU DOCUMENT\".\n\n# 3. Fermer le fichier.\n\n",
+    "files": {
+      "donnees.txt": "Première ligne\nDeuxième ligne\nTroisième ligne\n"
+    }
+  },
+  {
+    "id": "tp06-ex1",
+    "title": "Coco_TP06 · ex1 · Révision animaux (p. 147)",
+    "instructions": "1. Ouvrir mes_animaux.txt.\n2. Stocker les lignes dans une liste avec readlines().\n3. Retirer les lignes qui commencent par *.\n4. Tirer un animal au sort avec random.choice().\n5. Afficher l’animal sélectionné sans retour à la ligne superflu.",
+    "code": "# Prénom / Coco_TP06ex1-Animaux\nimport random\n\n# 1. Lire mes_animaux.txt et stocker les lignes dans une liste.\n\n# 2. Retirer les lignes commençant par \"*\".\n\n# 3. Tirer un animal au sort et l’afficher.\n\n",
+    "files": {
+      "mes_animaux.txt": "ÉléphantZèbré\nPangouin\n*Serpent à plumes\nChat-poisson\nKangourou volant\n*Girafe-licorne\n*Tortue-lumineuse\nPoule multicolore\nÉcureuil-sauterelle\n*Chauve-souris étoilée\n"
+    }
+  }
+]
