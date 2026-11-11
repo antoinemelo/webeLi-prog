@@ -1,0 +1,1587 @@
+{
+  "checked_at": "2026-11-11T03:42:49.207604+00:00",
+  "base_url": "https://webe.li/tec/",
+  "excluded": [
+    "server scripts",
+    "tests",
+    "tools",
+    "docs",
+    "partage",
+    "hidden files",
+    "SQLite databases"
+  ],
+  "summary": {
+    "match": 178,
+    "different": 8,
+    "error": 0
+  },
+  "files": [
+    {
+      "path": "annulation.html",
+      "status": "200",
+      "bytes_local": 7724,
+      "result": "different",
+      "sha256_local": "2fbaf5cd5b9268de3804938ff9f982a71ea6f7173702492d2064bcaf61b70c03",
+      "sha256_remote": "8c72bc1c217ae24f68fa53d874f4a171fff5d534f7301ae6571d4db170f7b36e",
+      "review": "Différences relues : habillage WebeLi, coordonnées et navigation propres au site publié. Conservées."
+    },
+    {
+      "path": "assets/aide/index.html",
+      "status": "200",
+      "bytes_local": 12959,
+      "result": "match",
+      "sha256_local": "fa4f3964ee082b10a1add052ebaa152905197db20eefac953c7077f6211a833a",
+      "sha256_remote": "fa4f3964ee082b10a1add052ebaa152905197db20eefac953c7077f6211a833a"
+    },
+    {
+      "path": "assets/aide/lexique.html",
+      "status": "200",
+      "bytes_local": 10154,
+      "result": "match",
+      "sha256_local": "cca0ff495074b56d3c4e2e14003645efe5621472325a32c3535f18a17949e6e7",
+      "sha256_remote": "cca0ff495074b56d3c4e2e14003645efe5621472325a32c3535f18a17949e6e7"
+    },
+    {
+      "path": "assets/css/app.css",
+      "status": "200",
+      "bytes_local": 26902,
+      "result": "match",
+      "sha256_local": "43723661b8b1abfe3247ddc9836a2412322d2aa6a485c22ce6d7eac4cc7eb5ad",
+      "sha256_remote": "43723661b8b1abfe3247ddc9836a2412322d2aa6a485c22ce6d7eac4cc7eb5ad"
+    },
+    {
+      "path": "assets/css/dist/bootstrap-icons@1.13.1/bootstrap-icons_min.css",
+      "status": "200",
+      "bytes_local": 87009,
+      "result": "match",
+      "sha256_local": "f37753b822057fffe0c391f2448a50c81102fda70d973bbbbccfe0ac668065c6",
+      "sha256_remote": "f37753b822057fffe0c391f2448a50c81102fda70d973bbbbccfe0ac668065c6"
+    },
+    {
+      "path": "assets/css/dist/bootstrap-icons@1.13.1/fonts/bootstrap-icons.woff",
+      "status": "200",
+      "bytes_local": 180288,
+      "result": "match",
+      "sha256_local": "f55513b7b591cb84a3b87ff0e34ea24d4831d6fedc22e54b911ca64b5b544a15",
+      "sha256_remote": "f55513b7b591cb84a3b87ff0e34ea24d4831d6fedc22e54b911ca64b5b544a15"
+    },
+    {
+      "path": "assets/css/dist/bootstrap-icons@1.13.1/fonts/bootstrap-icons.woff2",
+      "status": "200",
+      "bytes_local": 134044,
+      "result": "match",
+      "sha256_local": "6c75710364a1ca5604267716f6d28997b26319fdb078cf11e0b42ab66ff2ea61",
+      "sha256_remote": "6c75710364a1ca5604267716f6d28997b26319fdb078cf11e0b42ab66ff2ea61"
+    },
+    {
+      "path": "assets/css/dist/bootstrap@5.3.8/bootstrap_min.css",
+      "status": "200",
+      "bytes_local": 232111,
+      "result": "match",
+      "sha256_local": "8ad217347cb17f4ccaaadf8e3dd97ca6a6e0afbf3601d1b1a5f9434307717d09",
+      "sha256_remote": "8ad217347cb17f4ccaaadf8e3dd97ca6a6e0afbf3601d1b1a5f9434307717d09"
+    },
+    {
+      "path": "assets/css/dist/highlight@11.11.1/github-dark_min.css",
+      "status": "200",
+      "bytes_local": 1368,
+      "result": "match",
+      "sha256_local": "f891e8a5a92635306fb08f5b989a3fdabcf1a96738daabc252585814d9b4e13f",
+      "sha256_remote": "f891e8a5a92635306fb08f5b989a3fdabcf1a96738daabc252585814d9b4e13f"
+    },
+    {
+      "path": "assets/exemple/boxe/contact.html",
+      "status": "200",
+      "bytes_local": 1380,
+      "result": "match",
+      "sha256_local": "3c06c655d4f0cc47e2c35bb0dc04e19b165dceceb73826d37ef4d518740ca3ed",
+      "sha256_remote": "3c06c655d4f0cc47e2c35bb0dc04e19b165dceceb73826d37ef4d518740ca3ed"
+    },
+    {
+      "path": "assets/exemple/boxe/images/accueil.jpg",
+      "status": "200",
+      "bytes_local": 132115,
+      "result": "match",
+      "sha256_local": "aadc454bb8e785620e294e199118e28a470f19a26b77cc92952c8b29a1ffa361",
+      "sha256_remote": "aadc454bb8e785620e294e199118e28a470f19a26b77cc92952c8b29a1ffa361"
+    },
+    {
+      "path": "assets/exemple/boxe/images/groupe.jpg",
+      "status": "200",
+      "bytes_local": 265782,
+      "result": "match",
+      "sha256_local": "0f3faccea1e87e52832e0f7dc7c0e2356c286da0039df869eb21e976ab4d0eb1",
+      "sha256_remote": "0f3faccea1e87e52832e0f7dc7c0e2356c286da0039df869eb21e976ab4d0eb1"
+    },
+    {
+      "path": "assets/exemple/boxe/index.html",
+      "status": "200",
+      "bytes_local": 1460,
+      "result": "match",
+      "sha256_local": "3b205284fced3ddc9812b34357ec12b513c194a932c8af05c25b6bfea45575e8",
+      "sha256_remote": "3b205284fced3ddc9812b34357ec12b513c194a932c8af05c25b6bfea45575e8"
+    },
+    {
+      "path": "assets/exemple/boxe/presentation.html",
+      "status": "200",
+      "bytes_local": 1863,
+      "result": "match",
+      "sha256_local": "22ee7a5175f56e595d157ebd97a16993878052bf5587afc223a60ae41dc83aa9",
+      "sha256_remote": "22ee7a5175f56e595d157ebd97a16993878052bf5587afc223a60ae41dc83aa9"
+    },
+    {
+      "path": "assets/exemple/boxe/style.css",
+      "status": "200",
+      "bytes_local": 308,
+      "result": "match",
+      "sha256_local": "f890f98b6978d9a96a642a23a99742846868545326825d810dc77dcd8b9b7b03",
+      "sha256_remote": "f890f98b6978d9a96a642a23a99742846868545326825d810dc77dcd8b9b7b03"
+    },
+    {
+      "path": "assets/images/grid.ico",
+      "status": "200",
+      "bytes_local": 4286,
+      "result": "match",
+      "sha256_local": "77435bbb80ecc3feb0ed0692d89404591ca111e37cd3e17b0b5ae4b3a3d7e8a7",
+      "sha256_remote": "77435bbb80ecc3feb0ed0692d89404591ca111e37cd3e17b0b5ae4b3a3d7e8a7"
+    },
+    {
+      "path": "assets/images/grid.svg",
+      "status": "200",
+      "bytes_local": 856,
+      "result": "match",
+      "sha256_local": "b37fb9dc4c05781587fc2a25281cdde502467332ada2faabb8d5f1561e0c1f44",
+      "sha256_remote": "b37fb9dc4c05781587fc2a25281cdde502467332ada2faabb8d5f1561e0c1f44"
+    },
+    {
+      "path": "assets/index.html",
+      "status": "200",
+      "bytes_local": 1844,
+      "result": "match",
+      "sha256_local": "29ba7e8be967a1bf2992eba521d4421ada7b0a0ebf589292940656359edf84c0",
+      "sha256_remote": "29ba7e8be967a1bf2992eba521d4421ada7b0a0ebf589292940656359edf84c0"
+    },
+    {
+      "path": "assets/js/app.js",
+      "status": "200",
+      "bytes_local": 7466,
+      "result": "match",
+      "sha256_local": "ee2e3c5ba2a40be13a162c4965f748be1b4c5f52605b1c6082de62bea1bdde8a",
+      "sha256_remote": "ee2e3c5ba2a40be13a162c4965f748be1b4c5f52605b1c6082de62bea1bdde8a"
+    },
+    {
+      "path": "assets/js/dactylo.js",
+      "status": "200",
+      "bytes_local": 40270,
+      "result": "match",
+      "sha256_local": "834fe464ab5c9d54147af1b09175b412855e12a67a963e02c2164af9520688ba",
+      "sha256_remote": "834fe464ab5c9d54147af1b09175b412855e12a67a963e02c2164af9520688ba"
+    },
+    {
+      "path": "assets/js/dactylo_sync.js",
+      "status": "200",
+      "bytes_local": 9974,
+      "result": "match",
+      "sha256_local": "40065f6981e1482c7e2c42030a8487594d344369422a2455f0c1d1f4eb47f5c1",
+      "sha256_remote": "40065f6981e1482c7e2c42030a8487594d344369422a2455f0c1d1f4eb47f5c1"
+    },
+    {
+      "path": "assets/js/dico.js",
+      "status": "200",
+      "bytes_local": 21024,
+      "result": "match",
+      "sha256_local": "0da3a0cd1dd137099376ec1a5f5c98775a06b99d7415b5795d401d7bf911151b",
+      "sha256_remote": "0da3a0cd1dd137099376ec1a5f5c98775a06b99d7415b5795d401d7bf911151b"
+    },
+    {
+      "path": "assets/js/dist/bootstrap@5.3.8/bootstrap-bundle_min.js",
+      "status": "200",
+      "bytes_local": 80497,
+      "result": "match",
+      "sha256_local": "d1505263b4c1ce5a31ea75152a32587042fc26c9cd48cb234bba098b84898eaa",
+      "sha256_remote": "d1505263b4c1ce5a31ea75152a32587042fc26c9cd48cb234bba098b84898eaa"
+    },
+    {
+      "path": "assets/js/dist/brython@3.13.2/brython_min.js",
+      "status": "200",
+      "bytes_local": 1186337,
+      "result": "match",
+      "sha256_local": "a003bd47c6dda2318d7578c4964d6e862cdaeb475dbb4ed8430c5861d712100a",
+      "sha256_remote": "a003bd47c6dda2318d7578c4964d6e862cdaeb475dbb4ed8430c5861d712100a"
+    },
+    {
+      "path": "assets/js/dist/brython@3.13.2/brython_stdlib.js",
+      "status": "200",
+      "bytes_local": 4469156,
+      "result": "match",
+      "sha256_local": "3647482c648371f6e6853dbd58129fa369c8cd7212216e309b9cee8f8a29a1ce",
+      "sha256_remote": "3647482c648371f6e6853dbd58129fa369c8cd7212216e309b9cee8f8a29a1ce"
+    },
+    {
+      "path": "assets/js/dist/chart@4.5.0/chart-umd_min.js",
+      "status": "200",
+      "bytes_local": 208426,
+      "result": "match",
+      "sha256_local": "98fb0ae6f0ca1256db8f8a63abe2078e1bebe51f08c5bfa013280f75d1fa2095",
+      "sha256_remote": "98fb0ae6f0ca1256db8f8a63abe2078e1bebe51f08c5bfa013280f75d1fa2095"
+    },
+    {
+      "path": "assets/js/dist/highlight@11.11.1/common_min.js",
+      "status": "200",
+      "bytes_local": 2647,
+      "result": "match",
+      "sha256_local": "e5657dbd22a3dcce59517eecf99130e30913f01c83281886bf762a2b7378b242",
+      "sha256_remote": "e5657dbd22a3dcce59517eecf99130e30913f01c83281886bf762a2b7378b242"
+    },
+    {
+      "path": "assets/js/dist/html2pdf@0.10.1/html2pdf-bundle_min.js",
+      "status": "200",
+      "bytes_local": 905998,
+      "result": "match",
+      "sha256_local": "452cb96e8443df919f6bba721d97c6d2fdf86138b0edc527aafb3c70ec451348",
+      "sha256_remote": "452cb96e8443df919f6bba721d97c6d2fdf86138b0edc527aafb3c70ec451348"
+    },
+    {
+      "path": "assets/js/dist/jszip@3.10.1/jszip_min.js",
+      "status": "200",
+      "bytes_local": 97631,
+      "result": "match",
+      "sha256_local": "d14e71a95ef3290dec66a9cfdd8a37c2dd624f6f2b594c4512f607d4a56e19fc",
+      "sha256_remote": "d14e71a95ef3290dec66a9cfdd8a37c2dd624f6f2b594c4512f607d4a56e19fc"
+    },
+    {
+      "path": "assets/js/dist/marked@16.2.1/marked_umd.js",
+      "status": "200",
+      "bytes_local": 40158,
+      "result": "match",
+      "sha256_local": "723e4d4e830e66af087de937ae40d6859a52dbc74ddb9857366a771451713433",
+      "sha256_remote": "723e4d4e830e66af087de937ae40d6859a52dbc74ddb9857366a771451713433"
+    },
+    {
+      "path": "assets/js/dist/mermaid@11.11.0/mermaid_min.js",
+      "status": "200",
+      "bytes_local": 2720692,
+      "result": "match",
+      "sha256_local": "217cf4d1d11a918d3be25fd63323e22199363e2c57e2171485520fc153a2e3a6",
+      "sha256_remote": "217cf4d1d11a918d3be25fd63323e22199363e2c57e2171485520fc153a2e3a6"
+    },
+    {
+      "path": "assets/js/dist/sql-js@1.13.0/sql-wasm.js",
+      "status": "200",
+      "bytes_local": 48833,
+      "result": "match",
+      "sha256_local": "d02ebec740e5bea4a3ce290edfb4acee190bcd5951cdf767928e5fc69ff51117",
+      "sha256_remote": "d02ebec740e5bea4a3ce290edfb4acee190bcd5951cdf767928e5fc69ff51117"
+    },
+    {
+      "path": "assets/js/dist/sql-js@1.13.0/sql-wasm.wasm",
+      "status": "200",
+      "bytes_local": 659806,
+      "result": "match",
+      "sha256_local": "0734155c83e493983d1f2ff5b09a4fab6e35a32e9449c7e4e545756439f62d73",
+      "sha256_remote": "0734155c83e493983d1f2ff5b09a4fab6e35a32e9449c7e4e545756439f62d73"
+    },
+    {
+      "path": "assets/js/exercices/ex_00a.txt",
+      "status": "200",
+      "bytes_local": 23,
+      "result": "match",
+      "sha256_local": "b5465f1e07961d3c080f9624ffeb6ee16537f3b6a0495884a55bb4ca2fce7a90",
+      "sha256_remote": "b5465f1e07961d3c080f9624ffeb6ee16537f3b6a0495884a55bb4ca2fce7a90"
+    },
+    {
+      "path": "assets/js/exercices/ex_00b.txt",
+      "status": "200",
+      "bytes_local": 39,
+      "result": "match",
+      "sha256_local": "cb9d8d6b9a1e7361527d0aa96b13e93c29df538f9dcb98c015cf7fab44ed3870",
+      "sha256_remote": "cb9d8d6b9a1e7361527d0aa96b13e93c29df538f9dcb98c015cf7fab44ed3870"
+    },
+    {
+      "path": "assets/js/exercices/ex_00c.txt",
+      "status": "200",
+      "bytes_local": 47,
+      "result": "match",
+      "sha256_local": "30eb069b4a1e30c40ecd9f19de94a26d9927a66b01042d8d0da5824da36c059f",
+      "sha256_remote": "30eb069b4a1e30c40ecd9f19de94a26d9927a66b01042d8d0da5824da36c059f"
+    },
+    {
+      "path": "assets/js/exercices/ex_00d.txt",
+      "status": "200",
+      "bytes_local": 57,
+      "result": "match",
+      "sha256_local": "7bfa8f636aff423b8c149cedf02f08d4c612957a8dbd6fdd9a19d2d2c8d9dc7b",
+      "sha256_remote": "7bfa8f636aff423b8c149cedf02f08d4c612957a8dbd6fdd9a19d2d2c8d9dc7b"
+    },
+    {
+      "path": "assets/js/exercices/ex_01a.txt",
+      "status": "200",
+      "bytes_local": 356,
+      "result": "match",
+      "sha256_local": "5063a82f1bbbbcd11a608bcef570258a96caf377d75c39221fd4741930641747",
+      "sha256_remote": "5063a82f1bbbbcd11a608bcef570258a96caf377d75c39221fd4741930641747"
+    },
+    {
+      "path": "assets/js/exercices/ex_01b.txt",
+      "status": "200",
+      "bytes_local": 450,
+      "result": "match",
+      "sha256_local": "338616043eec69ac87cb380ac44d2762b83bfe3644a68e4625f16c9c873a63c0",
+      "sha256_remote": "338616043eec69ac87cb380ac44d2762b83bfe3644a68e4625f16c9c873a63c0"
+    },
+    {
+      "path": "assets/js/exercices/ex_01c.txt",
+      "status": "200",
+      "bytes_local": 387,
+      "result": "match",
+      "sha256_local": "3b98f82eee4a9d44a24095cbb6cb0f7200f031c2656cf25b8647b1c3a13ae6e4",
+      "sha256_remote": "3b98f82eee4a9d44a24095cbb6cb0f7200f031c2656cf25b8647b1c3a13ae6e4"
+    },
+    {
+      "path": "assets/js/exercices/ex_01d.txt",
+      "status": "200",
+      "bytes_local": 423,
+      "result": "match",
+      "sha256_local": "b7af19054c3bcdb20007617b0231233678bef52e7befd931c6002bd7517d33ca",
+      "sha256_remote": "b7af19054c3bcdb20007617b0231233678bef52e7befd931c6002bd7517d33ca"
+    },
+    {
+      "path": "assets/js/exercices/ex_02a.txt",
+      "status": "200",
+      "bytes_local": 437,
+      "result": "match",
+      "sha256_local": "f06995d18727b6c6be77a317c56f4d529b4047ed9d686b1da5b3d1bfddd0045d",
+      "sha256_remote": "f06995d18727b6c6be77a317c56f4d529b4047ed9d686b1da5b3d1bfddd0045d"
+    },
+    {
+      "path": "assets/js/exercices/ex_02b.txt",
+      "status": "200",
+      "bytes_local": 546,
+      "result": "match",
+      "sha256_local": "9ecfc1c6588a3cd8f4f01bc4774d42fa6bbe0766607216a9cc7fa758feb129ca",
+      "sha256_remote": "9ecfc1c6588a3cd8f4f01bc4774d42fa6bbe0766607216a9cc7fa758feb129ca"
+    },
+    {
+      "path": "assets/js/exercices/ex_02c.txt",
+      "status": "200",
+      "bytes_local": 401,
+      "result": "match",
+      "sha256_local": "467b8c94a38217fb60cc94260ade360c2ad3dc82b0f05191375ff1b93795eb2e",
+      "sha256_remote": "467b8c94a38217fb60cc94260ade360c2ad3dc82b0f05191375ff1b93795eb2e"
+    },
+    {
+      "path": "assets/js/exercices/ex_02d.txt",
+      "status": "200",
+      "bytes_local": 479,
+      "result": "match",
+      "sha256_local": "bd034b7a5add7bd954c60e83739592720eee23865d5571ca5efc285f2151ab74",
+      "sha256_remote": "bd034b7a5add7bd954c60e83739592720eee23865d5571ca5efc285f2151ab74"
+    },
+    {
+      "path": "assets/js/exercices/ex_03a.txt",
+      "status": "200",
+      "bytes_local": 560,
+      "result": "match",
+      "sha256_local": "fb73856e1274409ab9533430b5b3fd9fc4057f2634706da50cbb9519edd513eb",
+      "sha256_remote": "fb73856e1274409ab9533430b5b3fd9fc4057f2634706da50cbb9519edd513eb"
+    },
+    {
+      "path": "assets/js/exercices/ex_03b.txt",
+      "status": "200",
+      "bytes_local": 613,
+      "result": "match",
+      "sha256_local": "ebe004b1ff9f408e883bba482837e2e8047be0a485313a66b4d7374ae018a830",
+      "sha256_remote": "ebe004b1ff9f408e883bba482837e2e8047be0a485313a66b4d7374ae018a830"
+    },
+    {
+      "path": "assets/js/exercices/ex_03c.txt",
+      "status": "200",
+      "bytes_local": 399,
+      "result": "match",
+      "sha256_local": "a8e5b6463c8deefab8792bb77954506ac651e6054dfabfd9ded79a27ee1bb735",
+      "sha256_remote": "a8e5b6463c8deefab8792bb77954506ac651e6054dfabfd9ded79a27ee1bb735"
+    },
+    {
+      "path": "assets/js/exercices/ex_03d.txt",
+      "status": "200",
+      "bytes_local": 466,
+      "result": "match",
+      "sha256_local": "1db564224fc82c674455bb789552e1960d74d5da3f1e8adce8d97688d47e45e7",
+      "sha256_remote": "1db564224fc82c674455bb789552e1960d74d5da3f1e8adce8d97688d47e45e7"
+    },
+    {
+      "path": "assets/js/exercices/ex_04a.txt",
+      "status": "200",
+      "bytes_local": 537,
+      "result": "match",
+      "sha256_local": "dd9d579c189bc6070683f2d553a0f23a19253dec65b6899e8bc931526f5be80f",
+      "sha256_remote": "dd9d579c189bc6070683f2d553a0f23a19253dec65b6899e8bc931526f5be80f"
+    },
+    {
+      "path": "assets/js/exercices/ex_04b.txt",
+      "status": "200",
+      "bytes_local": 457,
+      "result": "match",
+      "sha256_local": "91b36f51152b1ab22fc2c4992e42bf8d6365820791d725bf0842060ecb5c7268",
+      "sha256_remote": "91b36f51152b1ab22fc2c4992e42bf8d6365820791d725bf0842060ecb5c7268"
+    },
+    {
+      "path": "assets/js/exercices/ex_04c.txt",
+      "status": "200",
+      "bytes_local": 556,
+      "result": "match",
+      "sha256_local": "b1f930fe835aac2e6a575524b0a54110767ef2d3434e42289c2e28990b360812",
+      "sha256_remote": "b1f930fe835aac2e6a575524b0a54110767ef2d3434e42289c2e28990b360812"
+    },
+    {
+      "path": "assets/js/exercices/ex_04d.txt",
+      "status": "200",
+      "bytes_local": 576,
+      "result": "match",
+      "sha256_local": "64f85ad7f049d8fe4a9406774e87eac706d2ce242508db9b6f3a907b3e6dfda0",
+      "sha256_remote": "64f85ad7f049d8fe4a9406774e87eac706d2ce242508db9b6f3a907b3e6dfda0"
+    },
+    {
+      "path": "assets/js/exercices/ex_05a.txt",
+      "status": "200",
+      "bytes_local": 535,
+      "result": "match",
+      "sha256_local": "53d8f042e411c2d99075720231d6c42a1321c8526a3867c67f82b383ca241384",
+      "sha256_remote": "53d8f042e411c2d99075720231d6c42a1321c8526a3867c67f82b383ca241384"
+    },
+    {
+      "path": "assets/js/exercices/ex_05b.txt",
+      "status": "200",
+      "bytes_local": 444,
+      "result": "match",
+      "sha256_local": "9995aba7a997d8c3aac4895be8a73d82c9d3e2894c8396bfe1ea5db3dc1e93d8",
+      "sha256_remote": "9995aba7a997d8c3aac4895be8a73d82c9d3e2894c8396bfe1ea5db3dc1e93d8"
+    },
+    {
+      "path": "assets/js/exercices/ex_05c.txt",
+      "status": "200",
+      "bytes_local": 452,
+      "result": "match",
+      "sha256_local": "40032d0e874193dc36e63ecb13320b12d584f9a9f70cf88d401b4ba16a3ed783",
+      "sha256_remote": "40032d0e874193dc36e63ecb13320b12d584f9a9f70cf88d401b4ba16a3ed783"
+    },
+    {
+      "path": "assets/js/exercices/ex_05d.txt",
+      "status": "200",
+      "bytes_local": 542,
+      "result": "match",
+      "sha256_local": "a2da23ec8b9c457ccee2b626bf169d4342a25cad4c8a964da3aae75340d0d6d3",
+      "sha256_remote": "a2da23ec8b9c457ccee2b626bf169d4342a25cad4c8a964da3aae75340d0d6d3"
+    },
+    {
+      "path": "assets/js/exercices/ex_06a.txt",
+      "status": "200",
+      "bytes_local": 718,
+      "result": "match",
+      "sha256_local": "7808591e690004280d09448d952e50617d29a1fd226122abfd70e77d54a9f4c9",
+      "sha256_remote": "7808591e690004280d09448d952e50617d29a1fd226122abfd70e77d54a9f4c9"
+    },
+    {
+      "path": "assets/js/exercices/ex_06b.txt",
+      "status": "200",
+      "bytes_local": 683,
+      "result": "match",
+      "sha256_local": "001d3c913d526d7ea77a84e822e2a79ab03ebeef8aaa7098817e2bee9ca0abb3",
+      "sha256_remote": "001d3c913d526d7ea77a84e822e2a79ab03ebeef8aaa7098817e2bee9ca0abb3"
+    },
+    {
+      "path": "assets/js/exercices/ex_07a.txt",
+      "status": "200",
+      "bytes_local": 1089,
+      "result": "match",
+      "sha256_local": "b318a345f90310e7d8a8e77899ee079ab50ba812e5ffd381e8b701b871fed525",
+      "sha256_remote": "b318a345f90310e7d8a8e77899ee079ab50ba812e5ffd381e8b701b871fed525"
+    },
+    {
+      "path": "assets/js/exercices/ex_07b.txt",
+      "status": "200",
+      "bytes_local": 629,
+      "result": "match",
+      "sha256_local": "fe36e781006ef4d3bc507fb43875ce9937e89eb723d319a3b9268fd9a5f1634f",
+      "sha256_remote": "fe36e781006ef4d3bc507fb43875ce9937e89eb723d319a3b9268fd9a5f1634f"
+    },
+    {
+      "path": "assets/js/exercices/ex_08a.txt",
+      "status": "200",
+      "bytes_local": 631,
+      "result": "match",
+      "sha256_local": "b421a83d1cf0aa29dc822d230dbf9c0b7ea5ad537f0d901928828abb3fb24d89",
+      "sha256_remote": "b421a83d1cf0aa29dc822d230dbf9c0b7ea5ad537f0d901928828abb3fb24d89"
+    },
+    {
+      "path": "assets/js/exercices/ex_08b.txt",
+      "status": "200",
+      "bytes_local": 784,
+      "result": "match",
+      "sha256_local": "e27fad9f2f8fa4dd131213e9ba6ca573695cb35b13f454b16c6dec5702c7922c",
+      "sha256_remote": "e27fad9f2f8fa4dd131213e9ba6ca573695cb35b13f454b16c6dec5702c7922c"
+    },
+    {
+      "path": "assets/js/exercices/ex_09a.txt",
+      "status": "200",
+      "bytes_local": 579,
+      "result": "match",
+      "sha256_local": "10a525b34b9971a553d07d0394d30749753e55e9d5017569f36906f3afd89056",
+      "sha256_remote": "10a525b34b9971a553d07d0394d30749753e55e9d5017569f36906f3afd89056"
+    },
+    {
+      "path": "assets/js/exercices/ex_09b.txt",
+      "status": "200",
+      "bytes_local": 1078,
+      "result": "match",
+      "sha256_local": "20799672ce20369d4ffecf42116a2b906de9d7636e65406fd7c1fc33dc0626fd",
+      "sha256_remote": "20799672ce20369d4ffecf42116a2b906de9d7636e65406fd7c1fc33dc0626fd"
+    },
+    {
+      "path": "assets/js/exercices/ex_09c.txt",
+      "status": "200",
+      "bytes_local": 670,
+      "result": "match",
+      "sha256_local": "5a1664414fc66569c19ae47dbb5295ee76755e3c3adc01400b99d5dbfbc601c7",
+      "sha256_remote": "5a1664414fc66569c19ae47dbb5295ee76755e3c3adc01400b99d5dbfbc601c7"
+    },
+    {
+      "path": "assets/js/exercices/ex_10a.txt",
+      "status": "200",
+      "bytes_local": 1060,
+      "result": "match",
+      "sha256_local": "0c0776fb1e02a064f68b9fbaabce42d2df5804804ac5e6cc14a737cc56605aad",
+      "sha256_remote": "0c0776fb1e02a064f68b9fbaabce42d2df5804804ac5e6cc14a737cc56605aad"
+    },
+    {
+      "path": "assets/js/exercices/ex_10b.txt",
+      "status": "200",
+      "bytes_local": 748,
+      "result": "match",
+      "sha256_local": "813ccc153665c810541f403b1a3dc281898717a0f83e53d90fce7a5cca829616",
+      "sha256_remote": "813ccc153665c810541f403b1a3dc281898717a0f83e53d90fce7a5cca829616"
+    },
+    {
+      "path": "assets/js/exercices/ex_10c.txt",
+      "status": "200",
+      "bytes_local": 387,
+      "result": "match",
+      "sha256_local": "3b98f82eee4a9d44a24095cbb6cb0f7200f031c2656cf25b8647b1c3a13ae6e4",
+      "sha256_remote": "3b98f82eee4a9d44a24095cbb6cb0f7200f031c2656cf25b8647b1c3a13ae6e4"
+    },
+    {
+      "path": "assets/js/exercices/ex_11a.txt",
+      "status": "200",
+      "bytes_local": 899,
+      "result": "match",
+      "sha256_local": "2d3c495e9cb279f520df4adf207d94a2d3083c4b07b827aac111724f1e06d281",
+      "sha256_remote": "2d3c495e9cb279f520df4adf207d94a2d3083c4b07b827aac111724f1e06d281"
+    },
+    {
+      "path": "assets/js/exercices/ex_11b.txt",
+      "status": "200",
+      "bytes_local": 693,
+      "result": "match",
+      "sha256_local": "2475cc830043cce7b8ed824062ad8d42fd9fe6c9c1f233760ea8907dfe52f02c",
+      "sha256_remote": "2475cc830043cce7b8ed824062ad8d42fd9fe6c9c1f233760ea8907dfe52f02c"
+    },
+    {
+      "path": "assets/js/exercices/ex_12a.txt",
+      "status": "200",
+      "bytes_local": 1129,
+      "result": "match",
+      "sha256_local": "20822a586e472b675cfd4d096df14159a7ecd38ad8b4ba2a484628cbc971024c",
+      "sha256_remote": "20822a586e472b675cfd4d096df14159a7ecd38ad8b4ba2a484628cbc971024c"
+    },
+    {
+      "path": "assets/js/exercices/ex_12b.txt",
+      "status": "200",
+      "bytes_local": 710,
+      "result": "match",
+      "sha256_local": "f16718861ba6c16b9c5055f5d737fecbaf5b31bee922928a701f578b305002f8",
+      "sha256_remote": "f16718861ba6c16b9c5055f5d737fecbaf5b31bee922928a701f578b305002f8"
+    },
+    {
+      "path": "assets/js/exercices/ex_13a.txt",
+      "status": "200",
+      "bytes_local": 837,
+      "result": "match",
+      "sha256_local": "b66e85d60d4e49fb963fd9f9720408e94abc5952647c67fe0e5c8bd5fbdae1f2",
+      "sha256_remote": "b66e85d60d4e49fb963fd9f9720408e94abc5952647c67fe0e5c8bd5fbdae1f2"
+    },
+    {
+      "path": "assets/js/exercices/ex_13b.txt",
+      "status": "200",
+      "bytes_local": 802,
+      "result": "match",
+      "sha256_local": "dc7892123e88a14e4c860bdd95279be6df489f7f06944545878f358f9faa74dc",
+      "sha256_remote": "dc7892123e88a14e4c860bdd95279be6df489f7f06944545878f358f9faa74dc"
+    },
+    {
+      "path": "assets/js/exercices/ex_14a.txt",
+      "status": "200",
+      "bytes_local": 918,
+      "result": "match",
+      "sha256_local": "19a73117678a398d159cce34d9b92809c589c8d4816b54378e196ab52a8c6235",
+      "sha256_remote": "19a73117678a398d159cce34d9b92809c589c8d4816b54378e196ab52a8c6235"
+    },
+    {
+      "path": "assets/js/exercices/ex_14b.txt",
+      "status": "200",
+      "bytes_local": 834,
+      "result": "match",
+      "sha256_local": "34589c2ca5e7215270d545fdd30d9b98d9e3ff96054a6a42326ffef473f8b963",
+      "sha256_remote": "34589c2ca5e7215270d545fdd30d9b98d9e3ff96054a6a42326ffef473f8b963"
+    },
+    {
+      "path": "assets/js/exercices/ex_15a.txt",
+      "status": "200",
+      "bytes_local": 993,
+      "result": "match",
+      "sha256_local": "991bf962f76e94deabe8de26a6ab360bb4ccfe57dad0c4ed0e9637c8f3f56d29",
+      "sha256_remote": "991bf962f76e94deabe8de26a6ab360bb4ccfe57dad0c4ed0e9637c8f3f56d29"
+    },
+    {
+      "path": "assets/js/exercices/ex_15b.txt",
+      "status": "200",
+      "bytes_local": 519,
+      "result": "match",
+      "sha256_local": "6b733cb15c570a9e0cbaa65df62bc92b71d87f3d890e8dccbb707c29a54baddd",
+      "sha256_remote": "6b733cb15c570a9e0cbaa65df62bc92b71d87f3d890e8dccbb707c29a54baddd"
+    },
+    {
+      "path": "assets/js/exercices/ex_15c.txt",
+      "status": "200",
+      "bytes_local": 1120,
+      "result": "match",
+      "sha256_local": "17e973c2b6fda56f5530661495613a2b4ce4bda30872a655807c386303383ab1",
+      "sha256_remote": "17e973c2b6fda56f5530661495613a2b4ce4bda30872a655807c386303383ab1"
+    },
+    {
+      "path": "assets/js/exercices/ex_16a.txt",
+      "status": "200",
+      "bytes_local": 912,
+      "result": "match",
+      "sha256_local": "f80c3f7766805393da226d6696e7d36b311dc9bfb1f0f20b7b28607f53657770",
+      "sha256_remote": "f80c3f7766805393da226d6696e7d36b311dc9bfb1f0f20b7b28607f53657770"
+    },
+    {
+      "path": "assets/js/exercices/ex_16b.txt",
+      "status": "200",
+      "bytes_local": 803,
+      "result": "match",
+      "sha256_local": "b3b718540878bffbb3ea79b0ecc28f0e3bbb0d031afb8e26d9a835d2dc02cbb5",
+      "sha256_remote": "b3b718540878bffbb3ea79b0ecc28f0e3bbb0d031afb8e26d9a835d2dc02cbb5"
+    },
+    {
+      "path": "assets/js/exercices/ex_17a.txt",
+      "status": "200",
+      "bytes_local": 701,
+      "result": "match",
+      "sha256_local": "de5c6b6a191352c27ff298dde63fa2a9247fe22b41bbab15024b6e7bf32c4d56",
+      "sha256_remote": "de5c6b6a191352c27ff298dde63fa2a9247fe22b41bbab15024b6e7bf32c4d56"
+    },
+    {
+      "path": "assets/js/exercices/ex_17b.txt",
+      "status": "200",
+      "bytes_local": 650,
+      "result": "match",
+      "sha256_local": "682e7a4eb931f435ac4803835bb19b412932c72c4ca02e75c297f5e3f0c6ed52",
+      "sha256_remote": "682e7a4eb931f435ac4803835bb19b412932c72c4ca02e75c297f5e3f0c6ed52"
+    },
+    {
+      "path": "assets/js/exercices/ex_18a.txt",
+      "status": "200",
+      "bytes_local": 675,
+      "result": "match",
+      "sha256_local": "aec64d91dc56b4bbab3564ed729dcf6cc753fc162579648ca673e6f371afa3aa",
+      "sha256_remote": "aec64d91dc56b4bbab3564ed729dcf6cc753fc162579648ca673e6f371afa3aa"
+    },
+    {
+      "path": "assets/js/exercices/ex_18b.txt",
+      "status": "200",
+      "bytes_local": 556,
+      "result": "match",
+      "sha256_local": "527019fdb2a0df6bfb9e69dd83f3284ca16973bef9b44ed85bfa5ad6ed550862",
+      "sha256_remote": "527019fdb2a0df6bfb9e69dd83f3284ca16973bef9b44ed85bfa5ad6ed550862"
+    },
+    {
+      "path": "assets/js/exercices/ex_19a.txt",
+      "status": "200",
+      "bytes_local": 648,
+      "result": "match",
+      "sha256_local": "24de001271ed987ce409b8a1abbbbf5c2eb7dcd3311a0248b66bfd7177f4586d",
+      "sha256_remote": "24de001271ed987ce409b8a1abbbbf5c2eb7dcd3311a0248b66bfd7177f4586d"
+    },
+    {
+      "path": "assets/js/exercices/ex_19b.txt",
+      "status": "200",
+      "bytes_local": 659,
+      "result": "match",
+      "sha256_local": "2b44614c2ed2dbe441c05a3623af1fe2342c2c4e3ffe6d1fa69251560f5ef811",
+      "sha256_remote": "2b44614c2ed2dbe441c05a3623af1fe2342c2c4e3ffe6d1fa69251560f5ef811"
+    },
+    {
+      "path": "assets/js/exercices/ex_20a.txt",
+      "status": "200",
+      "bytes_local": 742,
+      "result": "match",
+      "sha256_local": "4e090ef73820e4df115f9a9294b48561d0c873a2ddb89a6df1db12cce0d4f833",
+      "sha256_remote": "4e090ef73820e4df115f9a9294b48561d0c873a2ddb89a6df1db12cce0d4f833"
+    },
+    {
+      "path": "assets/js/exercices/ex_20b.txt",
+      "status": "200",
+      "bytes_local": 877,
+      "result": "match",
+      "sha256_local": "a16480666939a6ba701ecebcb153c74607ba4b3079df9953c187e7585b96a9d7",
+      "sha256_remote": "a16480666939a6ba701ecebcb153c74607ba4b3079df9953c187e7585b96a9d7"
+    },
+    {
+      "path": "assets/js/exercices/vi_0033.txt",
+      "status": "200",
+      "bytes_local": 34,
+      "result": "match",
+      "sha256_local": "95467637f1c93ee0331612ac5160bfb4d36eec50e9e5ddc769c8400599a0d6d2",
+      "sha256_remote": "95467637f1c93ee0331612ac5160bfb4d36eec50e9e5ddc769c8400599a0d6d2"
+    },
+    {
+      "path": "assets/js/exercices/vi_0623.txt",
+      "status": "200",
+      "bytes_local": 639,
+      "result": "match",
+      "sha256_local": "6879f6e1c37f0ec8bfbc7f13490b45c74e1dfafa2a8da12396e6a38411efadb9",
+      "sha256_remote": "6879f6e1c37f0ec8bfbc7f13490b45c74e1dfafa2a8da12396e6a38411efadb9"
+    },
+    {
+      "path": "assets/js/exercices/vi_0711.txt",
+      "status": "200",
+      "bytes_local": 720,
+      "result": "match",
+      "sha256_local": "29d97b287164453e5199536f56027f6ee842b375429ef5d0cd6b5691377b5418",
+      "sha256_remote": "29d97b287164453e5199536f56027f6ee842b375429ef5d0cd6b5691377b5418"
+    },
+    {
+      "path": "assets/js/exercices/vi_0737.txt",
+      "status": "200",
+      "bytes_local": 755,
+      "result": "match",
+      "sha256_local": "a9602ec02ebbba202a5d86e434ce81d88900d0133dac582ebedcb6d2644ed01c",
+      "sha256_remote": "a9602ec02ebbba202a5d86e434ce81d88900d0133dac582ebedcb6d2644ed01c"
+    },
+    {
+      "path": "assets/js/exercices/vi_0744.txt",
+      "status": "200",
+      "bytes_local": 754,
+      "result": "match",
+      "sha256_local": "e0bd409818716840e0d730caeb5b64808b1e50c5097c400dce74bb3fe216ea44",
+      "sha256_remote": "e0bd409818716840e0d730caeb5b64808b1e50c5097c400dce74bb3fe216ea44"
+    },
+    {
+      "path": "assets/js/exercices/vi_0809.txt",
+      "status": "200",
+      "bytes_local": 829,
+      "result": "match",
+      "sha256_local": "001b0d2e5beb7c3d1d337aabda921816376c65ce7ceaeab9e8e22e750e3b75db",
+      "sha256_remote": "001b0d2e5beb7c3d1d337aabda921816376c65ce7ceaeab9e8e22e750e3b75db"
+    },
+    {
+      "path": "assets/js/exercices/vi_0932.txt",
+      "status": "200",
+      "bytes_local": 951,
+      "result": "match",
+      "sha256_local": "e128d4a9619e7405e6b43058aa40c5c2ebe69165361b5d86a6d96e9daafeaab5",
+      "sha256_remote": "e128d4a9619e7405e6b43058aa40c5c2ebe69165361b5d86a6d96e9daafeaab5"
+    },
+    {
+      "path": "assets/js/exercices/vi_0963.txt",
+      "status": "200",
+      "bytes_local": 991,
+      "result": "match",
+      "sha256_local": "8eb84b09d407a244a9c18e4997038d5949cad3fbc98bbbce02d9822192f62414",
+      "sha256_remote": "8eb84b09d407a244a9c18e4997038d5949cad3fbc98bbbce02d9822192f62414"
+    },
+    {
+      "path": "assets/js/exercices/vi_0965.txt",
+      "status": "200",
+      "bytes_local": 968,
+      "result": "match",
+      "sha256_local": "7efaad677717d01e1c395c42b0c392a322399bea7009ec04c4e35d5b000016ca",
+      "sha256_remote": "7efaad677717d01e1c395c42b0c392a322399bea7009ec04c4e35d5b000016ca"
+    },
+    {
+      "path": "assets/js/exercices/vi_0966.txt",
+      "status": "200",
+      "bytes_local": 1016,
+      "result": "match",
+      "sha256_local": "75d9f0e3942fccaf6345d36d0e1aef27406c39983b909d206e7a6f27ece94be9",
+      "sha256_remote": "75d9f0e3942fccaf6345d36d0e1aef27406c39983b909d206e7a6f27ece94be9"
+    },
+    {
+      "path": "assets/js/exercices/vi_0982.txt",
+      "status": "200",
+      "bytes_local": 1006,
+      "result": "match",
+      "sha256_local": "44cb97c7085e06dce8e81ba00a5fa4281c76bc9904f91034ae8272264b511f3c",
+      "sha256_remote": "44cb97c7085e06dce8e81ba00a5fa4281c76bc9904f91034ae8272264b511f3c"
+    },
+    {
+      "path": "assets/js/exercices/vi_1005.txt",
+      "status": "200",
+      "bytes_local": 1020,
+      "result": "match",
+      "sha256_local": "53986376247bc995f80bb2bed7544f13491b27a772fc6148d4a8ee6623f71cd2",
+      "sha256_remote": "53986376247bc995f80bb2bed7544f13491b27a772fc6148d4a8ee6623f71cd2"
+    },
+    {
+      "path": "assets/js/exercices/vi_1028.txt",
+      "status": "200",
+      "bytes_local": 1054,
+      "result": "match",
+      "sha256_local": "28583d0bbb046ff72da7d1c0969222f7e856e78f5f44c1c069b4acfb80993d76",
+      "sha256_remote": "28583d0bbb046ff72da7d1c0969222f7e856e78f5f44c1c069b4acfb80993d76"
+    },
+    {
+      "path": "assets/js/exercices/vi_1063.txt",
+      "status": "200",
+      "bytes_local": 1086,
+      "result": "match",
+      "sha256_local": "317ac5e7af64372f89531f2b241e71b44fb932daa6502f0c0612ac24ebd053fa",
+      "sha256_remote": "317ac5e7af64372f89531f2b241e71b44fb932daa6502f0c0612ac24ebd053fa"
+    },
+    {
+      "path": "assets/js/exercices/vi_1136.txt",
+      "status": "200",
+      "bytes_local": 1177,
+      "result": "match",
+      "sha256_local": "2a89125011f9f4539346a41524dadd909b585271e3bf1090d3a711d823890ee7",
+      "sha256_remote": "2a89125011f9f4539346a41524dadd909b585271e3bf1090d3a711d823890ee7"
+    },
+    {
+      "path": "assets/js/exercices/vi_1150.txt",
+      "status": "200",
+      "bytes_local": 1181,
+      "result": "match",
+      "sha256_local": "aaff7daf507a316dd0b930a1b0f8730ec60ffbca42f933c74308ed1c5b7e00d7",
+      "sha256_remote": "aaff7daf507a316dd0b930a1b0f8730ec60ffbca42f933c74308ed1c5b7e00d7"
+    },
+    {
+      "path": "assets/js/exercices/vi_1210.txt",
+      "status": "200",
+      "bytes_local": 1247,
+      "result": "match",
+      "sha256_local": "f5d9b083cc38322589cc0ef4c4c29a2a10e7e4e1de9ba61c1bef057cd37f46bb",
+      "sha256_remote": "f5d9b083cc38322589cc0ef4c4c29a2a10e7e4e1de9ba61c1bef057cd37f46bb"
+    },
+    {
+      "path": "assets/js/exercices/vi_1222.txt",
+      "status": "200",
+      "bytes_local": 1240,
+      "result": "match",
+      "sha256_local": "6b34d832cea335ed5f6d7931702b7e6bec52bd84ad22ae23e8a9d39cf57a44de",
+      "sha256_remote": "6b34d832cea335ed5f6d7931702b7e6bec52bd84ad22ae23e8a9d39cf57a44de"
+    },
+    {
+      "path": "assets/js/exercices/vi_1234.txt",
+      "status": "200",
+      "bytes_local": 1244,
+      "result": "match",
+      "sha256_local": "9d247436b9252ed297c4067eeadcf0fa52e90347131d3f05cceb1398ad9ee1c4",
+      "sha256_remote": "9d247436b9252ed297c4067eeadcf0fa52e90347131d3f05cceb1398ad9ee1c4"
+    },
+    {
+      "path": "assets/js/exercices/vi_1254.txt",
+      "status": "200",
+      "bytes_local": 1301,
+      "result": "match",
+      "sha256_local": "a79f3a1ce4a1af844f4975a1458b2e448279d575fb1bce121c060b3b234d9674",
+      "sha256_remote": "a79f3a1ce4a1af844f4975a1458b2e448279d575fb1bce121c060b3b234d9674"
+    },
+    {
+      "path": "assets/js/exercices/vi_1260.txt",
+      "status": "200",
+      "bytes_local": 1284,
+      "result": "match",
+      "sha256_local": "cab0e0ca1f0e7e036ce27b41194ec2b4dad3b7120e1768337dd810fddc22702b",
+      "sha256_remote": "cab0e0ca1f0e7e036ce27b41194ec2b4dad3b7120e1768337dd810fddc22702b"
+    },
+    {
+      "path": "assets/js/exercices/vi_1269.txt",
+      "status": "200",
+      "bytes_local": 1280,
+      "result": "match",
+      "sha256_local": "a450b0bafd5d60405dc3ff8e3e046f5ea3587ac547b132924a09d7385c90df5e",
+      "sha256_remote": "a450b0bafd5d60405dc3ff8e3e046f5ea3587ac547b132924a09d7385c90df5e"
+    },
+    {
+      "path": "assets/js/exercices/vi_1270.txt",
+      "status": "200",
+      "bytes_local": 1295,
+      "result": "match",
+      "sha256_local": "633d2262e4fa350cdf6c34547525e17ff3d757bd773c7972bc0ce034ffafd38f",
+      "sha256_remote": "633d2262e4fa350cdf6c34547525e17ff3d757bd773c7972bc0ce034ffafd38f"
+    },
+    {
+      "path": "assets/js/exercices/vi_1295.txt",
+      "status": "200",
+      "bytes_local": 1315,
+      "result": "match",
+      "sha256_local": "cfb5564f285b137e8dfee0d126f100c6c0f980376f8acfbcce30cd67f2bd6271",
+      "sha256_remote": "cfb5564f285b137e8dfee0d126f100c6c0f980376f8acfbcce30cd67f2bd6271"
+    },
+    {
+      "path": "assets/js/exercices/vi_1311.txt",
+      "status": "200",
+      "bytes_local": 1331,
+      "result": "match",
+      "sha256_local": "f7a9bee34c7983c4636fc6ed3355e7dc90426a15dbd45a1e57f6e5d8746cf591",
+      "sha256_remote": "f7a9bee34c7983c4636fc6ed3355e7dc90426a15dbd45a1e57f6e5d8746cf591"
+    },
+    {
+      "path": "assets/js/exercices/vi_1396.txt",
+      "status": "200",
+      "bytes_local": 1434,
+      "result": "match",
+      "sha256_local": "71ce60fa207063a9bfc9aecb759a74f4924d418683b8269c702d08761eda9ced",
+      "sha256_remote": "71ce60fa207063a9bfc9aecb759a74f4924d418683b8269c702d08761eda9ced"
+    },
+    {
+      "path": "assets/js/exercices/vi_1398.txt",
+      "status": "200",
+      "bytes_local": 1436,
+      "result": "match",
+      "sha256_local": "b4d0a8af581f893cd9560d1f4ffca3e673309937eedebe58aeb9d1e585ca0d52",
+      "sha256_remote": "b4d0a8af581f893cd9560d1f4ffca3e673309937eedebe58aeb9d1e585ca0d52"
+    },
+    {
+      "path": "assets/js/exercices/vi_1403.txt",
+      "status": "200",
+      "bytes_local": 1384,
+      "result": "match",
+      "sha256_local": "21bae71676e6f15c68590470dd3aaee51b8385239da52077c16cb042d102e98d",
+      "sha256_remote": "21bae71676e6f15c68590470dd3aaee51b8385239da52077c16cb042d102e98d"
+    },
+    {
+      "path": "assets/js/exercices/vi_1406.txt",
+      "status": "200",
+      "bytes_local": 1458,
+      "result": "match",
+      "sha256_local": "93197251aadc3d566d506478b0f158bc081f95b76b3369c94c9e29971ffcb3fc",
+      "sha256_remote": "93197251aadc3d566d506478b0f158bc081f95b76b3369c94c9e29971ffcb3fc"
+    },
+    {
+      "path": "assets/js/exercices/vi_1412.txt",
+      "status": "200",
+      "bytes_local": 1432,
+      "result": "match",
+      "sha256_local": "13b54f1f09c434125f4dbd53664f446154005b30d62ce942ade12ab889707e4c",
+      "sha256_remote": "13b54f1f09c434125f4dbd53664f446154005b30d62ce942ade12ab889707e4c"
+    },
+    {
+      "path": "assets/js/exercices/vi_1442.txt",
+      "status": "200",
+      "bytes_local": 1488,
+      "result": "match",
+      "sha256_local": "dedc5e475b98d0d5672717c27e497b6b0fa47daaa53482294155af6d4ac3956f",
+      "sha256_remote": "dedc5e475b98d0d5672717c27e497b6b0fa47daaa53482294155af6d4ac3956f"
+    },
+    {
+      "path": "assets/js/exercices/vi_1444.txt",
+      "status": "200",
+      "bytes_local": 1474,
+      "result": "match",
+      "sha256_local": "a9079c0a6a1e37065bc0c3c4f1a56f4d374a9c421851814caf40ccc5bdcf05eb",
+      "sha256_remote": "a9079c0a6a1e37065bc0c3c4f1a56f4d374a9c421851814caf40ccc5bdcf05eb"
+    },
+    {
+      "path": "assets/js/exercices/vi_1450.txt",
+      "status": "200",
+      "bytes_local": 1485,
+      "result": "match",
+      "sha256_local": "eca84aa343d52817f3be49145ee5c85418cbff82959080a19111443aadd6cccb",
+      "sha256_remote": "eca84aa343d52817f3be49145ee5c85418cbff82959080a19111443aadd6cccb"
+    },
+    {
+      "path": "assets/js/exercices/vi_1467.txt",
+      "status": "200",
+      "bytes_local": 1505,
+      "result": "match",
+      "sha256_local": "24a5a77204865d8dddf30d41d0821fc2e6109bace2cc282540a96f67c7a5abdc",
+      "sha256_remote": "24a5a77204865d8dddf30d41d0821fc2e6109bace2cc282540a96f67c7a5abdc"
+    },
+    {
+      "path": "assets/js/exercices/vi_1468.txt",
+      "status": "200",
+      "bytes_local": 1497,
+      "result": "match",
+      "sha256_local": "2879086fdf665e657f4ea32000d04b695fa32bc532940b24457c146fb77dbf67",
+      "sha256_remote": "2879086fdf665e657f4ea32000d04b695fa32bc532940b24457c146fb77dbf67"
+    },
+    {
+      "path": "assets/js/exercices/vi_1484.txt",
+      "status": "200",
+      "bytes_local": 1510,
+      "result": "match",
+      "sha256_local": "fba34d1aa4f1319c494ac4d20618057d4087330c7ae38049d5be3e2361952441",
+      "sha256_remote": "fba34d1aa4f1319c494ac4d20618057d4087330c7ae38049d5be3e2361952441"
+    },
+    {
+      "path": "assets/js/exercices/vi_1507.txt",
+      "status": "200",
+      "bytes_local": 1545,
+      "result": "match",
+      "sha256_local": "4ceaeeecd0f4b260df9551dada72cd653bcdecd1abc1402b9364033fb14a3f75",
+      "sha256_remote": "4ceaeeecd0f4b260df9551dada72cd653bcdecd1abc1402b9364033fb14a3f75"
+    },
+    {
+      "path": "assets/js/exercices/vi_1525.txt",
+      "status": "200",
+      "bytes_local": 1527,
+      "result": "match",
+      "sha256_local": "dec92287b32b983c78eec3c49a488c5d0d2a2c035e0525c7aa6adab1a3eeac23",
+      "sha256_remote": "dec92287b32b983c78eec3c49a488c5d0d2a2c035e0525c7aa6adab1a3eeac23"
+    },
+    {
+      "path": "assets/js/exercices/vi_1539.txt",
+      "status": "200",
+      "bytes_local": 1545,
+      "result": "match",
+      "sha256_local": "b740b084bf64906993af7111621b41e3b49b2e05c753cb5a73c8c174845148e9",
+      "sha256_remote": "b740b084bf64906993af7111621b41e3b49b2e05c753cb5a73c8c174845148e9"
+    },
+    {
+      "path": "assets/js/exercices/vi_1559.txt",
+      "status": "200",
+      "bytes_local": 1634,
+      "result": "match",
+      "sha256_local": "aa31b0839e6fce388e6a8a254b8dcc3ce1355616bb3a30ca8297815c31320a73",
+      "sha256_remote": "aa31b0839e6fce388e6a8a254b8dcc3ce1355616bb3a30ca8297815c31320a73"
+    },
+    {
+      "path": "assets/js/exercices/vi_1593.txt",
+      "status": "200",
+      "bytes_local": 1626,
+      "result": "match",
+      "sha256_local": "e508a421abda587f9838ab8ba4507380df33471c8a2af9b98b2379129a100653",
+      "sha256_remote": "e508a421abda587f9838ab8ba4507380df33471c8a2af9b98b2379129a100653"
+    },
+    {
+      "path": "assets/js/exercices/vi_1609.txt",
+      "status": "200",
+      "bytes_local": 1664,
+      "result": "match",
+      "sha256_local": "1e9c8ab822b232c2237634a29984693e5657187eb8405912fa5ecbb410bc7a30",
+      "sha256_remote": "1e9c8ab822b232c2237634a29984693e5657187eb8405912fa5ecbb410bc7a30"
+    },
+    {
+      "path": "assets/js/exercices/vi_1610.txt",
+      "status": "200",
+      "bytes_local": 1632,
+      "result": "match",
+      "sha256_local": "c4ae49d988e1765acc887e650bb699bc5ccfc5f7d4ac058b7ff6370d8fdabcd1",
+      "sha256_remote": "c4ae49d988e1765acc887e650bb699bc5ccfc5f7d4ac058b7ff6370d8fdabcd1"
+    },
+    {
+      "path": "assets/js/exercices/vi_1635.txt",
+      "status": "200",
+      "bytes_local": 1645,
+      "result": "match",
+      "sha256_local": "902559b782e30384c0cf30b27d60b18616cf4211bf0296b20c5d20335a85d6fa",
+      "sha256_remote": "902559b782e30384c0cf30b27d60b18616cf4211bf0296b20c5d20335a85d6fa"
+    },
+    {
+      "path": "assets/js/exercices/vi_1704.txt",
+      "status": "200",
+      "bytes_local": 1734,
+      "result": "match",
+      "sha256_local": "9c4a461a74146b0b088fd71168deb43bb932b51321581323bec2acfaba12205c",
+      "sha256_remote": "9c4a461a74146b0b088fd71168deb43bb932b51321581323bec2acfaba12205c"
+    },
+    {
+      "path": "assets/js/exercices/vi_1736.txt",
+      "status": "200",
+      "bytes_local": 1757,
+      "result": "match",
+      "sha256_local": "8ff5626c50bfc64aceb54f89de4d33a20f9e3f0afd04223682510e95b096f604",
+      "sha256_remote": "8ff5626c50bfc64aceb54f89de4d33a20f9e3f0afd04223682510e95b096f604"
+    },
+    {
+      "path": "assets/js/exercices/vi_1743.txt",
+      "status": "200",
+      "bytes_local": 1781,
+      "result": "match",
+      "sha256_local": "6faf11b34062a474f667dfdd37c9bf735b153885dfaeef9cd34994f27ff8503a",
+      "sha256_remote": "6faf11b34062a474f667dfdd37c9bf735b153885dfaeef9cd34994f27ff8503a"
+    },
+    {
+      "path": "assets/js/exercices/vi_1764.txt",
+      "status": "200",
+      "bytes_local": 1799,
+      "result": "match",
+      "sha256_local": "a9f340cd07b26ed5e591065871ae2c0c7101e4ab678801d26949a9bfe12ed7d1",
+      "sha256_remote": "a9f340cd07b26ed5e591065871ae2c0c7101e4ab678801d26949a9bfe12ed7d1"
+    },
+    {
+      "path": "assets/js/exercices/vi_1838.txt",
+      "status": "200",
+      "bytes_local": 1876,
+      "result": "match",
+      "sha256_local": "f42a5f62e3c2abd816472aba331ea372bbfe91398853e927eeb35abb39ea46e6",
+      "sha256_remote": "f42a5f62e3c2abd816472aba331ea372bbfe91398853e927eeb35abb39ea46e6"
+    },
+    {
+      "path": "assets/js/exercices/vi_1912.txt",
+      "status": "200",
+      "bytes_local": 1692,
+      "result": "match",
+      "sha256_local": "d47b504a307c6fc031396bcdcafecb1b26224bb771f55bcb434875174e38b8a6",
+      "sha256_remote": "d47b504a307c6fc031396bcdcafecb1b26224bb771f55bcb434875174e38b8a6"
+    },
+    {
+      "path": "assets/js/exercices/vi_2017.txt",
+      "status": "200",
+      "bytes_local": 2082,
+      "result": "match",
+      "sha256_local": "9209f19df6ef109c0f7eac145ddd12b226d8ce53e21815e7516194bc3ea686d7",
+      "sha256_remote": "9209f19df6ef109c0f7eac145ddd12b226d8ce53e21815e7516194bc3ea686d7"
+    },
+    {
+      "path": "assets/js/exercices/vi_2279.txt",
+      "status": "200",
+      "bytes_local": 2311,
+      "result": "match",
+      "sha256_local": "cd2ec8993de3d4c0dae7cf0d850f2214a83afe2654a8f1b9ca725154a750c67a",
+      "sha256_remote": "cd2ec8993de3d4c0dae7cf0d850f2214a83afe2654a8f1b9ca725154a750c67a"
+    },
+    {
+      "path": "assets/js/exercices/vi_2281.txt",
+      "status": "200",
+      "bytes_local": 2297,
+      "result": "match",
+      "sha256_local": "bbea72fee782da0b7b1b57942d5dcc45af1a0dd50d354b840a55a676e4eba7a1",
+      "sha256_remote": "bbea72fee782da0b7b1b57942d5dcc45af1a0dd50d354b840a55a676e4eba7a1"
+    },
+    {
+      "path": "assets/js/exercices/vi_3007.txt",
+      "status": "200",
+      "bytes_local": 3016,
+      "result": "match",
+      "sha256_local": "5b48d44b8b1af83ac526eb587582ddbff09e2c97451a1da95e29e0c91bb49a64",
+      "sha256_remote": "5b48d44b8b1af83ac526eb587582ddbff09e2c97451a1da95e29e0c91bb49a64"
+    },
+    {
+      "path": "assets/js/exercices/vi_4320.txt",
+      "status": "200",
+      "bytes_local": 4377,
+      "result": "match",
+      "sha256_local": "1609dd62e12756509385130ba8ec36469d1af3476acfec8c157eb32022465763",
+      "sha256_remote": "1609dd62e12756509385130ba8ec36469d1af3476acfec8c157eb32022465763"
+    },
+    {
+      "path": "assets/js/exercices/vi_711.txt",
+      "status": "200",
+      "bytes_local": 719,
+      "result": "match",
+      "sha256_local": "fc6e2d331343e0723feea721240f298a97f2bb771d4ee883482823d6fade1a50",
+      "sha256_remote": "fc6e2d331343e0723feea721240f298a97f2bb771d4ee883482823d6fade1a50"
+    },
+    {
+      "path": "assets/js/exercices/vi_737.txt",
+      "status": "200",
+      "bytes_local": 752,
+      "result": "match",
+      "sha256_local": "3382b1916750ec91369a499afde10174dc15de571af1de451f15ea4b9c895396",
+      "sha256_remote": "3382b1916750ec91369a499afde10174dc15de571af1de451f15ea4b9c895396"
+    },
+    {
+      "path": "assets/js/html.js",
+      "status": "200",
+      "bytes_local": 59754,
+      "result": "match",
+      "sha256_local": "ded85c29ac25fec4351d62045836c8bc96593da5f240e9ece3ba666f91c8c1f6",
+      "sha256_remote": "ded85c29ac25fec4351d62045836c8bc96593da5f240e9ece3ba666f91c8c1f6"
+    },
+    {
+      "path": "assets/js/javascript.js",
+      "status": "200",
+      "bytes_local": 47347,
+      "result": "match",
+      "sha256_local": "a3fe5537c68c75fa61b0f0724642f8074b0d705ee577b9d249313a25e7ddbb8e",
+      "sha256_remote": "a3fe5537c68c75fa61b0f0724642f8074b0d705ee577b9d249313a25e7ddbb8e"
+    },
+    {
+      "path": "assets/js/markdown.js",
+      "status": "200",
+      "bytes_local": 42816,
+      "result": "match",
+      "sha256_local": "13451107b3b9215f79caa037ea93d795ccd25903d80ab8f0f52b2c08112e173e",
+      "sha256_remote": "13451107b3b9215f79caa037ea93d795ccd25903d80ab8f0f52b2c08112e173e"
+    },
+    {
+      "path": "assets/js/python-execution.js",
+      "status": "200",
+      "bytes_local": 5837,
+      "result": "match",
+      "sha256_local": "559e6cd88ceb130dbfd958f2bb7910c463d51e2757e9f10ef659fd05fa2f6c63",
+      "sha256_remote": "559e6cd88ceb130dbfd958f2bb7910c463d51e2757e9f10ef659fd05fa2f6c63"
+    },
+    {
+      "path": "assets/js/python-files.js",
+      "status": "200",
+      "bytes_local": 7380,
+      "result": "match",
+      "sha256_local": "1c178f0a017f5ee401f62fa76da54f8c143885ec6d60d2ffdc24aaf384fe13c8",
+      "sha256_remote": "1c178f0a017f5ee401f62fa76da54f8c143885ec6d60d2ffdc24aaf384fe13c8"
+    },
+    {
+      "path": "assets/js/python-turtle.js",
+      "status": "200",
+      "bytes_local": 4898,
+      "result": "match",
+      "sha256_local": "6f5eebe9facef4d4f383b7e759e2e464133426893fed60379f12ebdaefe1a2d0",
+      "sha256_remote": "6f5eebe9facef4d4f383b7e759e2e464133426893fed60379f12ebdaefe1a2d0"
+    },
+    {
+      "path": "assets/js/python.js",
+      "status": "200",
+      "bytes_local": 37426,
+      "result": "match",
+      "sha256_local": "a64d6582fc5bcdffe4cda8a52fbac0608182336ecd3354389db213b9e0020466",
+      "sha256_remote": "a64d6582fc5bcdffe4cda8a52fbac0608182336ecd3354389db213b9e0020466"
+    },
+    {
+      "path": "assets/js/sql.js",
+      "status": "200",
+      "bytes_local": 48613,
+      "result": "match",
+      "sha256_local": "c20db4bc0e29adc68877caef67e685f893460eafcac37ad240bb17c46694e3fb",
+      "sha256_remote": "c20db4bc0e29adc68877caef67e685f893460eafcac37ad240bb17c46694e3fb"
+    },
+    {
+      "path": "assets/js/theme.js",
+      "status": "200",
+      "bytes_local": 2209,
+      "result": "match",
+      "sha256_local": "95796377b9ad6621a6f980ceb0fa4b708e8c5f5c58f7e6a8865d7caae56df19d",
+      "sha256_remote": "95796377b9ad6621a6f980ceb0fa4b708e8c5f5c58f7e6a8865d7caae56df19d"
+    },
+    {
+      "path": "assets/supports/Th_Ex.html",
+      "status": "200",
+      "bytes_local": 5857,
+      "result": "match",
+      "sha256_local": "c75da4663ddd94decbe019d6f5e68872abdb6742f4fce418a9b8af4c8eced0c9",
+      "sha256_remote": "c75da4663ddd94decbe019d6f5e68872abdb6742f4fce418a9b8af4c8eced0c9"
+    },
+    {
+      "path": "assets/supports/Th_Ex.pdf",
+      "status": "200",
+      "bytes_local": 1173837,
+      "result": "different",
+      "sha256_local": "97821d953d11e5a190161bdeee40e037a89df05917759a4422db61023eebc716",
+      "sha256_remote": "eb993956a48dfa514d623fbd7928b6197d37070c9512dae6d480ef8431355a54",
+      "review": "Le fichier publié correspond exactement à ../Th_Ex_2026.pdf (SHA-256 identique). Le PDF du dossier dev est plus ancien."
+    },
+    {
+      "path": "blockchain/html.zip",
+      "status": "200",
+      "bytes_local": 12738,
+      "result": "match",
+      "sha256_local": "c95de9e4f1e8ede9200074bef03b9f6c63106487acbf29102040b589b6ec8a34",
+      "sha256_remote": "c95de9e4f1e8ede9200074bef03b9f6c63106487acbf29102040b589b6ec8a34"
+    },
+    {
+      "path": "blockchain/index.html",
+      "status": "200",
+      "bytes_local": 11874,
+      "result": "match",
+      "sha256_local": "2502787dec0a86c31113e95dd0426ac4032437baaa0dc3656b3c18ead38f52a1",
+      "sha256_remote": "2502787dec0a86c31113e95dd0426ac4032437baaa0dc3656b3c18ead38f52a1"
+    },
+    {
+      "path": "blockchain/node/README.txt",
+      "status": "200",
+      "bytes_local": 5355,
+      "result": "match",
+      "sha256_local": "7a45877cf11de6d4a9b57d464eed26382591a0cee32c319855a42e632d272849",
+      "sha256_remote": "7a45877cf11de6d4a9b57d464eed26382591a0cee32c319855a42e632d272849"
+    },
+    {
+      "path": "blockchain/node/app.js",
+      "status": "200",
+      "bytes_local": 22239,
+      "result": "match",
+      "sha256_local": "008dfef0bbe13fedcf0e4b7a4871fef3c8c9847a748c1fb413675b70d6e31918",
+      "sha256_remote": "008dfef0bbe13fedcf0e4b7a4871fef3c8c9847a748c1fb413675b70d6e31918"
+    },
+    {
+      "path": "blockchain/node/index.html",
+      "status": "200",
+      "bytes_local": 7058,
+      "result": "match",
+      "sha256_local": "9ddea456f6be27d1769b1c6f3d02bec1ed4cf0124b1134c854b05c55a0e04b56",
+      "sha256_remote": "9ddea456f6be27d1769b1c6f3d02bec1ed4cf0124b1134c854b05c55a0e04b56"
+    },
+    {
+      "path": "blockchain/node/style.css",
+      "status": "200",
+      "bytes_local": 666,
+      "result": "match",
+      "sha256_local": "5259f8f5089c7e8fd824e6ddf80b916942855f5b24f2849f825dc8208214d4c6",
+      "sha256_remote": "5259f8f5089c7e8fd824e6ddf80b916942855f5b24f2849f825dc8208214d4c6"
+    },
+    {
+      "path": "blockchain/php.zip",
+      "status": "200",
+      "bytes_local": 16116,
+      "result": "match",
+      "sha256_local": "3c4cd57d93d5f57e7b21e138e460d9713d7e726bf8ee954936fc62899066468a",
+      "sha256_remote": "3c4cd57d93d5f57e7b21e138e460d9713d7e726bf8ee954936fc62899066468a"
+    },
+    {
+      "path": "blockchain/py.zip",
+      "status": "200",
+      "bytes_local": 10754,
+      "result": "match",
+      "sha256_local": "68c141bc833c4b5aa913c52a4ff1c47f28a2a6ee3c3b0fc6ff51dd9b19609f03",
+      "sha256_remote": "68c141bc833c4b5aa913c52a4ff1c47f28a2a6ee3c3b0fc6ff51dd9b19609f03"
+    },
+    {
+      "path": "exam/index.html",
+      "status": "200",
+      "bytes_local": 2638,
+      "result": "match",
+      "sha256_local": "a3d5ef8e428f20cc27070bf598495aed0881416641c453b06b798366cacac976",
+      "sha256_remote": "a3d5ef8e428f20cc27070bf598495aed0881416641c453b06b798366cacac976"
+    },
+    {
+      "path": "index.html",
+      "status": "200",
+      "bytes_local": 20787,
+      "result": "different",
+      "sha256_local": "435b56871f4d7358948ce240b1d55f891f60907fef64e7a5cca35c29b763851a",
+      "sha256_remote": "51223c7f1e95231104e6f07bce0d76d365267f8b2e531146a81795b76cebf3a8",
+      "review": "Différences relues : habillage WebeLi, coordonnées et navigation propres au site publié. Conservées."
+    },
+    {
+      "path": "labs/dactylo/index.html",
+      "status": "200",
+      "bytes_local": 17725,
+      "result": "match",
+      "sha256_local": "4383b4ace5d81c449c346dfdcd337026914dd264242093ce334efca484a9d6cd",
+      "sha256_remote": "4383b4ace5d81c449c346dfdcd337026914dd264242093ce334efca484a9d6cd"
+    },
+    {
+      "path": "labs/fonctionnalites.html",
+      "status": "200",
+      "bytes_local": 9967,
+      "result": "different",
+      "sha256_local": "257999f38b433b42bb48ca5ec591d6b8509b3935fc0063f64705af0d796a427f",
+      "sha256_remote": "b516dbdab20d5f68c8b291c33b9cdb8c0bb42d74216bd8f04ff5e72ba5794cdc",
+      "review": "Différences relues : habillage WebeLi, coordonnées et navigation propres au site publié. Conservées."
+    },
+    {
+      "path": "labs/html/index.html",
+      "status": "200",
+      "bytes_local": 20764,
+      "result": "match",
+      "sha256_local": "486cb3a9e46da1183249231c71484032d6c66ae067ab4954526e4524078103f1",
+      "sha256_remote": "486cb3a9e46da1183249231c71484032d6c66ae067ab4954526e4524078103f1"
+    },
+    {
+      "path": "labs/index.html",
+      "status": "200",
+      "bytes_local": 18149,
+      "result": "different",
+      "sha256_local": "92879dca33ab4a32ee2599881f398c8fa1e48d78f8005970595e8f939a30fb4f",
+      "sha256_remote": "b0f2fb1d743d80a0cd5e7dbb8f0b3ff7b69b327ec0f5745a9aa8a17a8acbc254",
+      "review": "Différences relues : habillage WebeLi, coordonnées et navigation propres au site publié. Conservées."
+    },
+    {
+      "path": "labs/javascript/index.html",
+      "status": "200",
+      "bytes_local": 14387,
+      "result": "match",
+      "sha256_local": "426c842a89fc4c17c3424e7c69830daa5bb3324a879200e19a8f18e104f02135",
+      "sha256_remote": "426c842a89fc4c17c3424e7c69830daa5bb3324a879200e19a8f18e104f02135"
+    },
+    {
+      "path": "labs/langages.html",
+      "status": "200",
+      "bytes_local": 8472,
+      "result": "different",
+      "sha256_local": "95cc928d150adaa8b250e67f81748ac61acfbacebb5eb88bfce05bca35dbc700",
+      "sha256_remote": "fb1bfa095153d5b52e2dfca6c7336042739f5dd312c0500927ff2207a08f2e7d",
+      "review": "Différences relues : habillage WebeLi, coordonnées et navigation propres au site publié. Conservées."
+    },
+    {
+      "path": "labs/markdown/index.html",
+      "status": "200",
+      "bytes_local": 17851,
+      "result": "match",
+      "sha256_local": "5b0981d2f22a7a969f4f70fb01a8e630d5e0d6150b65b4269fea322dd13255f2",
+      "sha256_remote": "5b0981d2f22a7a969f4f70fb01a8e630d5e0d6150b65b4269fea322dd13255f2"
+    },
+    {
+      "path": "labs/pedagogique.html",
+      "status": "200",
+      "bytes_local": 10028,
+      "result": "different",
+      "sha256_local": "743e3f2b633984393118272c09809b13337643f1031506ef64d008a376c90da9",
+      "sha256_remote": "c4d4753145488c372e6f551423c78feeb3923b2d7ec8d7c01dcbec9b365fddcb",
+      "review": "Différences relues : habillage WebeLi, coordonnées et navigation propres au site publié. Conservées."
+    },
+    {
+      "path": "labs/python/activities.json",
+      "status": "200",
+      "bytes_local": 6638,
+      "result": "match",
+      "sha256_local": "d0e6d72554738116c14e1e1a6f0ab997753a6bfc6232e7741e155594bfb4a0e5",
+      "sha256_remote": "d0e6d72554738116c14e1e1a6f0ab997753a6bfc6232e7741e155594bfb4a0e5"
+    },
+    {
+      "path": "labs/python/execution.py",
+      "status": "200",
+      "bytes_local": 2191,
+      "result": "match",
+      "sha256_local": "45680baef47059a010838eaddc2e2c03c4b714e1a00e1e5c913440bd2f0a6145",
+      "sha256_remote": "45680baef47059a010838eaddc2e2c03c4b714e1a00e1e5c913440bd2f0a6145"
+    },
+    {
+      "path": "labs/python/index.html",
+      "status": "200",
+      "bytes_local": 25513,
+      "result": "match",
+      "sha256_local": "0b0179b6aa4a4ec6e458723ca4216688863496a51bbd4351953386272fdc5ee8",
+      "sha256_remote": "0b0179b6aa4a4ec6e458723ca4216688863496a51bbd4351953386272fdc5ee8"
+    },
+    {
+      "path": "labs/python/runner.py",
+      "status": "200",
+      "bytes_local": 2400,
+      "result": "match",
+      "sha256_local": "68a2d1970746a40304b89b3c8db6de0b23899f0bd1b9de1b53209dda0f36068c",
+      "sha256_remote": "68a2d1970746a40304b89b3c8db6de0b23899f0bd1b9de1b53209dda0f36068c"
+    },
+    {
+      "path": "labs/python/virtual_files.py",
+      "status": "200",
+      "bytes_local": 7729,
+      "result": "match",
+      "sha256_local": "a1a05b978c5453d64bdf9ed70a621add0560c3cac85c233ce2b27286cf4695e9",
+      "sha256_remote": "a1a05b978c5453d64bdf9ed70a621add0560c3cac85c233ce2b27286cf4695e9"
+    },
+    {
+      "path": "labs/python/worker.js",
+      "status": "200",
+      "bytes_local": 3078,
+      "result": "match",
+      "sha256_local": "734d5c62fdab602d3ec74d4025e82567ebea91b73362bce432c3f80e2d06f18f",
+      "sha256_remote": "734d5c62fdab602d3ec74d4025e82567ebea91b73362bce432c3f80e2d06f18f"
+    },
+    {
+      "path": "labs/python/worker_runtime.py",
+      "status": "200",
+      "bytes_local": 2737,
+      "result": "match",
+      "sha256_local": "e3b7f5cbed19939b024baa428ce737800ef04a63d9ec9eb5a4afff8a10d94cad",
+      "sha256_remote": "e3b7f5cbed19939b024baa428ce737800ef04a63d9ec9eb5a4afff8a10d94cad"
+    },
+    {
+      "path": "labs/sql/index.html",
+      "status": "200",
+      "bytes_local": 17235,
+      "result": "match",
+      "sha256_local": "caa3c3d04946af174dda8f8d9311cb67da2845757db400cf095d9b5108ec74e4",
+      "sha256_remote": "caa3c3d04946af174dda8f8d9311cb67da2845757db400cf095d9b5108ec74e4"
+    },
+    {
+      "path": "merci.html",
+      "status": "200",
+      "bytes_local": 8436,
+      "result": "different",
+      "sha256_local": "bbe0cb2b5e8372e5ee5815791a36741ce94c955a93b4a58bc4f63fdeb9940080",
+      "sha256_remote": "cd79a11d782811c27f9cc996091faccbe66d657e8740726db664138d092a638d",
+      "review": "Différences relues : habillage WebeLi, coordonnées et navigation propres au site publié. Conservées."
+    },
+    {
+      "path": "stats.html",
+      "status": "200",
+      "bytes_local": 9852,
+      "result": "match",
+      "sha256_local": "dc4c77196566817fae16d7061e231d84dc9f86a83a45cd5edc7295778a6094e1",
+      "sha256_remote": "dc4c77196566817fae16d7061e231d84dc9f86a83a45cd5edc7295778a6094e1"
+    }
+  ],
+  "finalized_at": "2026-11-11T03:49:29.213895+00:00",
+  "publication_status": "verified_with_existing_markdown_issue",
+  "scope": "Validation après transfert du site statique, notamment de la mise à jour de l’atelier Python.",
+  "remote_mutations_performed": false,
+  "server_headers": {
+    "labs/python/": {
+      "http_status": 200,
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "require-corp"
+    },
+    "assets/aide/": {
+      "http_status": 200,
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "require-corp"
+    }
+  },
+  "checks": {
+    "static_validation": {
+      "command": "python3 tools/check_project.py",
+      "exit_code": 0
+    },
+    "unit_tests": {
+      "command": "python3 -m unittest discover -s tests -v",
+      "passed": 38,
+      "exit_code": 0
+    },
+    "browser_test_syntax": {
+      "command": "node --check tools/check_python_browser.cjs",
+      "exit_code": 0
+    },
+    "python_browser": {
+      "command": "PYTHON_LAB_URL=https://webe.li/tec/labs/python/ node tools/check_python_browser.cjs",
+      "browser": "Chromium / Playwright",
+      "exit_code": 0,
+      "log": [
+        "OK: Ctrl+S saves the current script; F12 chooses a new handle; cancellation preserves it.",
+        "OK: warm executions (median 7 ms), fresh globals and recovery after syntax errors.",
+        "OK: Escape interrupts from either editor, before Stop appears and with autocomplete open.",
+        "OK: infinite loop stays off the UI thread; delayed manual stop and restart.",
+        "OK: an already-open Python file sees edits made during execution.",
+        "OK: bounded console, retained writes, input, exceptions, append and readlines.",
+        "OK: Turtle, reload persistence, purple Project menu and red Stop on mobile.",
+        "OK: Ctrl+S and F12 download the script when direct saving is unavailable."
+      ]
+    },
+    "other_workshops": {
+      "functional_checks_passed": [
+        "Accueil publié",
+        "Exécution HTML",
+        "Exécution JavaScript",
+        "Rendu Markdown et restauration après rechargement",
+        "SQL : exécution, export et réimport de la base",
+        "Ouverture de la dactylographie",
+        "Lexique Python intégré et isolation du navigateur"
+      ],
+      "exit_code": 1,
+      "failure_reason": "L’assertion finale sans erreur JavaScript échoue sur la bibliothèque CommonJS highlight.js du Markdown. Les sept vérifications fonctionnelles précédentes réussissent."
+    }
+  },
+  "existing_issue": {
+    "checked_at": "2026-11-11T03:47:30.675Z",
+    "errors": [
+      {
+        "message": "require is not defined",
+        "stack": "ReferenceError: require is not defined\n    at https://webe.li/tec/assets/js/dist/highlight@11.11.1/common_min.js:7:10"
+      }
+    ],
+    "rendered_code": "print(42)\n",
+    "description": "assets/js/dist/highlight@11.11.1/common_min.js utilise require, absent dans le navigateur. Le fichier local et le fichier publié ont la même empreinte. Le titre Markdown et le bloc de code restent rendus. Cette bibliothèque ne fait pas partie des modifications Python vérifiées."
+  },
+  "local_test_change": "Le test attend l’écriture de conserve.txt et la sortie de la boucle avant de cliquer sur Arrêter, pour éviter une interruption pendant le chargement réseau d’un Worker froid. Les assertions de conservation et de console bornée sont maintenues."
+}

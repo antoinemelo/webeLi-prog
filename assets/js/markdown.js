@@ -223,16 +223,37 @@
     }
 
     // ---------- marked configuration ----------
-    marked.setOptions({
+    const codeTheme = document.getElementById('hljs-theme');
+    const darkCodeTheme = codeTheme.href;
+    const lightCodeTheme = new URL('github_min.css', darkCodeTheme).href;
+    function syncCodeTheme() {
+      const light = document.documentElement.dataset.theme === 'light'
+        || document.body.classList.contains('view-only');
+      const href = light ? lightCodeTheme : darkCodeTheme;
+      if (codeTheme.href !== href) codeTheme.href = href;
+    }
+    new MutationObserver(syncCodeTheme).observe(document.documentElement, {
+      attributes: true, attributeFilter: ['data-theme']
+    });
+    syncCodeTheme();
+
+    marked.use({
       breaks: true,
       gfm: true,
-      highlight: (code, lang) => {
-        try {
-          if (lang && hljs.getLanguage(lang)) {
-            return hljs.highlight(code, {language: lang}).value;
+      renderer: {
+        code({text, lang}) {
+          const language = (lang || '').trim().split(/\s+/)[0];
+          // Keep Marked's escaped plain-code rendering for unsupported languages.
+          if (!window.hljs || (language && !hljs.getLanguage(language))) return false;
+          try {
+            const result = language
+              ? hljs.highlight(text, {language, ignoreIllegals: true})
+              : hljs.highlightAuto(text);
+            return `<pre><code class="hljs">${result.value}\n</code></pre>\n`;
+          } catch (_) {
+            return false;
           }
-        } catch(_) {}
-        return hljs.highlightAuto(code).value;
+        }
       }
     });
 

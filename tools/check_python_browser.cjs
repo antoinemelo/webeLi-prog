@@ -161,6 +161,11 @@ const assert = require('node:assert/strict');
     console.log('OK: an already-open Python file sees edits made during execution.');
 
     await start('with open("conserve.txt", "w") as fd:\n    fd.write("conservé après arrêt")\nwhile True:\n    print("x" * 1000)');
+    // A cold Worker may still be loading when Stop appears on the published site.
+    // Wait for the write and output before testing their retention and size limit.
+    await page.waitForFunction(() =>
+      document.querySelector('textarea[aria-label="conserve.txt"]')?.value === 'conservé après arrêt'
+      && document.getElementById('output').textContent.includes('x'.repeat(1000)), null, {timeout: 60000});
     await page.locator('#stopPython').waitFor({state: 'visible', timeout: 8000});
     assert((await page.locator('#output').innerText()).length <= 100000);
     await stop();

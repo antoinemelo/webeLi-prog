@@ -105,3 +105,67 @@ rouge différé, l'édition des fichiers pendant une boucle, la conservation des
 écritures après interruption, la console bornée, `input()` et Turtle. Les
 variables `PLAYWRIGHT_MODULE`, `CHROMIUM_EXECUTABLE` et `PYTHON_LAB_URL`
 permettent de préciser le module, le navigateur et l'adresse de test.
+
+Pour la régression navigateur Markdown, avec les mêmes prérequis :
+
+```bash
+node tools/check_markdown_browser.cjs
+```
+
+`MARKDOWN_LAB_URL` permet de tester le site publié. Le test vérifie la coloration
+des blocs de code, les thèmes clair et sombre, les langages inconnus, la
+restauration après rechargement et l'export HTML. Il vérifie aussi le rendu sans
+la bibliothèque de coloration et l'absence d'erreur JavaScript.
+
+## Vérification après publication du 11 novembre 2026
+
+La publication sur `https://webe.li/tec/` a été contrôlée après le transfert.
+Le site est statique : aucune migration applicative ni activation supplémentaire
+n'est nécessaire. Les contrôles de l'atelier Python sont terminés avec succès.
+Le [rapport de vérification](publication-2026-11-11.json) conserve les empreintes
+des fichiers et les résultats.
+
+- 186 fichiers accessibles en HTTP 200, dont 178 identiques au dossier `dev`.
+  Les sept pages HTML différentes contiennent l'habillage WebeLi et la navigation
+  du site publié ; le PDF publié correspond exactement à `../Th_Ex_2026.pdf`.
+- En-têtes d'isolation actifs pour Python et son lexique, avec vérification
+  de `crossOriginIsolated` et du chargement du lexique intégré.
+- Validation statique, 38 tests unitaires et régression navigateur Python réussis
+  sur le site publié, y compris sauvegarde, interruption, fichiers en direct,
+  Turtle, restauration après rechargement et affichage mobile.
+- Accueil, HTML, JavaScript, rendu et restauration Markdown, export/import SQL
+  et ouverture de la dactylographie vérifiés.
+
+Le test de conservation des fichiers attend désormais l'écriture et la sortie
+du programme avant l'arrêt : en ligne, un Worker froid peut encore charger
+l'interpréteur lorsque le bouton Arrêter apparaît.
+
+Une anomalie distincte avait été détectée dans la bibliothèque de coloration Markdown :
+`assets/js/dist/highlight@11.11.1/common_min.js` est une version CommonJS et produit
+`require is not defined` dans le navigateur. Le rendu Markdown fonctionnait,
+y compris les blocs de code, mais cette anomalie faisait échouer le contrôle
+général « aucune erreur JavaScript ». Aucun fichier distant ni aucune donnée
+de production n'a été modifié pendant cette vérification initiale.
+
+### Correctif Markdown publié le 11 novembre 2026
+
+L'anomalie est corrigée en local et sur le site. La page charge désormais le
+[fichier navigateur officiel de highlight.js 11.11.1](https://github.com/highlightjs/cdn-release/tree/11.11.1/build)
+(`highlight_min.js`) et sa licence BSD-3-Clause est conservée avec la bibliothèque.
+Le rendu utilise l'API `renderer.code` de Marked ; l'ancienne option `highlight`
+était ignorée par la version 16.2.1 embarquée. Le thème GitHub clair est chargé
+lorsque l'interface est claire ; la palette sombre reste utilisée en mode sombre.
+Les langages inconnus restent du texte échappé. Le script de l'atelier porte
+une nouvelle référence de cache pour charger le correctif après actualisation.
+
+Cinq fichiers ont été publiés par FTPS, après sauvegarde des deux fichiers
+remplacés dans `../.publication-backups/markdown-20261111T035900Z/`. Chaque transfert
+a été relu et vérifié. Aucun fichier distant n'a été supprimé.
+
+La validation statique, les 38 tests unitaires et la régression navigateur
+Markdown passent. Cette dernière a été exécutée en local puis en ligne :
+coloration de plusieurs langages, thèmes, restauration, export HTML et rendu
+sans la bibliothèque de coloration. Le contrôle général des ateliers passe
+également sans erreur JavaScript ni réponse HTTP en échec.
+Le [rapport du correctif](markdown-correction-2026-11-11.json) conserve les résultats,
+les empreintes des fichiers publiés et la référence de sauvegarde.
